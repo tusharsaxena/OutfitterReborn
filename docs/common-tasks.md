@@ -85,7 +85,9 @@ One row in `defaults/Zones.lua`, `{ id = "BG_<NAME>", kind = "bg" | "arena", map
 place in wear order, and nothing else: the map lookup, the order, the state events and the trigger
 row are derived from it at load, so the five tables the fork kept by hand cannot drift. Take the map
 IDs from `Map.db2` (<https://wago.tools/db2/Map>, `InstanceType` 3 or 4) with `tools/gen-zones.lua`,
-never from memory. The display name comes from `GetRealZoneText(mapID)`, so no locale key is needed.
+never from memory. A seed re-validation run (`tools/seeds/seeds.py`, [validate-seeds.md](validate-seeds.md))
+proposes every such map a client's pinned build has and no row holds. The display name comes from
+`GetRealZoneText(mapID)`, so no locale key is needed.
 
 ## Add a locale string
 

@@ -1,0 +1,545 @@
+{
+ "build": "12.1.5.70783",
+ "buildCreated": "2026-11-04 00:38:01",
+ "candidates": [
+  {
+   "id": 102547,
+   "key": "AURA_SPELL_STATE:102547",
+   "list": "AURA_SPELL_STATE",
+   "name": "Prowl",
+   "notes": [
+    "twin of 5215",
+    "lines: Druid",
+    "auras: 4, 16, 107"
+   ],
+   "source": "same-name",
+   "target": null
+  },
+  {
+   "id": 18,
+   "key": "DIFFICULTY_GROUPS.NONE:18",
+   "list": "DIFFICULTY_GROUPS.NONE",
+   "name": "Event",
+   "notes": [
+    "InstanceType 2",
+    "MaxPlayers 40"
+   ],
+   "source": "difficulty",
+   "target": null
+  },
+  {
+   "id": 19,
+   "key": "DIFFICULTY_GROUPS.NONE:19",
+   "list": "DIFFICULTY_GROUPS.NONE",
+   "name": "Event",
+   "notes": [
+    "InstanceType 1",
+    "MaxPlayers 5"
+   ],
+   "source": "difficulty",
+   "target": null
+  },
+  {
+   "id": 24,
+   "key": "DIFFICULTY_GROUPS.NONE:24",
+   "list": "DIFFICULTY_GROUPS.NONE",
+   "name": "Timewalking",
+   "notes": [
+    "InstanceType 1",
+    "MaxPlayers 5"
+   ],
+   "source": "difficulty",
+   "target": null
+  },
+  {
+   "id": 33,
+   "key": "DIFFICULTY_GROUPS.NONE:33",
+   "list": "DIFFICULTY_GROUPS.NONE",
+   "name": "Timewalking",
+   "notes": [
+    "InstanceType 2",
+    "MaxPlayers 30"
+   ],
+   "source": "difficulty",
+   "target": null
+  },
+  {
+   "id": 150,
+   "key": "DIFFICULTY_GROUPS.NONE:150",
+   "list": "DIFFICULTY_GROUPS.NONE",
+   "name": "Normal Scaling (1-5)",
+   "notes": [
+    "InstanceType 1",
+    "MaxPlayers 5"
+   ],
+   "source": "difficulty",
+   "target": null
+  },
+  {
+   "id": 151,
+   "key": "DIFFICULTY_GROUPS.NONE:151",
+   "list": "DIFFICULTY_GROUPS.NONE",
+   "name": "Looking For Raid",
+   "notes": [
+    "InstanceType 2",
+    "MaxPlayers 30"
+   ],
+   "source": "difficulty",
+   "target": null
+  },
+  {
+   "id": 205,
+   "key": "DIFFICULTY_GROUPS.NONE:205",
+   "list": "DIFFICULTY_GROUPS.NONE",
+   "name": "Follower",
+   "notes": [
+    "InstanceType 1",
+    "MaxPlayers 5"
+   ],
+   "source": "difficulty",
+   "target": null
+  },
+  {
+   "id": 216,
+   "key": "DIFFICULTY_GROUPS.NONE:216",
+   "list": "DIFFICULTY_GROUPS.NONE",
+   "name": "Quest",
+   "notes": [
+    "InstanceType 1",
+    "MaxPlayers 5"
+   ],
+   "source": "difficulty",
+   "target": null
+  },
+  {
+   "id": 220,
+   "key": "DIFFICULTY_GROUPS.NONE:220",
+   "list": "DIFFICULTY_GROUPS.NONE",
+   "name": "Story",
+   "notes": [
+    "InstanceType 2",
+    "MaxPlayers 10"
+   ],
+   "source": "difficulty",
+   "target": null
+  },
+  {
+   "id": 232,
+   "key": "DIFFICULTY_GROUPS.NONE:232",
+   "list": "DIFFICULTY_GROUPS.NONE",
+   "name": "Event",
+   "notes": [
+    "InstanceType 1",
+    "MaxPlayers 5"
+   ],
+   "source": "difficulty",
+   "target": null
+  },
+  {
+   "id": 233,
+   "key": "DIFFICULTY_GROUPS.NONE:233",
+   "list": "DIFFICULTY_GROUPS.NONE",
+   "name": "Mythic - Flexible Raiding",
+   "notes": [
+    "InstanceType 2",
+    "MaxPlayers 25"
+   ],
+   "source": "difficulty",
+   "target": null
+  },
+  {
+   "id": 236,
+   "key": "DIFFICULTY_GROUPS.NONE:236",
+   "list": "DIFFICULTY_GROUPS.NONE",
+   "name": "Lorewalking",
+   "notes": [
+    "InstanceType 1",
+    "MaxPlayers 5"
+   ],
+   "source": "difficulty",
+   "target": null
+  },
+  {
+   "id": 241,
+   "key": "DIFFICULTY_GROUPS.NONE:241",
+   "list": "DIFFICULTY_GROUPS.NONE",
+   "name": "Lorewalking",
+   "notes": [
+    "InstanceType 2",
+    "MaxPlayers 10"
+   ],
+   "source": "difficulty",
+   "target": null
+  },
+  {
+   "id": 250,
+   "key": "DIFFICULTY_GROUPS.NONE:250",
+   "list": "DIFFICULTY_GROUPS.NONE",
+   "name": "World",
+   "notes": [
+    "InstanceType 2",
+    "MaxPlayers 40"
+   ],
+   "source": "difficulty",
+   "target": null
+  },
+  {
+   "id": 257,
+   "key": "DIFFICULTY_GROUPS.NONE:257",
+   "list": "DIFFICULTY_GROUPS.NONE",
+   "name": "Timewalking",
+   "notes": [
+    "InstanceType 2",
+    "MaxPlayers 30"
+   ],
+   "source": "difficulty",
+   "target": null
+  }
+ ],
+ "date": "2026-11-15",
+ "flags": [
+  {
+   "comment": "Travel Form",
+   "file": "defaults/TriggerData.lua",
+   "id": 783,
+   "key": "shipped:wrong-kind:FORM_SPELL_STATE:783",
+   "kind": "wrong-kind",
+   "list": "FORM_SPELL_STATE",
+   "name": "Travel Form",
+   "notes": [
+    "auras: 4"
+   ],
+   "why": "no shapeshift aura (36)"
+  },
+  {
+   "comment": "rogue Stealth",
+   "file": "defaults/TriggerData.lua",
+   "id": 1784,
+   "key": "shipped:wrong-kind:FORM_SPELL_STATE:1784",
+   "kind": "wrong-kind",
+   "list": "FORM_SPELL_STATE",
+   "name": "Stealth",
+   "notes": [
+    "auras: 4, 107, 129, 443"
+   ],
+   "why": "no shapeshift aura (36)"
+  },
+  {
+   "comment": "Lockpicking",
+   "file": "defaults/TriggerData.lua",
+   "id": 633,
+   "key": "shipped:gone:SKILL_LINES:633",
+   "kind": "gone",
+   "list": "SKILL_LINES",
+   "name": "",
+   "notes": [],
+   "why": ""
+  },
+  {
+   "comment": "Rogue, Fortune",
+   "file": "defaults/Items.lua",
+   "id": 134552,
+   "key": "shipped:renamed:ITEM.PHANTOM_IDS:134552",
+   "kind": "renamed",
+   "list": "ITEM.PHANTOM_IDS",
+   "name": "The Dreadblades",
+   "notes": [
+    "ClassID 2, SubclassID 7, InventoryType 22"
+   ],
+   "why": ""
+  },
+  {
+   "comment": "Rogue, Akaari's Will",
+   "file": "defaults/Items.lua",
+   "id": 128479,
+   "key": "shipped:renamed:ITEM.PHANTOM_IDS:128479",
+   "kind": "renamed",
+   "list": "ITEM.PHANTOM_IDS",
+   "name": "Fangs of the Devourer",
+   "notes": [
+    "ClassID 2, SubclassID 15, InventoryType 22"
+   ],
+   "why": ""
+  },
+  {
+   "comment": "Warrior, Helya's Wrath",
+   "file": "defaults/Items.lua",
+   "id": 134553,
+   "key": "shipped:renamed:ITEM.PHANTOM_IDS:134553",
+   "kind": "renamed",
+   "list": "ITEM.PHANTOM_IDS",
+   "name": "Warswords of the Valarjar",
+   "notes": [
+    "ClassID 2, SubclassID 8, InventoryType 17"
+   ],
+   "why": ""
+  },
+  {
+   "comment": "Scroll of Protection V",
+   "file": "defaults/Items.lua",
+   "id": 27503,
+   "key": "shipped:renamed:ITEM.CORRECTIONS:27503",
+   "kind": "renamed",
+   "list": "ITEM.CORRECTIONS",
+   "name": "Scroll of Strength V",
+   "notes": [
+    "ClassID 0, SubclassID 8, InventoryType 0"
+   ],
+   "why": ""
+  }
+ ],
+ "flavor": "retail",
+ "handMissing": [],
+ "product": "wow",
+ "shipped": 172,
+ "shippedByKind": {
+  "battlepet": 2,
+  "creature": 23,
+  "difficulty": 15,
+  "icon": 26,
+  "item": 40,
+  "map": 44,
+  "skillline": 8,
+  "spell": 11,
+  "uimap": 3
+ },
+ "sources": [
+  {
+   "rows": 377,
+   "sha256": "1b8fcd3546d042f9897ddd2897ff53f7f60c72d5aba9ccf5cfb372134af6226a",
+   "size": 11360399,
+   "table": "SpellName",
+   "url": "https://wago.tools/db2/SpellName/csv?build=12.1.5.70783",
+   "why": "spell names: existence, the comment check, the same-name candidates"
+  },
+  {
+   "rows": 720,
+   "sha256": "cd9c42bb86e807f6ce0b680162ec551d75c3a79d28b253e60c61a56267561d73",
+   "size": 57345581,
+   "table": "SpellEffect",
+   "url": "https://wago.tools/db2/SpellEffect/csv?build=12.1.5.70783",
+   "why": "Effect / EffectAura on DifficultyID 0: the aura, shapeshift and tracking kind checks"
+  },
+  {
+   "rows": 19,
+   "sha256": "0fa7ed0fdd2004c405e574115412c4bc11c9df2e9a9122059b63782af9f71b64",
+   "size": 941378,
+   "table": "SkillLineAbility",
+   "url": "https://wago.tools/db2/SkillLineAbility/csv?build=12.1.5.70783",
+   "why": "Spell -> SkillLine: a same-name candidate must be learnable on a player line"
+  },
+  {
+   "rows": 397,
+   "sha256": "fefa339fbbaec7de820efcc8650eab142fda67aebf47e3753dcb41aac54932ee",
+   "size": 28460,
+   "table": "SkillLine",
+   "url": "https://wago.tools/db2/SkillLine/csv?build=12.1.5.70783",
+   "why": "DisplayName_lang of the profession lines; the line names that fence pet lines out"
+  },
+  {
+   "rows": 60,
+   "sha256": "5b5909ea3319a9596ba4472256ef8901e24c67d2b10638259bfabc652268a23e",
+   "size": 2957,
+   "table": "Difficulty",
+   "url": "https://wago.tools/db2/Difficulty/csv?build=12.1.5.70783",
+   "why": "InstanceType of each difficulty id; the difficulty candidates"
+  },
+  {
+   "rows": 1187,
+   "sha256": "9039064c63905730a8112cbb9b805de2f43520040fc9c04cf36d1c548434b524",
+   "size": 165366,
+   "table": "Map",
+   "url": "https://wago.tools/db2/Map/csv?build=12.1.5.70783",
+   "why": "InstanceType 3 (battleground) / 4 (arena) of every zone row's map id; the instance candidates"
+  },
+  {
+   "rows": 40,
+   "sha256": "9dc76656a83fa67f036b7748b29c534949f08ca7cdd9d861ee3317378a5ab7b3",
+   "size": 9104906,
+   "table": "Item",
+   "url": "https://wago.tools/db2/Item/csv?build=12.1.5.70783",
+   "why": "ClassID / InventoryType: the phantom and lance kind checks"
+  },
+  {
+   "rows": 40,
+   "sha256": "89910dad9e9a56a4446a0f8ad9c64f79c10267c26ee4f866bd7265db32e433a8",
+   "size": 51699329,
+   "table": "ItemSparse",
+   "url": "https://wago.tools/db2/ItemSparse/csv?build=12.1.5.70783",
+   "why": "Display_lang: item existence and the comment check"
+  },
+  {
+   "rows": 25,
+   "sha256": "9436292e89b49ac62401053ed6c464002065cc54faeaa815addad17acc989a59",
+   "size": 9376595,
+   "table": "ManifestInterfaceData",
+   "url": "https://wago.tools/db2/ManifestInterfaceData/csv?build=12.1.5.70783",
+   "why": "FilePath of each icon file id"
+  },
+  {
+   "rows": 3,
+   "sha256": "fbc828f3a355d9448aea86007801406cd5de00b8de1f7229476ce8996750d8bb",
+   "size": 1563559,
+   "table": "Creature",
+   "url": "https://wago.tools/db2/Creature/csv?build=12.1.5.70783",
+   "why": "Name_lang of the quest NPCs and the cooking pets (Retail-only lists)"
+  },
+  {
+   "rows": 1967,
+   "sha256": "c07589d908b00d7d079e9e88b8c50d80ae8bd36631a661615bd7e636e5bbb7b3",
+   "size": 99372,
+   "table": "UiMap",
+   "url": "https://wago.tools/db2/UiMap/csv?build=12.1.5.70783",
+   "why": "Name_lang / ParentUiMapID of the Vashj'ir uiMaps (a Retail-only list)"
+  },
+  {
+   "rows": 2,
+   "sha256": "c38ac4b6b85d31bbcb7ae56b696907a4d0ec807f1409b4d2cb0a5dc29b88a450",
+   "size": 510451,
+   "table": "BattlePetSpecies",
+   "url": "https://wago.tools/db2/BattlePetSpecies/csv?build=12.1.5.70783",
+   "why": "CreatureID of the cooking pets' species (a Retail-only list)"
+  }
+ ],
+ "tool": "tools/seeds/seeds.py derive",
+ "uncheckable": [
+  {
+   "comment": "Stabled Argent Warhorse",
+   "id": 33870,
+   "list": "ARGENT_MOUNTS",
+   "why": "Creature.db2 carries a subset; the server supplies this NPC"
+  },
+  {
+   "comment": "Stabled Campaign Warhorse",
+   "id": 34125,
+   "list": "ARGENT_MOUNTS",
+   "why": "Creature.db2 carries a subset; the server supplies this NPC"
+  },
+  {
+   "comment": "Stabled Exodar Elekk",
+   "id": 33790,
+   "list": "ARGENT_MOUNTS",
+   "why": "Creature.db2 carries a subset; the server supplies this NPC"
+  },
+  {
+   "comment": "Stabled Gnomeregan Mechanostrider",
+   "id": 33793,
+   "list": "ARGENT_MOUNTS",
+   "why": "Creature.db2 carries a subset; the server supplies this NPC"
+  },
+  {
+   "comment": "Stabled Darnassian Nightsaber",
+   "id": 33794,
+   "list": "ARGENT_MOUNTS",
+   "why": "Creature.db2 carries a subset; the server supplies this NPC"
+  },
+  {
+   "comment": "Stabled Ironforge Ram",
+   "id": 33795,
+   "list": "ARGENT_MOUNTS",
+   "why": "Creature.db2 carries a subset; the server supplies this NPC"
+  },
+  {
+   "comment": "Stabled Stormwind Steed",
+   "id": 33800,
+   "list": "ARGENT_MOUNTS",
+   "why": "Creature.db2 carries a subset; the server supplies this NPC"
+  },
+  {
+   "comment": "Stabled Quel'dorei Steed",
+   "id": 33843,
+   "list": "ARGENT_MOUNTS",
+   "why": "Creature.db2 carries a subset; the server supplies this NPC"
+  },
+  {
+   "comment": "Argent Warhorse",
+   "id": 36557,
+   "list": "ARGENT_MOUNTS",
+   "why": "Creature.db2 carries a subset; the server supplies this NPC"
+  },
+  {
+   "comment": "Stabled Silvermoon Hawkstrider",
+   "id": 33791,
+   "list": "ARGENT_MOUNTS",
+   "why": "Creature.db2 carries a subset; the server supplies this NPC"
+  },
+  {
+   "comment": "Stabled Thunder Bluff Kodo",
+   "id": 33792,
+   "list": "ARGENT_MOUNTS",
+   "why": "Creature.db2 carries a subset; the server supplies this NPC"
+  },
+  {
+   "comment": "Stabled Darkspear Raptor",
+   "id": 33796,
+   "list": "ARGENT_MOUNTS",
+   "why": "Creature.db2 carries a subset; the server supplies this NPC"
+  },
+  {
+   "comment": "Stabled Forsaken Warhorse",
+   "id": 33798,
+   "list": "ARGENT_MOUNTS",
+   "why": "Creature.db2 carries a subset; the server supplies this NPC"
+  },
+  {
+   "comment": "Stabled Orgrimmar Wolf",
+   "id": 33799,
+   "list": "ARGENT_MOUNTS",
+   "why": "Creature.db2 carries a subset; the server supplies this NPC"
+  },
+  {
+   "comment": "Stabled Sunreaver Hawkstrider",
+   "id": 33842,
+   "list": "ARGENT_MOUNTS",
+   "why": "Creature.db2 carries a subset; the server supplies this NPC"
+  },
+  {
+   "comment": "Argent Battleworg",
+   "id": 36558,
+   "list": "ARGENT_MOUNTS",
+   "why": "Creature.db2 carries a subset; the server supplies this NPC"
+  },
+  {
+   "comment": "Aviana's Guardian",
+   "id": 39710,
+   "list": "VIGILANCE_NPCS",
+   "why": "Creature.db2 carries a subset; the server supplies this NPC"
+  },
+  {
+   "comment": "Aviana's Guardian",
+   "id": 40719,
+   "list": "VIGILANCE_NPCS",
+   "why": "Creature.db2 carries a subset; the server supplies this NPC"
+  },
+  {
+   "comment": "Aviana's Guardian",
+   "id": 40720,
+   "list": "VIGILANCE_NPCS",
+   "why": "Creature.db2 carries a subset; the server supplies this NPC"
+  },
+  {
+   "comment": "Aviana's Guardian",
+   "id": 40723,
+   "list": "VIGILANCE_NPCS",
+   "why": "Creature.db2 carries a subset; the server supplies this NPC"
+  },
+  {
+   "comment": "Salvaged Siege Engine",
+   "id": 33060,
+   "list": "LEVIATHAN_NPCS",
+   "why": "Creature.db2 carries a subset; the server supplies this NPC"
+  },
+  {
+   "comment": "Salvaged Demolisher",
+   "id": 33109,
+   "list": "LEVIATHAN_NPCS",
+   "why": "Creature.db2 carries a subset; the server supplies this NPC"
+  },
+  {
+   "comment": "Salvaged Chopper",
+   "id": 33062,
+   "list": "LEVIATHAN_NPCS",
+   "why": "Creature.db2 carries a subset; the server supplies this NPC"
+  }
+ ]
+}

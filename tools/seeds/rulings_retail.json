@@ -1,0 +1,94 @@
+{
+  "AURA_SPELL_STATE:102547": {
+    "reason": "needs owner review: a Druid-line Prowl with MOD_STEALTH (aura 16), the variant a druid casts in combat under Incarnation: Avatar of Ashamane; a Retail-only id here needs the NS.PerClient key shape Shadowmeld uses, and which id the player's aura carries is unconfirmed in game",
+    "ruling": "reject"
+  },
+  "DIFFICULTY_GROUPS.NONE:150": {
+    "reason": "needs owner review: Normal Scaling (1-5) (InstanceType 1) fits none of the groups design 6.8.1 row 17 lists, and the header does not name it among the ids left out",
+    "ruling": "reject"
+  },
+  "DIFFICULTY_GROUPS.NONE:151": {
+    "reason": "the TriggerData.lua header (O24, 2026-11-03) leaves 151 (the second Looking For Raid row) out: no group the design lists covers it",
+    "ruling": "reject"
+  },
+  "DIFFICULTY_GROUPS.NONE:18": {
+    "reason": "needs owner review: Event (InstanceType 2) fits none of the groups design 6.8.1 row 17 lists, and the header does not name it among the ids left out",
+    "ruling": "reject"
+  },
+  "DIFFICULTY_GROUPS.NONE:19": {
+    "reason": "needs owner review: Event (InstanceType 1) fits none of the groups design 6.8.1 row 17 lists, and the header does not name it among the ids left out",
+    "ruling": "reject"
+  },
+  "DIFFICULTY_GROUPS.NONE:205": {
+    "reason": "the TriggerData.lua header (O24, 2026-11-03) leaves 205 (Follower) out: no group the design lists covers it",
+    "ruling": "reject"
+  },
+  "DIFFICULTY_GROUPS.NONE:216": {
+    "reason": "needs owner review: Quest (InstanceType 1) fits none of the groups design 6.8.1 row 17 lists, and the header does not name it among the ids left out",
+    "ruling": "reject"
+  },
+  "DIFFICULTY_GROUPS.NONE:220": {
+    "reason": "the TriggerData.lua header (O24, 2026-11-03) leaves 220 (Story) out: no group the design lists covers it",
+    "ruling": "reject"
+  },
+  "DIFFICULTY_GROUPS.NONE:232": {
+    "reason": "needs owner review: Event (InstanceType 1) fits none of the groups design 6.8.1 row 17 lists, and the header does not name it among the ids left out",
+    "ruling": "reject"
+  },
+  "DIFFICULTY_GROUPS.NONE:233": {
+    "reason": "the TriggerData.lua header (O24, 2026-11-03) leaves 233 (the second Mythic raid row) out: no group the design lists covers it",
+    "ruling": "reject"
+  },
+  "DIFFICULTY_GROUPS.NONE:236": {
+    "reason": "needs owner review: Lorewalking (InstanceType 1) fits none of the groups design 6.8.1 row 17 lists, and the header does not name it among the ids left out",
+    "ruling": "reject"
+  },
+  "DIFFICULTY_GROUPS.NONE:24": {
+    "reason": "the TriggerData.lua header (O24, 2026-11-03) leaves 24 (Timewalking) out: no group the design lists covers it",
+    "ruling": "reject"
+  },
+  "DIFFICULTY_GROUPS.NONE:241": {
+    "reason": "needs owner review: Lorewalking (InstanceType 2) fits none of the groups design 6.8.1 row 17 lists, and the header does not name it among the ids left out",
+    "ruling": "reject"
+  },
+  "DIFFICULTY_GROUPS.NONE:250": {
+    "reason": "needs owner review: World (InstanceType 2) fits none of the groups design 6.8.1 row 17 lists, and the header does not name it among the ids left out",
+    "ruling": "reject"
+  },
+  "DIFFICULTY_GROUPS.NONE:257": {
+    "reason": "a raid Timewalking row, like 33 which the TriggerData.lua header leaves out (O24); no group the design lists covers Timewalking",
+    "ruling": "reject"
+  },
+  "DIFFICULTY_GROUPS.NONE:33": {
+    "reason": "the TriggerData.lua header (O24, 2026-11-03) leaves 33 (Timewalking) out: no group the design lists covers it",
+    "ruling": "reject"
+  },
+  "shipped:gone:SKILL_LINES:633": {
+    "reason": "needs owner review: Retail's SkillLine has no row 633; GetTradeSkillDisplayName(633) then reads nothing and D4's L[\"Requires Lockpicking\"] fallback carries LOCKPICKING; O22's client check decides whether the line or the fallback stays",
+    "ruling": "keep"
+  },
+  "shipped:renamed:ITEM.CORRECTIONS:27503": {
+    "reason": "needs owner review: 27503 is Scroll of Strength V on this build, while the legacy comment says Scroll of Protection V (27500); the correction (subType Scroll) fits either, so whether the legacy meant 27500 is the owner's call (Outfitter.lua:3903-3908)",
+    "ruling": "keep"
+  },
+  "shipped:renamed:ITEM.PHANTOM_IDS:128479": {
+    "reason": "same item (ClassID 2, an artifact weapon): ItemSparse names the artifact pair Fangs of the Devourer while the comment names the half the legacy table named (Outfitter.lua:625-646); legacy parity, the id stands",
+    "ruling": "keep"
+  },
+  "shipped:renamed:ITEM.PHANTOM_IDS:134552": {
+    "reason": "same item (ClassID 2, an artifact weapon): ItemSparse names the artifact pair The Dreadblades while the comment names the half the legacy table named (Outfitter.lua:625-646); legacy parity, the id stands",
+    "ruling": "keep"
+  },
+  "shipped:renamed:ITEM.PHANTOM_IDS:134553": {
+    "reason": "same item (ClassID 2, an artifact weapon): ItemSparse names the artifact pair Warswords of the Valarjar while the comment names the half the legacy table named (Outfitter.lua:625-646); legacy parity, the id stands",
+    "ruling": "keep"
+  },
+  "shipped:wrong-kind:FORM_SPELL_STATE:1784": {
+    "reason": "needs owner review: rogue Stealth's form-bar id (legacy parity, Outfitter.lua:1297-1307; States.lua reads it as a form with no aura); this build gives 1784 aura 443 in place of the shapeshift aura 36, so confirm in game that GetShapeshiftFormInfo still reports 1784 while stealthed",
+    "ruling": "keep"
+  },
+  "shipped:wrong-kind:FORM_SPELL_STATE:783": {
+    "reason": "the Travel Form button's id, which GetShapeshiftFormInfo reports; on this build 783 sets the form through a dummy aura (4) and the spell it selects, so DB2 shows no aura 36 on the id itself; legacy parity (Outfitter.lua:1297-1307)",
+    "ruling": "keep"
+  }
+}

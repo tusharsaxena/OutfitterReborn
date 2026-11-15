@@ -1,0 +1,756 @@
+{
+ "build": "1.60.1.70938",
+ "buildCreated": "2026-11-13 01:36:09",
+ "candidates": [
+  {
+   "id": 6783,
+   "key": "AURA_SPELL_STATE:6783",
+   "list": "AURA_SPELL_STATE",
+   "name": "Prowl",
+   "notes": [
+    "twin of 5215",
+    "lines: Feral Combat",
+    "auras: 16, 33"
+   ],
+   "source": "same-name",
+   "target": null
+  },
+  {
+   "id": 9913,
+   "key": "AURA_SPELL_STATE:9913",
+   "list": "AURA_SPELL_STATE",
+   "name": "Prowl",
+   "notes": [
+    "twin of 5215",
+    "lines: Feral Combat",
+    "auras: 16, 33"
+   ],
+   "source": "same-name",
+   "target": null
+  },
+  {
+   "id": 184,
+   "key": "DIFFICULTY_GROUPS.NONE:184",
+   "list": "DIFFICULTY_GROUPS.NONE",
+   "name": "Normal",
+   "notes": [
+    "InstanceType 1",
+    "MaxPlayers 5"
+   ],
+   "source": "difficulty",
+   "target": null
+  },
+  {
+   "id": 185,
+   "key": "DIFFICULTY_GROUPS.NONE:185",
+   "list": "DIFFICULTY_GROUPS.NONE",
+   "name": "20 Player",
+   "notes": [
+    "InstanceType 2",
+    "MaxPlayers 20"
+   ],
+   "source": "difficulty",
+   "target": null
+  },
+  {
+   "id": 186,
+   "key": "DIFFICULTY_GROUPS.NONE:186",
+   "list": "DIFFICULTY_GROUPS.NONE",
+   "name": "40 Player",
+   "notes": [
+    "InstanceType 2",
+    "MaxPlayers 40"
+   ],
+   "source": "difficulty",
+   "target": null
+  },
+  {
+   "id": 197,
+   "key": "DIFFICULTY_GROUPS.NONE:197",
+   "list": "DIFFICULTY_GROUPS.NONE",
+   "name": "10 Player",
+   "notes": [
+    "InstanceType 2",
+    "MaxPlayers 10"
+   ],
+   "source": "difficulty",
+   "target": null
+  },
+  {
+   "id": 198,
+   "key": "DIFFICULTY_GROUPS.NONE:198",
+   "list": "DIFFICULTY_GROUPS.NONE",
+   "name": "Normal",
+   "notes": [
+    "InstanceType 1",
+    "MaxPlayers 10"
+   ],
+   "source": "difficulty",
+   "target": null
+  },
+  {
+   "id": 201,
+   "key": "DIFFICULTY_GROUPS.NONE:201",
+   "list": "DIFFICULTY_GROUPS.NONE",
+   "name": "Normal",
+   "notes": [
+    "InstanceType 1",
+    "MaxPlayers 5"
+   ],
+   "source": "difficulty",
+   "target": null
+  },
+  {
+   "id": 202,
+   "key": "DIFFICULTY_GROUPS.NONE:202",
+   "list": "DIFFICULTY_GROUPS.NONE",
+   "name": "Difficulty A",
+   "notes": [
+    "InstanceType 1",
+    "MaxPlayers 5"
+   ],
+   "source": "difficulty",
+   "target": null
+  },
+  {
+   "id": 203,
+   "key": "DIFFICULTY_GROUPS.NONE:203",
+   "list": "DIFFICULTY_GROUPS.NONE",
+   "name": "Difficulty B",
+   "notes": [
+    "InstanceType 1",
+    "MaxPlayers 5"
+   ],
+   "source": "difficulty",
+   "target": null
+  },
+  {
+   "id": 204,
+   "key": "DIFFICULTY_GROUPS.NONE:204",
+   "list": "DIFFICULTY_GROUPS.NONE",
+   "name": "Difficulty C",
+   "notes": [
+    "InstanceType 1",
+    "MaxPlayers 5"
+   ],
+   "source": "difficulty",
+   "target": null
+  },
+  {
+   "id": 207,
+   "key": "DIFFICULTY_GROUPS.NONE:207",
+   "list": "DIFFICULTY_GROUPS.NONE",
+   "name": "Normal",
+   "notes": [
+    "InstanceType 1",
+    "MaxPlayers 1"
+   ],
+   "source": "difficulty",
+   "target": null
+  },
+  {
+   "id": 213,
+   "key": "DIFFICULTY_GROUPS.NONE:213",
+   "list": "DIFFICULTY_GROUPS.NONE",
+   "name": "Infinite",
+   "notes": [
+    "InstanceType 1",
+    "MaxPlayers 5"
+   ],
+   "source": "difficulty",
+   "target": null
+  },
+  {
+   "id": 214,
+   "key": "DIFFICULTY_GROUPS.NONE:214",
+   "list": "DIFFICULTY_GROUPS.NONE",
+   "name": "DNT - Internal only",
+   "notes": [
+    "InstanceType 1",
+    "MaxPlayers 5"
+   ],
+   "source": "difficulty",
+   "target": null
+  },
+  {
+   "id": 215,
+   "key": "DIFFICULTY_GROUPS.NONE:215",
+   "list": "DIFFICULTY_GROUPS.NONE",
+   "name": "Normal",
+   "notes": [
+    "InstanceType 1",
+    "MaxPlayers 20"
+   ],
+   "source": "difficulty",
+   "target": null
+  },
+  {
+   "id": 226,
+   "key": "DIFFICULTY_GROUPS.NONE:226",
+   "list": "DIFFICULTY_GROUPS.NONE",
+   "name": "20 Player",
+   "notes": [
+    "InstanceType 2",
+    "MaxPlayers 20"
+   ],
+   "source": "difficulty",
+   "target": null
+  },
+  {
+   "id": 231,
+   "key": "DIFFICULTY_GROUPS.NONE:231",
+   "list": "DIFFICULTY_GROUPS.NONE",
+   "name": "Normal",
+   "notes": [
+    "InstanceType 2",
+    "MaxPlayers 1"
+   ],
+   "source": "difficulty",
+   "target": null
+  },
+  {
+   "id": 242,
+   "key": "DIFFICULTY_GROUPS.NONE:242",
+   "list": "DIFFICULTY_GROUPS.NONE",
+   "name": "20 Player",
+   "notes": [
+    "InstanceType 2",
+    "MaxPlayers 20"
+   ],
+   "source": "difficulty",
+   "target": null
+  },
+  {
+   "id": 243,
+   "key": "DIFFICULTY_GROUPS.NONE:243",
+   "list": "DIFFICULTY_GROUPS.NONE",
+   "name": "10 Player",
+   "notes": [
+    "InstanceType 2",
+    "MaxPlayers 10"
+   ],
+   "source": "difficulty",
+   "target": null
+  },
+  {
+   "id": 255,
+   "key": "DIFFICULTY_GROUPS.NONE:255",
+   "list": "DIFFICULTY_GROUPS.NONE",
+   "name": "20 Player",
+   "notes": [
+    "InstanceType 2",
+    "MaxPlayers 20"
+   ],
+   "source": "difficulty",
+   "target": null
+  },
+  {
+   "id": 256,
+   "key": "DIFFICULTY_GROUPS.NONE:256",
+   "list": "DIFFICULTY_GROUPS.NONE",
+   "name": "10 Player",
+   "notes": [
+    "InstanceType 2",
+    "MaxPlayers 10"
+   ],
+   "source": "difficulty",
+   "target": null
+  },
+  {
+   "id": 1785,
+   "key": "FORM_SPELL_STATE:1785",
+   "list": "FORM_SPELL_STATE",
+   "name": "Stealth",
+   "notes": [
+    "twin of 1784",
+    "lines: Subtlety",
+    "auras: 16, 33, 36"
+   ],
+   "source": "same-name",
+   "target": null
+  },
+  {
+   "id": 1786,
+   "key": "FORM_SPELL_STATE:1786",
+   "list": "FORM_SPELL_STATE",
+   "name": "Stealth",
+   "notes": [
+    "twin of 1784",
+    "lines: Subtlety",
+    "auras: 16, 33, 36"
+   ],
+   "source": "same-name",
+   "target": null
+  },
+  {
+   "id": 1787,
+   "key": "FORM_SPELL_STATE:1787",
+   "list": "FORM_SPELL_STATE",
+   "name": "Stealth",
+   "notes": [
+    "twin of 1784",
+    "lines: Subtlety",
+    "auras: 16, 33, 36"
+   ],
+   "source": "same-name",
+   "target": null
+  },
+  {
+   "id": 9634,
+   "key": "FORM_SPELL_STATE:9634",
+   "list": "FORM_SPELL_STATE",
+   "name": "Dire Bear Form",
+   "notes": [
+    "hand: Dire Bear Form replaces Bear Form at level 40 on a vanilla client (its own form, not a rank of 5487)",
+    "auras: 4, 36, 77, 110, 668"
+   ],
+   "source": "hand",
+   "target": null
+  },
+  {
+   "id": 2997,
+   "key": "Zones.NEW:2997",
+   "list": "Zones.NEW",
+   "name": "Darkspear Islands",
+   "notes": [
+    "InstanceType 3 (battleground)",
+    "ExpansionID 0"
+   ],
+   "source": "instance",
+   "target": null
+  },
+  {
+   "id": 3005,
+   "key": "Zones.NEW:3005",
+   "list": "Zones.NEW",
+   "name": "Battle for Gilneas",
+   "notes": [
+    "InstanceType 3 (battleground)",
+    "ExpansionID 0"
+   ],
+   "source": "instance",
+   "target": null
+  }
+ ],
+ "date": "2026-11-15",
+ "flags": [
+  {
+   "comment": "Alterac Valley, Korrak's Revenge",
+   "file": "defaults/Zones.lua",
+   "id": 2197,
+   "key": "shipped:gone:Zones.BG_AV:2197",
+   "kind": "gone",
+   "list": "Zones.BG_AV",
+   "name": "",
+   "notes": [],
+   "why": ""
+  },
+  {
+   "comment": "Classic, Winter, current, Comp Stomp",
+   "file": "defaults/Zones.lua",
+   "id": 1681,
+   "key": "shipped:gone:Zones.BG_AB:1681",
+   "kind": "gone",
+   "list": "Zones.BG_AB",
+   "name": "",
+   "notes": [],
+   "why": ""
+  },
+  {
+   "comment": "Classic, Winter, current, Comp Stomp",
+   "file": "defaults/Zones.lua",
+   "id": 2107,
+   "key": "shipped:gone:Zones.BG_AB:2107",
+   "kind": "gone",
+   "list": "Zones.BG_AB",
+   "name": "",
+   "notes": [],
+   "why": ""
+  },
+  {
+   "comment": "Classic, Winter, current, Comp Stomp",
+   "file": "defaults/Zones.lua",
+   "id": 2177,
+   "key": "shipped:gone:Zones.BG_AB:2177",
+   "kind": "gone",
+   "list": "Zones.BG_AB",
+   "name": "",
+   "notes": [],
+   "why": ""
+  },
+  {
+   "comment": "Classic, current",
+   "file": "defaults/Zones.lua",
+   "id": 2106,
+   "key": "shipped:gone:Zones.BG_WSG:2106",
+   "kind": "gone",
+   "list": "Zones.BG_WSG",
+   "name": "",
+   "notes": [],
+   "why": ""
+  },
+  {
+   "comment": "Shadowstrike",
+   "file": "defaults/Items.lua",
+   "id": 17074,
+   "key": "shipped:gone:ITEM.ALIASES:17074",
+   "kind": "gone",
+   "list": "ITEM.ALIASES",
+   "name": "",
+   "notes": [],
+   "why": ""
+  },
+  {
+   "comment": "Alliance Lance",
+   "file": "defaults/Items.lua",
+   "id": 46069,
+   "key": "shipped:gone:ITEM.ALIASES:46069",
+   "kind": "gone",
+   "list": "ITEM.ALIASES",
+   "name": "",
+   "notes": [],
+   "why": ""
+  },
+  {
+   "comment": "Horde Lance",
+   "file": "defaults/Items.lua",
+   "id": 46070,
+   "key": "shipped:gone:ITEM.ALIASES:46070",
+   "kind": "gone",
+   "list": "ITEM.ALIASES",
+   "name": "",
+   "notes": [],
+   "why": ""
+  },
+  {
+   "comment": "Argent Lance",
+   "file": "defaults/Items.lua",
+   "id": 46106,
+   "key": "shipped:gone:ITEM.ALIASES:46106",
+   "kind": "gone",
+   "list": "ITEM.ALIASES",
+   "name": "",
+   "notes": [],
+   "why": ""
+  },
+  {
+   "comment": "Brumdysla, Hammer of Vrorsk",
+   "file": "defaults/Items.lua",
+   "id": 136350,
+   "key": "shipped:gone:ITEM.IGNORED_UNUSED:136350",
+   "kind": "gone",
+   "list": "ITEM.IGNORED_UNUSED",
+   "name": "",
+   "notes": [],
+   "why": ""
+  },
+  {
+   "comment": "Monk, Fists of the Heavens",
+   "file": "defaults/Items.lua",
+   "id": 133948,
+   "key": "shipped:gone:ITEM.PHANTOM_IDS:133948",
+   "kind": "gone",
+   "list": "ITEM.PHANTOM_IDS",
+   "name": "",
+   "notes": [],
+   "why": ""
+  },
+  {
+   "comment": "DK, Blades of the Fallen Prince",
+   "file": "defaults/Items.lua",
+   "id": 128293,
+   "key": "shipped:gone:ITEM.PHANTOM_IDS:128293",
+   "kind": "gone",
+   "list": "ITEM.PHANTOM_IDS",
+   "name": "",
+   "notes": [],
+   "why": ""
+  },
+  {
+   "comment": "DH, Twinblades of the Deceiver",
+   "file": "defaults/Items.lua",
+   "id": 127830,
+   "key": "shipped:gone:ITEM.PHANTOM_IDS:127830",
+   "kind": "gone",
+   "list": "ITEM.PHANTOM_IDS",
+   "name": "",
+   "notes": [],
+   "why": ""
+  },
+  {
+   "comment": "DH, Aldrachi Warblades",
+   "file": "defaults/Items.lua",
+   "id": 128831,
+   "key": "shipped:gone:ITEM.PHANTOM_IDS:128831",
+   "kind": "gone",
+   "list": "ITEM.PHANTOM_IDS",
+   "name": "",
+   "notes": [],
+   "why": ""
+  },
+  {
+   "comment": "Druid, Fangs of Ashamane",
+   "file": "defaults/Items.lua",
+   "id": 128859,
+   "key": "shipped:gone:ITEM.PHANTOM_IDS:128859",
+   "kind": "gone",
+   "list": "ITEM.PHANTOM_IDS",
+   "name": "",
+   "notes": [],
+   "why": ""
+  },
+  {
+   "comment": "Druid, Claws of Ursoc",
+   "file": "defaults/Items.lua",
+   "id": 128822,
+   "key": "shipped:gone:ITEM.PHANTOM_IDS:128822",
+   "kind": "gone",
+   "list": "ITEM.PHANTOM_IDS",
+   "name": "",
+   "notes": [],
+   "why": ""
+  },
+  {
+   "comment": "Mage, Heart of the Phoenix",
+   "file": "defaults/Items.lua",
+   "id": 133959,
+   "key": "shipped:gone:ITEM.PHANTOM_IDS:133959",
+   "kind": "gone",
+   "list": "ITEM.PHANTOM_IDS",
+   "name": "",
+   "notes": [],
+   "why": ""
+  },
+  {
+   "comment": "Paladin, Oathseeker",
+   "file": "defaults/Items.lua",
+   "id": 128867,
+   "key": "shipped:gone:ITEM.PHANTOM_IDS:128867",
+   "kind": "gone",
+   "list": "ITEM.PHANTOM_IDS",
+   "name": "",
+   "notes": [],
+   "why": ""
+  },
+  {
+   "comment": "Priest, Secrets of the Void",
+   "file": "defaults/Items.lua",
+   "id": 133958,
+   "key": "shipped:gone:ITEM.PHANTOM_IDS:133958",
+   "kind": "gone",
+   "list": "ITEM.PHANTOM_IDS",
+   "name": "",
+   "notes": [],
+   "why": ""
+  },
+  {
+   "comment": "Rogue, The Kingslayers",
+   "file": "defaults/Items.lua",
+   "id": 128869,
+   "key": "shipped:gone:ITEM.PHANTOM_IDS:128869",
+   "kind": "gone",
+   "list": "ITEM.PHANTOM_IDS",
+   "name": "",
+   "notes": [],
+   "why": ""
+  },
+  {
+   "comment": "Rogue, Fortune",
+   "file": "defaults/Items.lua",
+   "id": 134552,
+   "key": "shipped:gone:ITEM.PHANTOM_IDS:134552",
+   "kind": "gone",
+   "list": "ITEM.PHANTOM_IDS",
+   "name": "",
+   "notes": [],
+   "why": ""
+  },
+  {
+   "comment": "Rogue, Akaari's Will",
+   "file": "defaults/Items.lua",
+   "id": 128479,
+   "key": "shipped:gone:ITEM.PHANTOM_IDS:128479",
+   "kind": "gone",
+   "list": "ITEM.PHANTOM_IDS",
+   "name": "",
+   "notes": [],
+   "why": ""
+  },
+  {
+   "comment": "Shaman, The Highkeeper's Ward",
+   "file": "defaults/Items.lua",
+   "id": 128936,
+   "key": "shipped:gone:ITEM.PHANTOM_IDS:128936",
+   "kind": "gone",
+   "list": "ITEM.PHANTOM_IDS",
+   "name": "",
+   "notes": [],
+   "why": ""
+  },
+  {
+   "comment": "Shaman, Fury of the Stonemother",
+   "file": "defaults/Items.lua",
+   "id": 128873,
+   "key": "shipped:gone:ITEM.PHANTOM_IDS:128873",
+   "kind": "gone",
+   "list": "ITEM.PHANTOM_IDS",
+   "name": "",
+   "notes": [],
+   "why": ""
+  },
+  {
+   "comment": "Shaman, Shield of the Sea Queen",
+   "file": "defaults/Items.lua",
+   "id": 128934,
+   "key": "shipped:gone:ITEM.PHANTOM_IDS:128934",
+   "kind": "gone",
+   "list": "ITEM.PHANTOM_IDS",
+   "name": "",
+   "notes": [],
+   "why": ""
+  },
+  {
+   "comment": "Warlock, Spine of Thal'kiel",
+   "file": "defaults/Items.lua",
+   "id": 137246,
+   "key": "shipped:gone:ITEM.PHANTOM_IDS:137246",
+   "kind": "gone",
+   "list": "ITEM.PHANTOM_IDS",
+   "name": "",
+   "notes": [],
+   "why": ""
+  },
+  {
+   "comment": "Warrior, Helya's Wrath",
+   "file": "defaults/Items.lua",
+   "id": 134553,
+   "key": "shipped:gone:ITEM.PHANTOM_IDS:134553",
+   "kind": "gone",
+   "list": "ITEM.PHANTOM_IDS",
+   "name": "",
+   "notes": [],
+   "why": ""
+  },
+  {
+   "comment": "Warrior, Scaleshard",
+   "file": "defaults/Items.lua",
+   "id": 128288,
+   "key": "shipped:gone:ITEM.PHANTOM_IDS:128288",
+   "kind": "gone",
+   "list": "ITEM.PHANTOM_IDS",
+   "name": "",
+   "notes": [],
+   "why": ""
+  },
+  {
+   "comment": "Scroll of Protection V",
+   "file": "defaults/Items.lua",
+   "id": 27503,
+   "key": "shipped:gone:ITEM.CORRECTIONS:27503",
+   "kind": "gone",
+   "list": "ITEM.CORRECTIONS",
+   "name": "",
+   "notes": [],
+   "why": ""
+  },
+  {
+   "comment": "Huge Spotted Feltail",
+   "file": "defaults/Items.lua",
+   "id": 27515,
+   "key": "shipped:gone:ITEM.CORRECTIONS:27515",
+   "kind": "gone",
+   "list": "ITEM.CORRECTIONS",
+   "name": "",
+   "notes": [],
+   "why": ""
+  }
+ ],
+ "flavor": "forever",
+ "handMissing": [],
+ "product": "wowf",
+ "shipped": 92,
+ "shippedByKind": {
+  "difficulty": 3,
+  "icon": 24,
+  "item": 40,
+  "map": 8,
+  "skillline": 8,
+  "spell": 9
+ },
+ "sources": [
+  {
+   "rows": 63,
+   "sha256": "bd8dc963dd691c69aff531464636e7b5a944efeedb773895e7b2c4a0fb7c38b4",
+   "size": 851160,
+   "table": "SpellName",
+   "url": "https://wago.tools/db2/SpellName/csv?build=1.60.1.70938",
+   "why": "spell names: existence, the comment check, the same-name candidates"
+  },
+  {
+   "rows": 125,
+   "sha256": "f419db3f95ef93b2cf052d9c3996ec355df60846f1fa24c671822aacfa8f59a3",
+   "size": 3925743,
+   "table": "SpellEffect",
+   "url": "https://wago.tools/db2/SpellEffect/csv?build=1.60.1.70938",
+   "why": "Effect / EffectAura on DifficultyID 0: the aura, shapeshift and tracking kind checks"
+  },
+  {
+   "rows": 21,
+   "sha256": "6696abd03ef90ad250a12ac23778616c292c46f6a0082130fbe187c96ead0aa0",
+   "size": 407525,
+   "table": "SkillLineAbility",
+   "url": "https://wago.tools/db2/SkillLineAbility/csv?build=1.60.1.70938",
+   "why": "Spell -> SkillLine: a same-name candidate must be learnable on a player line"
+  },
+  {
+   "rows": 154,
+   "sha256": "f3867d43ab42d1f5278e6e5028d0151bc06e4ef8e5cbd790a20df6ee57aa654d",
+   "size": 14266,
+   "table": "SkillLine",
+   "url": "https://wago.tools/db2/SkillLine/csv?build=1.60.1.70938",
+   "why": "DisplayName_lang of the profession lines; the line names that fence pet lines out"
+  },
+  {
+   "rows": 22,
+   "sha256": "ffc9b9a62579ae3330d062c2c0f412f14d3bd500fa522b358fdcd7ce40146b78",
+   "size": 1167,
+   "table": "Difficulty",
+   "url": "https://wago.tools/db2/Difficulty/csv?build=1.60.1.70938",
+   "why": "InstanceType of each difficulty id; the difficulty candidates"
+  },
+  {
+   "rows": 78,
+   "sha256": "a4fa6474f5bba3dc815f0e78943b3a907840b8f44bba605d4ff0680048994908",
+   "size": 12296,
+   "table": "Map",
+   "url": "https://wago.tools/db2/Map/csv?build=1.60.1.70938",
+   "why": "InstanceType 3 (battleground) / 4 (arena) of every zone row's map id; the instance candidates"
+  },
+  {
+   "rows": 16,
+   "sha256": "32ee11866ddee06477a4830105b084f68e972644fd6b067d77c859168cbf9df3",
+   "size": 1443725,
+   "table": "Item",
+   "url": "https://wago.tools/db2/Item/csv?build=1.60.1.70938",
+   "why": "ClassID / InventoryType: the phantom and lance kind checks"
+  },
+  {
+   "rows": 15,
+   "sha256": "fdc65396e8a1103ea5f552ea59aaebc0e73ba572612a3412c50e636b54c90b41",
+   "size": 5345571,
+   "table": "ItemSparse",
+   "url": "https://wago.tools/db2/ItemSparse/csv?build=1.60.1.70938",
+   "why": "Display_lang: item existence and the comment check"
+  },
+  {
+   "rows": 23,
+   "sha256": "71b82f75741b87ad38c82bb73cba99b3e3bdeb6c0c00e09dde1298dafce31441",
+   "size": 8780683,
+   "table": "ManifestInterfaceData",
+   "url": "https://wago.tools/db2/ManifestInterfaceData/csv?build=1.60.1.70938",
+   "why": "FilePath of each icon file id"
+  }
+ ],
+ "tool": "tools/seeds/seeds.py derive",
+ "uncheckable": []
+}
