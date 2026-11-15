@@ -74,7 +74,7 @@ A WoW Forever install is the same junction, named `OutfitterReborn`, in the Fore
 
 ## Release / assets
 
-**Two entries: Pillow and curl.**
+**Three entries: Pillow, curl and Python with a network connection.**
 
 **Pillow**, only for **regenerating** the logo. The four files in `media/logos/` are
 committed; `outfitterreborn.logo.128.tga` (the TOC icon, the minimap button and the launcher's
@@ -97,6 +97,25 @@ Pillow, it is not needed to build, run or test the addon.
 ```sh
 sudo apt-get install -y curl
 curl --version | head -1
+```
+
+**Python 3.8+ and a network connection**, only for **re-validating** the seed ids.
+`tools/seeds/seeds.py` checks the ids in `defaults/TriggerData.lua`, `defaults/Zones.lua`,
+`defaults/Items.lua` and `defaults/Triggers.lua` against one pinned build of each client's DB2 on
+wago.tools (`https://wago.tools/db2/<Table>/csv?build=<version>`, products `wow` and `wowf`), and
+`/dev-copilot:validate-seeds OutfitterReborn <retail|forever>` drives it through
+[`docs/validate-seeds.md`](docs/validate-seeds.md). It imports only the standard library
+(`argparse`, `csv`, `gzip`, `hashlib`, `json`, `urllib`, ...), so there is no `pip install` step; 3.8
+is the floor because of its `from __future__ import annotations`. A run that is not `--replay`
+fetches about 140 MB (Retail) or 21 MB (WoW Forever) per build into `tools/seeds/.cache/`
+(git-ignored, `tools/seeds/.gitignore`); a frozen bundle re-derives offline. Its tests,
+`python3 -m pytest -q tools/seeds`, need pytest, or run under the standard library's
+`python3 -m unittest discover -s tools/seeds -p 'test_*.py'`. Not needed to build, run or test the
+addon, and not part of the Lua gate.
+
+```sh
+python3 --version                     # 3.8 or newer
+python3 tools/seeds/seeds.py status   # needs the network: prints CURRENT or NEW per client
 ```
 
 The icons and the fonts come inside the vendored LibKa0s payload; regenerating them is that repo's

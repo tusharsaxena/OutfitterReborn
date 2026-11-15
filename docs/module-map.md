@@ -212,5 +212,10 @@ the diagnostics sections.
 | `tools/legacy_capture.lua` | Writes `tests/fixtures/legacy/` from a worktree of the fork |
 | `tools/gen-zones.lua` | Diffs a wago.tools Map.db2 export against `defaults/Zones.lua` (added, removed, wrong kind); edits nothing |
 | `tools/rekey-locales.lua` | Writes the six locale overlays from the legacy translations (`--check` compares without writing) |
+| `tools/seeds/seeds.py` | Re-validates the seed ids in `defaults/` against one pinned wago.tools build per client: flags, candidates, rulings, bundle, apply ([validate-seeds.md](validate-seeds.md)) |
+| `tools/seeds/test_seeds.py` | The seed tool's offline tests (`python3 -m pytest -q tools/seeds`) |
+| `tools/seeds/fixtures/` | The tiny DB2 CSVs those tests read |
+| `tools/seeds/rulings_*.json` | The seed rulings per client, written only by `seeds.py rule` |
+| `tools/seeds/.gitignore` | Keeps the per-build download cache (`.cache/`) and `__pycache__/` out of git |
 | `media/logos/*.png`, `media/logos/*.jpg`, `media/screenshots/` | Source art and screenshots |
 | `docs/` | This doc set |

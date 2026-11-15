@@ -52,7 +52,9 @@ picker entry, schema row or setting (clients-§4), so it is absent, never hidden
 D1 to D10 and the probes behind each value are in
 [`superpowers/specs/2026-11-08-forever-port-design.md`](superpowers/specs/2026-11-08-forever-port-design.md);
 a value an open probe has still to confirm is marked `-- PROBE Pn` at its site and has a smoke row in
-`smoke-tests.md` sections 14 to 18.
+`smoke-tests.md` sections 14 to 18. Every seeded game id (aura, form, NPC, difficulty, map, skill
+line, pet, item and icon ids) is re-validated per client against that client's own wago.tools build
+by `tools/seeds/seeds.py` (clients-§10), under the contract in [`validate-seeds.md`](validate-seeds.md).
 
 | Feature | Retail | WoW Forever | Picked in |
 |---|---|---|---|
@@ -274,9 +276,10 @@ Frozen and generated stores are named once each and not enumerated: `docs/audits
 `docs/reviews/`, `docs/automated-tests/<run>/`, `docs/perf-analysis/<run>/`,
 `docs/revendor/<date>-v<tag>/`, `docs/superpowers/` and `docs/investigations/` (documentation-§3).
 Of those, `docs/audits/`, `docs/reviews/`, `docs/automated-tests/<run>/`,
-`docs/revendor/<date>-v<tag>/` and `docs/superpowers/` exist today; `docs/superpowers/` holds the
-design, the plan and the research behind them, and `docs/reviews/2026-09-16/` is the fork's last
-review, kept frozen.
+`docs/revendor/<date>-v<tag>/` and `docs/superpowers/` exist today; so does `docs/seed-research/`,
+the frozen per-build seed bundles `tools/seeds/seeds.py` writes (one `<date>-<flavor>/` per run, not
+enumerated; clients-§10). `docs/superpowers/` holds the design, the plan and the research behind
+them, and `docs/reviews/2026-09-16/` is the fork's last review, kept frozen.
 
 ### Required (documentation-§3, Tier 1)
 
@@ -317,7 +320,11 @@ review, kept frozen.
 
 ### Addon-specific (documentation-§3, Tier 3)
 
-None. The fork's `users-manual.md` was retired in P10: its player content is the README (the one
+| Doc | Covers |
+|---|---|
+| [`validate-seeds.md`](validate-seeds.md) | The seed-validation contract `/dev-copilot:validate-seeds OutfitterReborn <retail\|forever>` runs: the tool, the id kinds and tables, the ruling precedent, the steps and the gate |
+
+The fork's `users-manual.md` was retired in P10: its player content is the README (the one
 player-facing document, documentation-§1), and its slash-command table was a second copy of
 [`slash-dispatch.md`](slash-dispatch.md), which Tier 3 may not duplicate.
 
