@@ -22,9 +22,12 @@ local _, NS = ...
 -- L["Outfits"], is LEFT; the controls are RIGHT, outermost first: close (NS.MakeCloseButton through
 -- Bar.Close, which writes `bar.shown = false`, or in test mode dismisses the bar for that test
 -- session) and lock (the Master `locked` row, through the one seam). Both are
--- 18 px slots with the close X's art size, painted as the X is (S.CloseButton), as the window's
--- gear is (modules/Window.lua). The drag strip covers the band left of the controls: it moves the
--- bar unless locked, saves the place on release, and a right click opens the bar's settings page.
+-- 18 px slots with the close X's art size. The lock is painted as the window's gear is
+-- (NS.TitleControl, core/CoreSetup.lua; LibKa0s v1.105.0 smoke round 1, rulings 3 and 4): icon.tint at
+-- rest, as the X is, text.link under the pointer, where the X takes close.hot, and its tooltip above
+-- it in gtip.title. The drag strip covers the band left of the controls: it moves the
+-- bar unless locked, saves the place on release, and a right click opens the bar's settings page;
+-- its tooltip is placed and colored the same way (NS.ShowTitleTip).
 -- The separate drag handle above the bar is retired.
 --
 -- THE TEST STRIP hangs flush under the band (DpsRace modules/Hud.lua:501-512), and Bar.HeaderHeight
@@ -40,7 +43,7 @@ local _, NS = ...
 --
 -- CALLS (at call time): NS.Skin (Shell through NS.ApplySkin, and again for Show border's `noBorder`, Band, Header, CloseButton, BarBorder,
 -- Resolve, Color, HudFont, HudFontSize, HudLabelColor), NS.SkinBandGeometry, NS.ResolveColor, NS.MakeCloseButton, NS.MakeTestStrip,
--- NS.SetByPath, NS.OpenOptionsPanel.
+-- NS.TitleControl, NS.ShowTitleTip, NS.HideTitleTip, NS.SetByPath, NS.OpenOptionsPanel.
 
 local Bar = NS.Bar
 
@@ -112,16 +115,6 @@ local function artSize(close)
     return w
 end
 
-local function tooltip(owner, title, body)
-    if not GameTooltip then return end
-    GameTooltip:SetOwner(owner, "ANCHOR_TOP")
-    GameTooltip:SetText(title)
-    if body then GameTooltip:AddLine(body, nil, nil, nil, true) end
-    GameTooltip:Show()
-end
-
-local function hideTooltip() if GameTooltip then GameTooltip:Hide() end end
-
 --- The lock control: the Master `locked` row, flipped through the one write seam.
 local function lockControl(parent, art)
     local b = CreateFrame("Button", nil, parent)
@@ -129,16 +122,11 @@ local function lockControl(parent, art)
     b.icon = b:CreateTexture(nil, "ARTWORK")
     b.icon:SetPoint("CENTER", b, "CENTER", 0, 0)
     b.icon:SetSize(art, art)
-    NS.Skin.CloseButton(b)
+    NS.TitleControl(b, L["Lock or unlock the outfit bar"],
+        L["The same switch as Lock frame on General > Master controls."])
     b:SetScript("OnClick", function() NS.SetByPath("locked", not locked()) end)
-    b:HookScript("OnEnter", function(self)
-        Bar.HoverIn()
-        tooltip(self, L["Lock or unlock the outfit bar"], L["The same switch as Lock frame on General > Master controls."])
-    end)
-    b:HookScript("OnLeave", function()
-        hideTooltip()
-        Bar.HoverOut()
-    end)
+    b:HookScript("OnEnter", function() Bar.HoverIn() end)
+    b:HookScript("OnLeave", function() Bar.HoverOut() end)
     return b
 end
 
@@ -157,10 +145,10 @@ local function dragStrip(f, parent)
     end)
     d:SetScript("OnEnter", function(self)
         Bar.HoverIn()
-        tooltip(self, L["Outfit bar"], L["Drag to move. Right-click for bar settings."])
+        NS.ShowTitleTip(self, L["Outfit bar"], L["Drag to move. Right-click for bar settings."])
     end)
-    d:SetScript("OnLeave", function()
-        hideTooltip()
+    d:SetScript("OnLeave", function(self)
+        NS.HideTitleTip(self)
         Bar.HoverOut()
     end)
     return d

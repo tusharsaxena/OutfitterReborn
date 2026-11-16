@@ -173,7 +173,7 @@ Total.
 - skin seam: the degraded HudFont draws the face, a picked flag and no shadow
 - skin seam: each host-copy skin token is the live library's Ka0s Default value
 
-### test_surface_parity.lua (29)
+### test_surface_parity.lua (30)
 
 - parity: the degraded load still initializes, enables and answers /or version
 - parity: the Options stub carries every public member of the live Helpers surface
@@ -202,6 +202,7 @@ Total.
 - secure queue: a write out of lockdown drops the stale one under its key
 - secure queue: one raising write reaches the error handler and the rest still run
 - secure queue: Clear drops every waiting write and the registration
+- parity: the Tooltip seam (NS.TitleControl) shows a title-bar tooltip on both arms, degraded included
 - parity: every LibKa0s major the host leases has its parity row
 - parity: the degraded load resumes every module at login, and stands them down and up
 
@@ -1267,7 +1268,7 @@ Total.
 - dock: stood down, a sheet show neither shows nor re-anchors the button
 - window: the close button is anchored at the header's top right
 - window: the gear sits left of the close button
-- window: the gear's art is the close X's size, centered, in the X's rest and hover tint
+- window: the gear's art is the close X's size, centered, in the X's rest tint and text.link on hover
 - window: without a close art texture the gear's art falls back to 12 px
 - dock: switching to the Reputation tab on EllesmereUI does not re-anchor the button to stock
 - dock: a sheet tab built after the paper doll's OnShow is picked up on the next frame
@@ -1681,6 +1682,13 @@ Total.
 - skin: without the library a dialog's error line still draws of.dialog.error's red
 - skin: a switch marks the window, and its next tick recolors an item row's name
 
+### test_titlebar.lua (4)
+
+- title bar: the outfit window's close and gear carry tooltips and the skin's rest and hover colors
+- title bar: the outfit bar's close and lock carry tooltips and the skin's rest and hover colors
+- title bar: every dialog's close carries a tooltip and the skin's rest and hover colors
+- title bar: the bar's lock keeps its body line, and the drag strip's tip takes gtip.title
+
 ### test_skin_values.lua (3)
 
 - skin values: every host row carries its file, substring, why and cause id
@@ -1855,7 +1863,7 @@ Total.
 | test_secrets.lua | 42 |
 | test_bus.lua | 12 |
 | test_skinsetup.lua | 22 |
-| test_surface_parity.lua | 29 |
+| test_surface_parity.lua | 30 |
 | test_perf_harness.lua | 19 |
 | test_schema.lua | 25 |
 | test_settings.lua | 16 |
@@ -1918,6 +1926,7 @@ Total.
 | test_diagnostics.lua | 12 |
 | test_credits.lua | 8 |
 | test_skin.lua | 14 |
+| test_titlebar.lua | 4 |
 | test_skin_values.lua | 3 |
 | test_skin_switch.lua | 84 |
 | test_client_globals.lua | 3 |
@@ -1927,4 +1936,4 @@ Total.
 | test_lizard_sighted.lua | 8 |
 | test_prose.lua | 15 |
 | Skipped | 1 |
-| **Total** | **1593** |
+| **Total** | **1598** |

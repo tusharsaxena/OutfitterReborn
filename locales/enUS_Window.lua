@@ -151,3 +151,6 @@ L["Outfits (test mode)"] = "Outfits (test mode)"
 
 -- Smoke round 3 E4 keys (modules/OutfitMenu.lua: a sample's browse-only menu in test mode)
 L["Not available in test mode"] = "Not available in test mode"
+
+-- LibKa0s v1.105.0 smoke round 1 SR-OR keys (modules/Window.lua: the header gear's tooltip)
+L["Open settings"] = "Open settings"

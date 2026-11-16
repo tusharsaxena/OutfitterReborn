@@ -158,7 +158,7 @@ return function(T)
 
     local surfaces = {
         { name = "the window's shell", build = function() return named("OutfitterRebornWindow") end },
-        { name = "the window's settings button", build = function() return named("OutfitterRebornWindowSettings") end },
+        { name = "the window's settings button", build = function() return named("OutfitterRebornWindowSettings").icon end },
         { name = "the window's scroll bar", build = function() return named("OutfitterRebornWindowScroll") end },
         { name = "a category row", build = function() return row("category") end },
         { name = "an outfit row", build = function() return row("outfit") end },
@@ -179,7 +179,7 @@ return function(T)
         { name = "the icon browser's selected cell", build = function() return browser().cells[1].selected end },
         { name = "the icon browser's dim", build = function() return browser().catcher end },
         { name = "the bar's window chrome", build = function() return bar().chrome end },
-        { name = "the bar's lock control", build = function() return bar().lock end },
+        { name = "the bar's lock control", build = function() return bar().lock.icon end },
         { name = "a bar label", paint = function() NS.Bar.Refresh() end,
           build = function() bar(); return assert(NS.Bar.Label(1), "the bar drew no label") end,
           companion = function(on)

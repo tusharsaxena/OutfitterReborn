@@ -504,6 +504,27 @@ test("secure queue: Clear drops every waiting write and the registration", funct
     end)
 end)
 
+test("parity: the Tooltip seam (NS.TitleControl) shows a title-bar tooltip on both arms, degraded included", function()
+    -- core/CoreSetup.lua leases LibKa0s-Tooltip-1.0 at call time for PlaceAttached; without the
+    -- library the tooltip is still shown, owned by the control and placed above it.
+    -- red under: NS.ShowTitleTip returning early when the Tooltip major is absent.
+    for arm, inst in pairs({ live = (pair()), degraded = select(2, pair()) }) do
+        local NS, M = inst.NS, inst.mocks
+        local btn = M.CreateFrame("Button", nil, M.UIParent)
+        btn.icon = btn:CreateTexture(nil, "ARTWORK")
+        assertTrue(NS.TitleControl(btn, "Words", "More") == btn, arm .. ": TitleControl answers the control")
+        local tip = M.GameTooltip
+        tip:Hide()
+        btn:__fire("OnEnter")
+        assertTrue(tip:IsShown(), arm .. ": no tooltip")
+        assertTrue(tip:GetOwner() == btn, arm .. ": not owned by the control")
+        assertEqual(tip.TextLeft1:GetText(), "Words", arm)
+        assertEqual(tip.TextLeft2:GetText(), "More", arm)
+        btn:__fire("OnLeave")
+        assertFalse(tip:IsShown(), arm .. ": the tooltip stays up")
+    end
+end)
+
 -- ── the closed set (P4.27) ────────────────────────────────────────────────────────────────────
 
 local function readFile(rel)

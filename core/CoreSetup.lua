@@ -13,6 +13,85 @@ NS.rejectedEvents = NS.rejectedEvents or {}
 NS.LIBKA0S_MISSING = "The LibKa0s library is missing from this installation of Ka0s Outfitter Reborn "
     .. "(expected in libs/LibKa0s)"
 
+-- ── a title-bar control (LibKa0s v1.105.0 smoke round 1, rulings 3 and 4; SR-OR) ──────────────
+--
+-- Every control on a title band this addon draws itself (the outfit window's gear, the outfit bar's
+-- lock) wears the library's header-mark look: its art (`btn.icon`) through the skin facade's Mark,
+-- `icon.tint` at rest and `text.link` under the pointer, recorded so a skin switch repaints it, as
+-- LibKa0s-Widgets' HeaderButton paints its marks. The close X is Core's (NS.MakeCloseButton), which
+-- carries `close.rest` (following `icon.tint`), `close.hot` and its "Close" tooltip itself. A
+-- control's tooltip is the game tooltip owned by it, its first line in the owner's `gtip.title` and
+-- an optional second line in `gtip.body`, placed by LibKa0s-Tooltip-1.0's PlaceAttached (above the
+-- control, below only without room), else above it by a relative point. Resolved at call time:
+-- the skin facade (core/SkinSetup.lua) and the Tooltip major load after this file, and without the
+-- library the facade's Mark is a no-op and the tooltip is still placed above.
+
+local TITLE_HOT = { token = "text.link" }
+
+local function words(v, btn)
+    if type(v) == "function" then v = v(btn) end
+    return type(v) == "string" and v ~= "" and v or nil
+end
+
+--- Show `title` (and `body`, wrapped) as `owner`'s title-bar tooltip.
+--- @param owner table the control or strip under the pointer
+--- @param title string|function
+--- @param body string|nil
+function NS.ShowTitleTip(owner, title, body)
+    local tip = GameTooltip
+    title = words(title, owner)
+    if not (title and tip and tip.SetOwner) then return end
+    local color = NS.Skin and NS.Skin.Color or function() end
+    tip:SetOwner(owner, "ANCHOR_NONE")
+    local r, g, b = color("gtip.title")
+    tip:SetText(title, r, g, b, 1, true)
+    body = words(body, owner)
+    if body then
+        local br, bg, bb = color("gtip.body")
+        tip:AddLine(body, br, bg, bb, true)
+    end
+    tip:Show()
+    local Tip = LibStub and LibStub("LibKa0s-Tooltip-1.0", true)
+    if Tip and type(Tip.PlaceAttached) == "function" and Tip.PlaceAttached(tip, owner) then return end
+    tip:ClearAllPoints()
+    tip:SetPoint("BOTTOM", owner, "TOP", 0, 2)
+end
+
+--- Hide the game tooltip when `owner` holds it.
+--- @param owner table
+function NS.HideTitleTip(owner)
+    local tip = GameTooltip
+    if not (tip and tip.Hide) then return end
+    if type(tip.IsOwned) == "function" and not tip:IsOwned(owner) then return end
+    if type(tip.GetOwner) == "function" and tip:GetOwner() ~= owner then return end
+    tip:Hide()
+end
+
+local function paintTitleMark(btn, hot)
+    local icon = rawget(btn, "icon")
+    local S = NS.Skin
+    if icon and S and type(S.Mark) == "function" then S.Mark(icon, hot and TITLE_HOT or nil) end
+end
+
+--- Make `btn` (a Button with its art in `btn.icon`) a title-bar control: the mark's rest and hover
+--- colors and the tooltip, both hooked, so the control's own OnEnter / OnLeave keep running.
+--- @param btn table
+--- @param title string|function the tooltip's first line, read on each hover
+--- @param body string|nil a second line
+--- @return table btn
+function NS.TitleControl(btn, title, body)
+    paintTitleMark(btn, false)
+    btn:HookScript("OnEnter", function(self)
+        paintTitleMark(self, true)
+        NS.ShowTitleTip(self, title, body)
+    end)
+    btn:HookScript("OnLeave", function(self)
+        paintTitleMark(self, false)
+        NS.HideTitleTip(self)
+    end)
+    return btn
+end
+
 local lib = LibStub and LibStub("LibKa0s-Core-1.0", true)
 
 if not lib then

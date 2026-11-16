@@ -230,15 +230,16 @@ local function titleStrip(f)
     local gear = CreateFrame("Button", "OutfitterRebornWindowSettings", f)
     gear:SetSize(18, 18)
     gear:SetPoint("TOPRIGHT", f, "TOPRIGHT", -28, -5)
-    -- The art at the close X's art size, centered in the unchanged 18 px click target, and painted as
-    -- the X is (close.rest, close.hot under the pointer), so the two header controls read as a pair
-    -- (smoke round 2 design G5).
+    -- The art at the close X's art size, centered in the unchanged 18 px click target (smoke round 2
+    -- design G5). Painted as the library's header marks are (LibKa0s v1.105.0 smoke round 1, ruling
+    -- 4): icon.tint at rest, as the X is, and text.link under the pointer, where the X takes
+    -- close.hot; "Open settings" above it on hover (ruling 3). NS.TitleControl, core/CoreSetup.lua.
     local art = closeArtSize(close)
     gear.icon = gear:CreateTexture(nil, "ARTWORK")
     gear.icon:SetPoint("CENTER", gear, "CENTER", 0, 0)
     gear.icon:SetSize(art, art)
     gear.icon:SetTexture(NS.Icon("settings"))
-    NS.Skin.CloseButton(gear)
+    NS.TitleControl(gear, L["Open settings"])
     gear:SetScript("OnClick", function() if not NS.IsStoodDown() then NS.OpenOptionsPanel() end end)
     chrome[#chrome + 1] = gear
 end
