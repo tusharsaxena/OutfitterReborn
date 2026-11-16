@@ -143,6 +143,9 @@ if not lib then
         "RegisterOptionsPage", "CreateOptionsPanel", "OpenOptionsPanel", "SetChromeHeight", "TabStrip",
         "PageBanner", "RenderTabbedSchema", "SelectTab", "ChoiceGrid", "IdInput", "IdList", "NavRail",
         "Drawer", "Relayout", "KeybindingsTab", "KeybindRows",
+        -- The one-tab side strip (LibKa0s v1.100.0, OptionsNav minor 7): it draws on a panel, and
+        -- there is none without the library.
+        "SideTabs",
     }) do
         Helpers[name] = function() end
     end

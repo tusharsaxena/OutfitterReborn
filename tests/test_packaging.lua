@@ -189,8 +189,10 @@ local function drawnIcons()
     local VendorSync = dofile(T.root .. "/tests/_kit/vendor_sync.lua")
     for _, name in ipairs(VendorSync.LIBRARY_MARKS) do drawn[name] = true end
     local console = readFile("libs/LibKa0s/DebugLogWindow.lua")
+    -- Since DebugLogWindow minor 5 (LibKa0s v1.105.0) the two buttons are HeaderButtons extras rows,
+    -- `{ key = "copy", icon = "copy", ... }`; the settings and close marks are in LIBRARY_MARKS.
     local buttons = 0
-    for name in console:gmatch('makeIconButton%(titleBar, spec%.addonName, "([%w:%-]+)"') do
+    for name in console:gmatch('{ key = "[%w]+", icon = "([%w:%-]+)"') do
         drawn[name], buttons = true, buttons + 1
     end
     assertEqual(buttons, 2, "the debug console's clear and copy buttons were not found")
