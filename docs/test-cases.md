@@ -1700,6 +1700,20 @@ Total.
 - title bar: the bar's lock mark carries its own tip, so every mark has a __tip
 - title bar: without the library the bar's degraded strip matches the library's order and offsets
 
+### test_tooltip_place.lua (11)
+
+- tooltip place: a body tooltip opens right of the group, top level with the element, else left
+- tooltip place: unreadable geometry attaches above the element, never at the cursor
+- tooltip place: a category row's tooltip opens beside the outfit window
+- tooltip place: the EM mark's tooltip opens beside the outfit window, top level with the mark
+- tooltip place: an item row's tooltip opens beside the outfit window
+- tooltip place: a sample outfit row's tooltip opens beside the outfit window
+- tooltip place: an outfit row hands the outfit window to the outfit tooltip as its group
+- tooltip place: the outfit tooltip is owned at ANCHOR_NONE and placed beside the group it is given
+- tooltip place: a bar button's outfit tooltip takes the whole bar as its group, with always
+- tooltip place: a sample bar button's tooltip opens beside the whole bar
+- tooltip place: no source file owns a tooltip at the cursor or a corner anchor
+
 ### test_skin_values.lua (3)
 
 - skin values: every host row carries its file, substring, why and cause id
@@ -1938,6 +1952,7 @@ Total.
 | test_credits.lua | 8 |
 | test_skin.lua | 14 |
 | test_titlebar.lua | 12 |
+| test_tooltip_place.lua | 11 |
 | test_skin_values.lua | 3 |
 | test_skin_switch.lua | 84 |
 | test_client_globals.lua | 3 |
@@ -1947,4 +1962,4 @@ Total.
 | test_lizard_sighted.lua | 8 |
 | test_prose.lua | 15 |
 | Skipped | 1 |
-| **Total** | **1609** |
+| **Total** | **1620** |

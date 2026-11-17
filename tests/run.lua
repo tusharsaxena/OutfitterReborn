@@ -210,6 +210,7 @@ local SUITES = {
 
     { name = "test_skin" },
     { name = "test_titlebar" },
+    { name = "test_tooltip_place" },
 
     { name = "test_skin_values", dir = "tests/_kit/" },
     { name = "test_skin_switch", dir = "tests/_kit/" },

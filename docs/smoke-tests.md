@@ -576,3 +576,18 @@ footer.
 | WCF3 (AD-88-OR, Forever) | Stock sheet with the side-tab strip down the window's edge: `/or test`, press `C` | Docked, the window's strip starts at the divider's left edge, right of the tabs, as the title and list do |
 | WCF4 (AD-89-OR) | `/or test` off; open the window and select an outfit; look at its bottom edge under each skin | A 1 px hairline in the skin's divider color runs across the bottom band, with no filled strip under it. *New outfit* sits on the left and *Slots: All None* on the right, each centered in the 24 px band below the hairline; the list's last row ends above the hairline. Labels, tooltips and clicks are as before |
 | WCF5 (AD-89-OR, Forever) | Stock, EllesmereUI and Chonky with the side-tab strip down the window's edge: open the window | The footer's hairline starts right of the tabs, as the title divider does, and *New outfit* starts flush with the rows |
+
+## 23. Tooltip placement (LibKa0s v1.105.0 adoption, AD-92-OR, 2026-11-18)
+
+Retail and Forever. Standalone-windows' *Tooltip placement* (standard v2.113.0): a body element's
+tooltip opens beside the whole window group, right then left, its top level with the element; never at
+the cursor, never at the element's corner. Title-bar tooltips (SK7) are unchanged.
+
+| # | Do | See |
+|---|---|---|
+| TP1 (AD-92-OR) | Open the window alone (sheet closed) in the screen's middle; hover a category with a description, an outfit with a missing or banked item, an outfit's EM mark, and an item row under a selected outfit | Each tooltip opens just right of the window's right edge (a 2 px gap), its top level with the hovered row's (the mark's) top, and it does not move with the pointer. The words are as before |
+| TP2 (AD-92-OR) | Drag the alone window against the screen's right edge; hover the same rows | Each tooltip opens just left of the window's left edge, top level with the row, never over the window |
+| TP3 (AD-92-OR) | Hover an item row, then hold Shift (comparisons on), with the window in the middle, then at the right edge | The item tooltip sits beside the window as in TP1 / TP2, and the comparison tooltips open further out on the same side; the item tooltip's point is not undone by them |
+| TP4 (AD-92-OR) | Press `C` with the window docked to the sheet; hover rows | The tooltips open right of the window; with no room there, left of it (over the sheet, which is Blizzard's) |
+| TP5 (AD-92-OR) | Show the outfit bar; hover a button, then move the bar to the screen's right edge and hover it again; `/or test` and hover a sample button and a sample row | Each tooltip opens beside the whole bar (right, then left at the edge), top level with the button, never over the bar. The samples read *Sample outfit (test mode). Nothing is equipped.* |
+| TP6 (AD-92-OR) | Hover the outfit tab on the character frame, and an item in a bag with an outfit holding it | Unchanged (out of scope): the tab's tooltip sits at its right as before, and the bag item's tooltip is where the client puts it, the compare tooltips beside it |

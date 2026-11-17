@@ -262,6 +262,38 @@ under it, and hiding it first would discard or cancel what it holds (the outfit 
 draft, the rebuild's unapplied stat choice, the progress dialog's running optimize), since every
 Hide does. The addon builds no LibKa0s `DragHandle`, so the drag strip's settings mark does not arise.
 
+**Tooltip placement** (standalone-windows' *Tooltip placement*, frame-layering-§4; AD-92-OR,
+LibKa0s#92, 2026-11-18). Every tooltip the addon places itself is classified and placed through
+LibKa0s-Tooltip-1.0, never at the cursor and never by a corner anchor:
+
+| Element | Kind | Placed by | Group |
+|---|---|---|---|
+| An outfit window row (category, outfit, sample outfit, item) and a row's EM mark | body | `NS.PlaceBodyTip` (`core/CoreSetup.lua`) → `PlaceBeside` | the outfit window |
+| An outfit bar button (an outfit, a sample) | body | `NS.PlaceBodyTip` → `PlaceBeside` | the whole bar |
+| The outfit tooltip (`NS.OutfitTooltip.Show(id, owner, group, always)`) | body | `NS.PlaceBodyTip` → `PlaceBeside` | the group its caller passes |
+| Title-bar controls: the window's and bar's marks, the bar's lock, every dialog's close | chrome | `NS.ShowTitleTip` / the library's `AttachTitleTip` → `PlaceAttached` | — |
+
+`NS.PlaceBodyTip(tip, el, group)` runs after the tooltip is owned at `ANCHOR_NONE`, filled and shown:
+right of the group, else left, top level with the element (the comparison side set to match). With
+unreadable geometry it falls back to `PlaceAttached` above the element, then a plain `BOTTOM`-on-`TOP`
+attach (0, 2). The outfit window is the whole group: it has no companion panel. A window docked on the
+character sheet's right may, with no room right of it, open a row's tooltip on its left, over the
+sheet; the sheet is Blizzard's, not part of the group.
+
+Left where they are, out of scope (the rule's *What it does not bind*), each held by
+`tests/test_tooltip_place.lua`'s guard:
+
+- **The outfit tab on the character frame** (`modules/Dock.lua`, `SetOwner(self, "ANCHOR_RIGHT")`): a
+  button parented to and drawn as part of Blizzard's `CharacterFrame`, in the host's look
+  (DEV-SKIN-SHEET-BUTTON); tooltips over Blizzard's frames are not bound.
+- **The compare tooltips** (`modules/Tooltips_Compare.lua`, owned at `ANCHOR_NONE` and chained
+  `TOPLEFT`/`TOPRIGHT` off the item tooltip): they extend a tooltip the client placed (an item hovered
+  in a bag, on the sheet or in a link), so their side follows the client's tooltip, not a window group.
+- **Item tooltips decorated in place** (`modules/Tooltips.lua`, the outfit lines added to the client's
+  own item tooltips): client-placed.
+- **The settings canvas pages** and **LibDataBroker displays** (the broker object's tooltip is drawn
+  by the display) and the **minimap button** (the library's Launcher, `PlaceLauncher`, launcher-§7).
+
 ## Taint Notes
 
 Every secure-environment write goes through `NS.SecureQueue.Run(key, fn)`: it runs at once out of

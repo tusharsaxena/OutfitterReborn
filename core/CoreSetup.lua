@@ -57,6 +57,35 @@ function NS.ShowTitleTip(owner, title, body)
     tip:SetPoint("BOTTOM", owner, "TOP", 0, 2)
 end
 
+-- ── a body element's tooltip (AD-92-OR, LibKa0s#92; standalone-windows, *Tooltip placement*) ──
+--
+-- Every tooltip this addon places on a BODY element (an outfit window row, the EM mark in a row, an
+-- outfit bar button) is owned at ANCHOR_NONE, filled, shown, and then placed here: beside the whole
+-- window group by LibKa0s-Tooltip-1.0's PlaceBeside (right of the group, else left, top level with
+-- the element, comparisons on the same side). Unreadable geometry falls back to PlaceAttached above
+-- the element, then to a plain attach above it by a relative point; never the cursor. Resolved at
+-- call time, as ShowTitleTip resolves the major.
+
+--- Place the shown tooltip `tip`, owned by body element `el`, beside window group `group` (a frame,
+--- a list of frames or a group table; anything else lets the library find the group from `el`).
+--- @param tip table
+--- @param el table
+--- @param group table|function|nil
+--- @return string|nil side the side the tooltip took ("right", "left", "above", "below")
+function NS.PlaceBodyTip(tip, el, group)
+    if not (tip and el) then return nil end
+    local g = group
+    if type(g) ~= "table" and type(g) ~= "function" then g = nil end
+    local Tip = LibStub and LibStub("LibKa0s-Tooltip-1.0", true)
+    local side = Tip and type(Tip.PlaceBeside) == "function" and Tip.PlaceBeside(tip, el, g) or nil
+    if side then return side end
+    side = Tip and type(Tip.PlaceAttached) == "function" and Tip.PlaceAttached(tip, el) or nil
+    if side then return side end
+    tip:ClearAllPoints()
+    tip:SetPoint("BOTTOM", el, "TOP", 0, 2)
+    return "above"
+end
+
 --- Hide the game tooltip when `owner` holds it.
 --- @param owner table
 function NS.HideTitleTip(owner)

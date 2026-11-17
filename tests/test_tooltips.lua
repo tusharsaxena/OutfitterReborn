@@ -414,7 +414,8 @@ test("outfit tooltip: the name, the trigger description, Missing: in red and Ban
     local id = outfit(NS, "Dive", { HeadSlot = "head_plate", LegsSlot = "legs_plate", NeckSlot = "neck_chain" })
     NS.Outfits.Get(id).trigger = { id = "SWIMMING" }
     local owner = M.CreateFrame("Button", nil, M.UIParent)
-    assertTrue(NS.OutfitTooltip.Show(id, owner, "ANCHOR_RIGHT"))
+    -- re-pinned (AD-92-OR): the third argument is the window group now, not an anchor.
+    assertTrue(NS.OutfitTooltip.Show(id, owner, owner))
     local tip = M.GameTooltip
     local lines = texts(tip)
     assertEqual(lines[1], "Dive")
@@ -461,13 +462,14 @@ test("outfit tooltip: `always` (the bar) draws the full tooltip with nothing mis
     M.__cvars.UberTooltips = "0"
     local plain = outfit(NS, "Plain", { HeadSlot = "head_plate" })
     -- red under: OT.Show ignoring `always` (the legacy pShowEmptyTooltips, OutfitterBar.lua:844).
-    assertTrue(NS.OutfitTooltip.Show(plain, owner, "ANCHOR_RIGHT", true))
+    -- re-pinned (AD-92-OR): the third argument is the window group now, not an anchor.
+    assertTrue(NS.OutfitTooltip.Show(plain, owner, owner, true))
     local lines = texts(M.GameTooltip)
     assertEqual(#lines, 1)
     assertEqual(lines[1], "Plain")
     local id = outfit(NS, "Dive", { HeadSlot = "head_plate" })
     NS.Outfits.Get(id).trigger = { id = "SWIMMING" }
-    assertTrue(NS.OutfitTooltip.Show(id, owner, "ANCHOR_RIGHT", true))
+    assertTrue(NS.OutfitTooltip.Show(id, owner, owner, true))
     lines = texts(M.GameTooltip)
     assertEqual(lines[1] .. "|" .. lines[2], "Dive|Worn while you are swimming")
 end)
