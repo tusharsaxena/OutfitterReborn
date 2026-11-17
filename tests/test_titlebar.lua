@@ -247,3 +247,47 @@ test("title bar: every dialog's close is W.HeaderButtons', its settings mark opt
         assertEqual(hb.offsets.close, -H.PAD)
     end
 end)
+
+test("title bar: every dialog's opt-out reason holds for a draft, a confirm and a running search alike", function()
+    -- The progress dialog holds no draft (its hide cancels the optimize), so the recorded reason must
+    -- name what every dialog's hide does. red under: the "unsaved draft" wording (AD-86-OR review).
+    local NS = live()
+    for _, d in ipairs({ NS.OutfitDialog, NS.TriggerDialog, NS.RebuildDialog, NS.ProgressDialog }) do
+        local why = d.Frame().headerButtons.optOut
+        assertTrue(not why:find("draft", 1, true), "the reason speaks of a draft: " .. why)
+        assertTrue(why:find("discards or cancels", 1, true) ~= nil, "the reason does not say the hide discards or cancels")
+    end
+end)
+
+test("title bar: the bar's lock mark carries its own tip, so every mark has a __tip", function()
+    -- red under: the lock extra built with no `tip` (its title only from the hooked NS.ShowTitleTip).
+    local NS, _, f = shownBar()
+    assertEqual(f.lock.__tip, NS.L["Lock or unlock the outfit bar"])
+end)
+
+test("title bar: without the library the bar's degraded strip matches the library's order and offsets", function()
+    -- core/WidgetsSetup.lua's hostStrip re-builds W.HeaderButtons by hand; pinned against the library
+    -- strip so the two cannot drift (AD-86-OR review).
+    local _, M, lf = shownBar()
+    local want = lf.headerButtons
+    local H = M.LibStub("LibKa0s-Widgets-1.0").HEADER
+    local inst = T.load({ libFiles = {} })
+    local NS, DM = inst.NS, inst.mocks
+    dofile(T.root .. "/tests/_kit/mock_paint.lua")(DM)
+    NS.db.profile.bar.shown = true
+    NS.Outfits.Create("A", dofile(T.root .. "/tests/bar_scene.lua")(T).naked())
+    NS.Bar.Resume()
+    DM.__fireTimers()
+    local hb = NS.Bar.Frame().headerButtons
+    -- Without the library NS.MakeCloseButton answers nil (core/CoreSetup.lua: the chrome degrades to
+    -- nothing), so the strip holds no close; like W.HeaderButtons with no close, the rest pack from
+    -- the corner in the same order and at the same pitch: each mark one slot outward of the library's.
+    assertEqual(strip(hb), "lock,settings")
+    assertEqual(NS.HEADER.PAD, H.PAD); assertEqual(NS.HEADER.SIZE, H.SIZE); assertEqual(NS.HEADER.GAP, H.GAP)
+    assertEqual(hb.offsets.settings, want.offsets.close, "settings is not where the library puts the corner mark")
+    assertEqual(hb.offsets.lock, want.offsets.settings, "the lock is not one pitch in from settings")
+    assertEqual(hb.offsets.settings, -H.PAD)
+    assertEqual(hb.offsets.lock, -(H.PAD + H.SIZE + H.GAP))
+    assertNil(hb.close, "a degraded close appeared")
+    assertNil(hb.optOut, "the degraded bar keeps its settings mark")
+end)

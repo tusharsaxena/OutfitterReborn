@@ -841,6 +841,8 @@ test("window: the gear's art is the close X's size, centered, in the X's rest ti
     -- W.HeaderButton anchors its art by SetPoint("CENTER"), no relative frame: the client takes the
     -- parent, the gear (AD-86-OR re-pin; the hand-built gear named it).
     assertEqual(p[1], "CENTER"); assertTrue(p[2] == gear or p[2] == nil, "the art is not centered on the gear")
+    -- With no relative frame named, the anchor is the art's parent: pin that it is the gear.
+    if p[2] == nil then assertTrue(gear.icon:GetParent() == gear, "the art's parent (its anchor) is not the gear") end
     -- red under: the gear left untinted (white) beside the X's gray, or no hover. Under the pointer
     -- the gear takes text.link, as the library's header marks do, and the X its own close.hot
     -- (LibKa0s v1.105.0 smoke round 1, ruling 4, which superseded G5's shared close.hot hover).

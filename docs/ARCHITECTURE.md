@@ -257,9 +257,10 @@ keeps its state art and its two-line tooltip, the settings mark opens the bar's 
 (as the header's right click does), and the drag strip stops 2 px short of the lock; the bar's narrowest
 width (`Bar.Layout.MIN_WIDTH`) is 136 to hold the title beside three marks. The **dialogs** (outfit,
 trigger, rebuild, progress) carry the close alone, their settings mark **opted out** with the reason
-the strip records (`settingsOptOut`): a dialog is a `MODAL`-tier editor over an unsaved draft, so the
-settings panel would open under it, and hiding it first would drop the draft, since every Hide
-discards. The addon builds no LibKa0s `DragHandle`, so the drag strip's settings mark does not arise.
+the strip records (`settingsOptOut`): a dialog is `MODAL`-tier, so the settings panel would open
+under it, and hiding it first would discard or cancel what it holds (the outfit and trigger dialogs'
+draft, the rebuild's unapplied stat choice, the progress dialog's running optimize), since every
+Hide does. The addon builds no LibKa0s `DragHandle`, so the drag strip's settings mark does not arise.
 
 ## Taint Notes
 

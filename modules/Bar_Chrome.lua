@@ -112,7 +112,8 @@ end
 -- ── the controls ──────────────────────────────────────────────────────────────────────────────
 
 --- The marks (AD-86-OR): lock · settings · close, made on `header` and laid on the band by
---- placeHeader. The lock keeps its two-line tooltip, hooked over the strip's own hover paint.
+--- placeHeader. The lock carries its title as its `tip` (`__tip`, as every mark does) and keeps its
+--- two-line tooltip, hooked over the strip's own one-line tip and hover paint.
 local function marks(f, header)
     local hb = NS.HeaderButtons(header, {
         frame = f, place = false,
@@ -120,6 +121,7 @@ local function marks(f, header)
         settings = function() NS.OpenOptionsPanel("bar") end,
         settingsTip = L["Open settings"],
         extras = { { key = "lock", icon = locked() and "lock" or "unlock",
+                     tip = L["Lock or unlock the outfit bar"],
                      onClick = function() NS.SetByPath("locked", not locked()) end } },
     })
     f.close, f.settingsButton, f.lock = hb.close, hb.settings, hb.extras.lock
