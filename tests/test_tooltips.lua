@@ -383,6 +383,91 @@ test("compare: placed beside the shopping tooltips, left to right on secret geom
     assertTrue(toRight, "secret geometry: left to right")
 end)
 
+-- Record the points `tip` is given (the base mock no-ops SetPoint).
+local function recordPoints(tip)
+    rawset(tip, "__pts", {})
+    rawset(tip, "SetPoint", function(self, ...) local p = rawget(self, "__pts"); p[#p + 1] = { ... } end)
+    rawset(tip, "ClearAllPoints", function(self) rawset(self, "__pts", {}) end)
+end
+
+-- GameTooltip owned by an outfit window item row and placed by this addon on `side`, its own
+-- geometry at `left`..`right` on the 1920 px screen.
+local function placedByRow(NS, M, row, side, left, right)
+    local GT = M.GameTooltip
+    rawset(GT, "GetLeft", function() return left end)
+    rawset(GT, "GetRight", function() return right end)
+    M.LibStub("LibKa0s-Tooltip-1.0").PlaceBeside = function() return side end
+    GT:SetOwner(row, "ANCHOR_NONE")
+    assertEqual(NS.PlaceBodyTip(GT, row, row), side)
+end
+
+test("compare: on an item row's tooltip ours open further out on the side this addon placed it (body rule 5)", function()
+    local NS, M = compareScene()
+    NS.Outfits.Create("Set", { HeadSlot = helm(1, 3, 600) })
+    local row = M.CreateFrame("Button", nil, M.UIParent)
+    -- The review's case: the window at 1100..1450, the item tooltip right of it at 1452..1752, so
+    -- the screen's wider half is the left one.
+    placedByRow(NS, M, row, "right", 1452, 1752)
+    showCompare(M, DB.head_plate.link)
+    local ours = M.OutfitterRebornCompareTooltip1
+    recordPoints(ours)
+    M.GameTooltip_ShowCompareItem(M.GameTooltip)
+    local p = ours.__pts[#ours.__pts]
+    -- red under: Compare.Placement choosing by the screen half alone (TOPRIGHT on the anchor's
+    -- TOPLEFT: back over the item tooltip and the window).
+    assertEqual(p[1], "TOPLEFT", "right: ours to the anchor's right")
+    assertTrue(p[2] == M.GameTooltip, "beside the item tooltip")
+    assertEqual(p[3], "TOPRIGHT")
+    M.ShoppingTooltip1:Show()
+    placedByRow(NS, M, row, "left", 100, 400)       -- left of a window at the screen's right edge
+    M.GameTooltip_ShowCompareItem(M.GameTooltip)
+    p = ours.__pts[#ours.__pts]
+    assertEqual(p[1], "TOPRIGHT", "left: ours to the anchor's left")
+    assertTrue(p[2] == M.ShoppingTooltip1, "beside the outward stock shopping tooltip")
+    assertEqual(p[3], "TOPLEFT")
+    M.ShoppingTooltip1:Hide()
+    -- A bag, sheet or link hover: GameTooltip re-owned by the client's frame, the screen half again.
+    M.GameTooltip:SetOwner(M.CreateFrame("Button", nil, M.UIParent), "ANCHOR_NONE")
+    -- red under: a side that outlives the row's ownership.
+    assertTrue(select(2, NS.Compare.Placement()), "the client's tooltip: the wider half (right)")
+end)
+
+test("compare: Reside draws ours again only while they show", function()
+    local NS, M = compareScene()
+    NS.Outfits.Create("Set", { HeadSlot = helm(1, 3, 600) })
+    local row = M.CreateFrame("Button", nil, M.UIParent)
+    placedByRow(NS, M, row, "right", 1452, 1752)
+    NS.Compare.Reside()
+    -- red under: Reside drawing ours unasked (no compare was shown).
+    assertEqual(#shownCompares(M), 0, "none shown: none drawn")
+    showCompare(M, DB.head_plate.link)
+    local ours = M.OutfitterRebornCompareTooltip1
+    recordPoints(ours)
+    NS.Compare.Reside()
+    assertEqual(#shownCompares(M), 1)
+    assertEqual(ours.__pts[#ours.__pts][1], "TOPLEFT", "drawn again on the row's side")
+end)
+
+test("compare: the item post-call places a row's item tooltip again after late growth", function()
+    local NS, M = scene()
+    local replaced, resided, side = 0, 0, "right"
+    NS.BodyTipSide = function(tip) return tip == M.GameTooltip and side or nil end
+    NS.ReplaceBodyTip = function() replaced = replaced + 1; return side end
+    NS.Compare.Reside = function() resided = resided + 1 end
+    M.GameTooltip:SetHyperlink(DB.head_plate.link)
+    postCall(M)
+    -- red under: an item post-call that never places the row's tooltip again (a stale clamp).
+    assertEqual(replaced, 1, "placed again")
+    assertEqual(resided, 0, "same side: ours stay chained")
+    NS.ReplaceBodyTip = function() replaced = replaced + 1; return "left" end
+    postCall(M)
+    assertEqual(resided, 1, "the side changed: ours drawn again")
+    side = nil
+    postCall(M)
+    postCall(M, M.ShoppingTooltip1)
+    assertEqual(replaced, 2, "a tooltip this addon did not place is left where the client put it")
+end)
+
 test("compare: GameTooltip's OnHide, Refresh and the stand-down hide every compare tooltip", function()
     local NS, M = compareScene()
     NS.Outfits.Create("Set", { HeadSlot = helm(1, 3, 600) })

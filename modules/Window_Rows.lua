@@ -42,7 +42,7 @@ local _, NS = ...
 -- CALLS (at call time; design §12): NS.Window.MarkDirty/ToggleCollapsed, NS.Stack.Wear/Remove/IsWorn/
 -- Select/Selected, NS.Outfits.Get/IsEM, NS.EM.SetStored, NS.OutfitMenu.Open,
 -- NS.OutfitTooltip.Show, NS.OutfitIcon (the one icon resolver), NS.Compat (pickup, use, sell
--- cursor, item icon).
+-- cursor, item icon), NS.PlaceBodyTip, NS.Compare.Reside.
 
 local Rows = { rows = {}, built = false, COUNT = 14, ROW_H = 18, ROW_W = 228 }
 NS.WindowRows = Rows
@@ -214,6 +214,9 @@ local function itemTooltip(row, item)
     end
     GameTooltip:Show()
     NS.PlaceBodyTip(GameTooltip, row, NS.Window.Frame())
+    -- ours chain off it on the side just chosen (body rule 5); a late-growing item is placed again
+    -- by the item post-call (NS.Tooltips.OnItem → NS.ReplaceBodyTip).
+    NS.Compare.Reside()
 end
 
 local HOVER = {}

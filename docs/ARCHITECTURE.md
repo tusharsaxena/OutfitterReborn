@@ -276,7 +276,18 @@ LibKa0s-Tooltip-1.0, never at the cursor and never by a corner anchor:
 `NS.PlaceBodyTip(tip, el, group)` runs after the tooltip is owned at `ANCHOR_NONE`, filled and shown:
 right of the group, else left, top level with the element (the comparison side set to match). With
 unreadable geometry it falls back to `PlaceAttached` above the element, then a plain `BOTTOM`-on-`TOP`
-attach (0, 2). The outfit window is the whole group: it has no companion panel. A window docked on the
+attach (0, 2). The outfit window is the whole group: it has no companion panel.
+
+The side each body tooltip took is remembered with the element it was placed against
+(`NS.BodyTipSide`, while the tooltip is still owned by that element). On an outfit window item row it
+drives the addon's own compare tooltips (`OutfitterRebornCompareTooltip1..5`, body rule 5):
+`Compare.Placement` chains them further out on that same side, off `ShoppingTooltip2`, else
+`ShoppingTooltip1`, else `GameTooltip`, so they never open back over the item tooltip and the window.
+The client may run its compare before the row places its tooltip, so the row calls `Compare.Reside`
+after placing, which draws ours again from the side just chosen. An item tooltip that grows after it
+is placed (item data arriving late, the outfit line added) is placed again from the item post-call
+(`NS.Tooltips.OnItem` → `NS.ReplaceBodyTip`, the library's `Replace`); ours are drawn again when that
+changes the side. A window docked on the
 character sheet's right may, with no room right of it, open a row's tooltip on its left, over the
 sheet; the sheet is Blizzard's, not part of the group.
 
@@ -286,9 +297,11 @@ Left where they are, out of scope (the rule's *What it does not bind*), each hel
 - **The outfit tab on the character frame** (`modules/Dock.lua`, `SetOwner(self, "ANCHOR_RIGHT")`): a
   button parented to and drawn as part of Blizzard's `CharacterFrame`, in the host's look
   (DEV-SKIN-SHEET-BUTTON); tooltips over Blizzard's frames are not bound.
-- **The compare tooltips** (`modules/Tooltips_Compare.lua`, owned at `ANCHOR_NONE` and chained
-  `TOPLEFT`/`TOPRIGHT` off the item tooltip): they extend a tooltip the client placed (an item hovered
-  in a bag, on the sheet or in a link), so their side follows the client's tooltip, not a window group.
+- **The compare tooltips on a client-placed item tooltip** (`modules/Tooltips_Compare.lua`, owned at
+  `ANCHOR_NONE` and chained `TOPLEFT`/`TOPRIGHT` off the item tooltip) for an item hovered in a bag,
+  on the sheet or in a link: they extend a tooltip the client placed, so with no side of this addon's
+  to follow they take the screen half with more room. On an outfit window item row they are in scope
+  and follow the row's side (above).
 - **Item tooltips decorated in place** (`modules/Tooltips.lua`, the outfit lines added to the client's
   own item tooltips): client-placed.
 - **The settings canvas pages** and **LibDataBroker displays** (the broker object's tooltip is drawn

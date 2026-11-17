@@ -5,16 +5,18 @@
 -- an outfit, an item), the EM mark inside an outfit row, and a button of the outfit bar. Each is owned
 -- at ANCHOR_NONE, filled, shown, and then placed by LibKa0s-Tooltip-1.0's PlaceBeside against the
 -- whole window group (the window; the whole bar), through NS.PlaceBodyTip (core/CoreSetup.lua). The
--- title-bar controls are chrome and attach above their control (test_titlebar). Out of scope, and
--- held to that by the guard below: the toggle button on the client's character frame (a Blizzard
--- frame) and the compare tooltips chained off the client-placed GameTooltip (modules/Tooltips_Compare.lua).
+-- title-bar controls are chrome and attach above their control (test_titlebar). The addon's own
+-- compare tooltips are in scope on an item row (body rule 5: chained further out on the side the
+-- row's tooltip took; this file and test_tooltips' compare cases) and out of scope on a bag, sheet
+-- or link hover, where GameTooltip is the client's. Out of scope, and held to that by the guard
+-- below: the toggle button on the client's character frame (a Blizzard frame).
 --
 -- The surface cases spy on the instance's own PlaceBeside (its call shape, calling straight
 -- through); the geometry case drives the kit's fake screen (tests/_kit/mock_screen.lua, revision 57)
 -- through a right-fits and a right-does-not-fit layout.
 
 local T = _G.OUTFITTERREBORN_TEST
-local test, assertEqual, assertTrue = T.test, T.assertEqual, T.assertTrue
+local test, assertEqual, assertTrue, assertNil = T.test, T.assertEqual, T.assertTrue, T.assertNil
 local dockScene = dofile(T.root .. "/tests/dock_scene.lua")(T)
 local B = dofile(T.root .. "/tests/bar_scene.lua")(T)
 
@@ -63,6 +65,68 @@ test("tooltip place: a body tooltip opens right of the group, top level with the
         local _, _, r, t2 = scr.rectOf(tip)
         assertEqual(r, 1498, "left: the tooltip's right is the group's left edge - 2")
         assertEqual(t2, 600, "left: the tooltip's top is the row's top")
+    end)
+    scr.restore()
+    if not ok then error(err, 0) end
+end)
+
+-- The anchor type of `tip`'s last SetAnchorType (the comparison side the placer handed the client).
+local function lastAnchorType(tip)
+    local found
+    for _, e in ipairs(tip.__log or {}) do
+        if e.op == "SetAnchorType" then found = e.anchor end
+    end
+    return found
+end
+
+test("tooltip place: the comparison side follows the side taken, and the side is remembered for its owner", function()
+    local NS, M = T.NS, T.mocks
+    local scr = dofile(T.root .. "/tests/_kit/mock_screen.lua")(M, { width = 1920, height = 1080 })
+    local ok, err = pcall(function()
+        local win = scr.frame{ left = 400, bottom = 300, width = 300, height = 400 }
+        local row = scr.frame{ left = 400, bottom = 580, width = 300, height = 20, parent = win }
+        local tip = scr.tooltip{ width = 250, height = 90 }
+        tip:SetOwner(row, "ANCHOR_NONE")
+        assertEqual(NS.PlaceBodyTip(tip, row, win), "right")
+        -- red under: PlaceBeside called with comparisons = false (the stock shopping pair would
+        -- keep the client's own side and open back over the window).
+        assertEqual(lastAnchorType(tip), "ANCHOR_RIGHT", "right: the comparisons go right")
+        -- red under: NS.PlaceBodyTip not remembering its side (Compare.Placement falls back to the
+        -- screen half with more room: left here, back over the tooltip and the window).
+        assertEqual(NS.BodyTipSide(tip), "right", "the side is remembered")
+        win:__place(1500, 300, 300, 400)
+        row:__place(1500, 580, 300, 20)
+        assertEqual(NS.PlaceBodyTip(tip, row, win), "left")
+        assertEqual(lastAnchorType(tip), "ANCHOR_LEFT", "left: the comparisons go left")
+        assertEqual(NS.BodyTipSide(tip), "left")
+        tip:SetOwner(M.UIParent, "ANCHOR_NONE")
+        -- red under: a record that outlives its owner (a bag hover would take a row's side).
+        assertNil(NS.BodyTipSide(tip), "re-owned: the client's tooltip again")
+    end)
+    scr.restore()
+    if not ok then error(err, 0) end
+end)
+
+test("tooltip place: a body tooltip that grows after it is placed is placed again", function()
+    local NS, M = T.NS, T.mocks
+    local scr = dofile(T.root .. "/tests/_kit/mock_screen.lua")(M, { width = 1920, height = 1080 })
+    local ok, err = pcall(function()
+        local win = scr.frame{ left = 400, bottom = 60, width = 300, height = 400 }
+        local row = scr.frame{ left = 400, bottom = 80, width = 300, height = 20, parent = win }
+        local tip = scr.tooltip{ width = 250, height = 90 }
+        tip:SetOwner(row, "ANCHOR_NONE")
+        NS.PlaceBodyTip(tip, row, win)
+        local _, b0, _, t0 = scr.rectOf(tip)
+        assertEqual(t0, 100, "placed: top level with the row")
+        assertEqual(b0, 10)
+        tip:__size(250, 300)                  -- the item's data arrived: it grew below the screen
+        -- red under: no NS.ReplaceBodyTip (the item post-call leaves the stale clamp).
+        assertEqual(NS.ReplaceBodyTip(tip), "right")
+        local _, b1, _, t1 = scr.rectOf(tip)
+        assertEqual(t1, 300, "placed again: slid up just enough to stay on the screen")
+        assertEqual(b1, 0)
+        tip:SetOwner(M.UIParent, "ANCHOR_NONE")
+        assertNil(NS.ReplaceBodyTip(tip), "a tooltip this addon no longer owns is not moved")
     end)
     scr.restore()
     if not ok then error(err, 0) end
@@ -128,6 +192,29 @@ test("tooltip place: an item row's tooltip opens beside the outfit window", func
     local calls = spyBeside(M)
     row:__fire("OnEnter")
     assertBeside(calls, row, NS.Window.Frame(), "item row")
+end)
+
+test("tooltip place: an item row hands the side it took to the compare tooltips, after placing", function()
+    local NS, M = opened()
+    local row = NS.WindowRows.rows[1]
+    row.entry = { kind = "item", id = "loose:1", depth = 1, item = { id = 0, name = "Item", loc = { slotID = 1 } } }
+    local Tip = M.LibStub("LibKa0s-Tooltip-1.0")
+    local order, side = {}, "left"
+    Tip.PlaceBeside = function() order[#order + 1] = "placed"; return side end
+    NS.Compare.Reside = function()
+        order[#order + 1] = "reside"
+        -- what Compare.Placement reads when ours are drawn again
+        order[#order + 1] = tostring(NS.BodyTipSide(M.GameTooltip))
+    end
+    row:__fire("OnEnter")
+    -- red under: no Compare.Reside after the placement (a compare the client ran first keeps the
+    -- screen-half side), or a side not remembered (Placement cannot follow it).
+    assertEqual(table.concat(order, " "), "placed reside left")
+    assertEqual(select(2, NS.Compare.Placement()), false, "ours go left with the item tooltip")
+    order, side = {}, "right"
+    row:__fire("OnEnter")
+    assertEqual(table.concat(order, " "), "placed reside right")
+    assertTrue(select(2, NS.Compare.Placement()), "ours go right with the item tooltip")
 end)
 
 test("tooltip place: a sample outfit row's tooltip opens beside the outfit window", function()

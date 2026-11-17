@@ -895,7 +895,7 @@ Total.
 - equip bracket: a stand-down between the load screen's two events clears the load flag
 - equip bracket: Diagnostic reports depth, the next update, the last error and the tripwire
 
-### test_tooltips.lua (18)
+### test_tooltips.lua (21)
 
 - tooltips: the line lands on bag, player inventory and hyperlink tooltips
 - tooltips: another unit's inventory item gets no line
@@ -911,6 +911,9 @@ Total.
 - compare: the gates: stood down, the row, the client's wish, the modifier, a plain link, armor
 - compare: releasing the modifier over the same item hides ours on the next frame
 - compare: placed beside the shopping tooltips, left to right on secret geometry
+- compare: on an item row's tooltip ours open further out on the side this addon placed it (body rule 5)
+- compare: Reside draws ours again only while they show
+- compare: the item post-call places a row's item tooltip again after late growth
 - compare: GameTooltip's OnHide, Refresh and the stand-down hide every compare tooltip
 - outfit tooltip: the name, the trigger description, Missing: in red and Banked: in blue
 - outfit tooltip: nothing missing falls back to the newbie tip, which follows UberTooltips
@@ -1700,13 +1703,16 @@ Total.
 - title bar: the bar's lock mark carries its own tip, so every mark has a __tip
 - title bar: without the library the bar's degraded strip matches the library's order and offsets
 
-### test_tooltip_place.lua (11)
+### test_tooltip_place.lua (14)
 
 - tooltip place: a body tooltip opens right of the group, top level with the element, else left
+- tooltip place: the comparison side follows the side taken, and the side is remembered for its owner
+- tooltip place: a body tooltip that grows after it is placed is placed again
 - tooltip place: unreadable geometry attaches above the element, never at the cursor
 - tooltip place: a category row's tooltip opens beside the outfit window
 - tooltip place: the EM mark's tooltip opens beside the outfit window, top level with the mark
 - tooltip place: an item row's tooltip opens beside the outfit window
+- tooltip place: an item row hands the side it took to the compare tooltips, after placing
 - tooltip place: a sample outfit row's tooltip opens beside the outfit window
 - tooltip place: an outfit row hands the outfit window to the outfit tooltip as its group
 - tooltip place: the outfit tooltip is owned at ANCHOR_NONE and placed beside the group it is given
@@ -1916,7 +1922,7 @@ Total.
 | test_quickslots.lua | 19 |
 | test_drawer.lua | 35 |
 | test_equip_bracket.lua | 32 |
-| test_tooltips.lua | 18 |
+| test_tooltips.lua | 21 |
 | test_stack.lua | 27 |
 | test_em_sync.lua | 27 |
 | test_bank.lua | 14 |
@@ -1952,7 +1958,7 @@ Total.
 | test_credits.lua | 8 |
 | test_skin.lua | 14 |
 | test_titlebar.lua | 12 |
-| test_tooltip_place.lua | 11 |
+| test_tooltip_place.lua | 14 |
 | test_skin_values.lua | 3 |
 | test_skin_switch.lua | 84 |
 | test_client_globals.lua | 3 |
@@ -1962,4 +1968,4 @@ Total.
 | test_lizard_sighted.lua | 8 |
 | test_prose.lua | 15 |
 | Skipped | 1 |
-| **Total** | **1620** |
+| **Total** | **1626** |
