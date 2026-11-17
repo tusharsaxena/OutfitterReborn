@@ -133,6 +133,7 @@ checked by eye in the client.
 | SK4 | Item icons in the list, the icon browser and the bar | Cropped with no art border showing; a 1 px edge in the window, in the icon browser and on the bar (the window outline: the bar always draws a window background) |
 | SK5 | A dialog open over the window, then Escape twice | The dialog closes first, then the window |
 | SK6 | Another addon moves the character sheet with the window open | The sheet still moves, and the window follows it |
+| SK7 | Under Ka0s Default and one other skin, hover each title-bar control: the window's gear and close, the bar's lock and close, each dialog's close (LibKa0s v1.105.0 smoke round 1, rulings 3 and 4) | Each shows a tooltip above it (below only at the screen's top edge) in the skin's tooltip title color: "Open settings", "Lock or unlock the outfit bar" with its second line, "Close"; at rest every control, the X included, draws the skin's icon color; under the pointer the gear and the lock take the link color and the X turns red |
 
 ## 10. What the headless run cannot reach
 

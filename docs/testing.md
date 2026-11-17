@@ -201,6 +201,7 @@ has no row here, or a row leaves its §9.3 group or order.
 | `test_tooltips` | The "Used by outfits" line on bag, inventory and hyperlink tooltips (never another unit's), its colors and cache; the compare tooltips; the outfit tooltip |
 | `test_skinsetup` | The skin seam: the owner registration, the `of.*` tokens, the choice and the picker |
 | `test_skin` | Only our frames are skinned; the window, bar, dialogs and menus follow a skin switch |
+| `test_titlebar` | The title-bar controls of the windows this addon draws (the outfit window, the outfit bar, the four dialogs): every control shows a tooltip in `gtip.title`, and rests in `icon.tint` and lights in `text.link` (a close in `close.hot`) under every shipped skin (LibKa0s v1.105.0 smoke round 1, rulings 3 and 4) |
 | `test_perf_harness` | The ten buckets in order with the one nest, each reached on the whole addon (`equipExecute` only inside `E.Update`), the six offline scenarios doing what they are named for (the idle docked window's announcing nothing and leaving no update pending among them), the `perf` verb, the latch's `perf` hold |
 | `test_glyphs` | The display-glyph guard over the addon's own Lua. The zhCN, zhTW, koKR and ruRU overlays are skipped (no western safe set holds them); their faces are left to the H8 client check |
 

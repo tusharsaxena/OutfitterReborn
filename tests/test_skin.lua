@@ -255,14 +255,15 @@ end)
 
 test("window: the header gear has no border", function()
     -- Sheet and window feedback design G10: the window's small icon buttons lose their box and
-    -- bevel; the text buttons (New outfit, Slots: All / None) keep theirs. Smoke round 2 design
-    -- G5: the gear is painted as the close X is (S.CloseButton: close.rest, close.hot), which draws
-    -- no box. red under: modules/Window.lua's NS.Skin.Button(gear) (a box, and no X tint).
-    local _, _, Skin, built = buildAll()
-    local gear = built["the window's settings button"]
-    local calls = Skin.painted[gear].calls
-    assertTrue(calls.CloseButton ~= nil, "the gear is not painted as the close X is")
-    assertTrue(calls.Button == nil, "S.Button(gear) draws a box")
+    -- bevel; the text buttons (New outfit, Slots: All / None) keep theirs. LibKa0s v1.105.0 smoke
+    -- round 1 (ruling 4): the gear's art is a header mark (S.Mark: icon.tint, text.link under the
+    -- pointer), which draws no box. red under: modules/Window.lua's NS.Skin.Button(gear) (a box).
+    local _, M, Skin, built = buildAll()
+    local art = built["the window's settings button"]
+    local gear = M.OutfitterRebornWindowSettings
+    assertTrue(art == gear.icon, "the surface is the gear's art")
+    assertTrue(Skin.painted[art].calls.Mark ~= nil, "the gear's art is not painted as a header mark")
+    assertTrue(Skin.painted[gear] == nil, "the gear button itself is painted (a box)")
     -- The New outfit mark is an S.Mark on a texture (a tint, never a box); its button keeps its border.
     local new = built["the New outfit button"]
     local newOpts = Skin.painted[new].calls.Button[1]

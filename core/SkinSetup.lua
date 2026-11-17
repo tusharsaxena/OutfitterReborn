@@ -135,8 +135,9 @@ NS.SKIN_TOKENS = {
     ["of.row.trigger"]     = { default = { 1, 1, 1, 1 }, follow = "icon.tint" },
     -- A slot checkbox's "unknown" mark (a slot an outfit neither sets nor clears): gold.
     ["of.slot.unknown"]    = { default = { 1, 0.82, 0, 1 }, follow = "sem.statusWarn" },
-    -- The outfit bar's worn mark over a button whose outfit is on.
-    ["of.bar.worn"]        = { default = { 1, 0.82, 0, 1 }, follow = "icon.hot" },
+    -- The outfit bar's worn mark over a button whose outfit is on. It follows the accent, not
+    -- `icon.hot`, which is white under three skins from LibKa0s v1.105.0 (SkinDefsOthers minor 10).
+    ["of.bar.worn"]        = { default = { 1, 0.82, 0, 1 }, follow = "text.accent" },
     -- A dialog's error line (a duplicate name, an invalid trigger parameter).
     ["of.dialog.error"]    = { default = { 1, 0.33, 0.33, 1 }, follow = "sem.bad" },
 }

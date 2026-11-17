@@ -28,7 +28,7 @@ local TOKENS = {
     ["of.outfit.banked"]   = { { 0.25, 0.2, 1.0, 1 }, "sem.info" },
     ["of.row.trigger"]     = { { 1, 1, 1, 1 }, "icon.tint" },
     ["of.slot.unknown"]    = { { 1, 0.82, 0, 1 }, "sem.statusWarn" },
-    ["of.bar.worn"]        = { { 1, 0.82, 0, 1 }, "icon.hot" },
+    ["of.bar.worn"]        = { { 1, 0.82, 0, 1 }, "text.accent" },  -- was icon.hot (LibKa0s v1.105.0, D-7)
     ["of.dialog.error"]    = { { 1, 0.33, 0.33, 1 }, "sem.bad" },
     -- Smoke round 2 design G1 retired `of.sheet.button`: the sheet button wears the host's tab and
     -- the broker draws the default icon untinted, so nothing reads it.

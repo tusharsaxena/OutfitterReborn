@@ -36,7 +36,7 @@ local _, NS = ...
 -- pointer is anywhere over it, its controls and its secure child included: each one's enter sets the
 -- row's hover, each one's leave clears it unless the pointer is still over the row. The worn box and
 -- the Equipment Manager mark add their own wash in the skin's accent (`icon.arrow` at HOT_ALPHA),
--- colored on each enter so it is the live skin's; the gear is painted as the title gear is
+-- colored on each enter so it is the live skin's; the gear is painted as the close X is
 -- (NS.Skin.CloseButton: `close.rest`, `close.hot` under the pointer).
 --
 -- CALLS (at call time; design §12): NS.Window.MarkDirty/ToggleCollapsed, NS.Stack.Wear/Remove/IsWorn/
@@ -454,7 +454,7 @@ local function gearMenu(row)
     menu.icon:SetSize(GEAR_ART, GEAR_ART)
     menu.icon:SetPoint("CENTER", menu, "CENTER", 0, 0)
     menu.icon:SetTexture(NS.Icon("ph:gear-six"))
-    -- Painted as the title gear is: `close.rest`, `close.hot` under the pointer (S6).
+    -- Painted as the close X is: `close.rest`, `close.hot` under the pointer (S6).
     NS.Skin.CloseButton(menu)
     menu:SetScript("OnClick", function()
         local e = row.entry

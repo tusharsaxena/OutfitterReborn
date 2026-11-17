@@ -178,6 +178,9 @@ for _, f in ipairs({ "modules/Bar.lua", "modules/Bar_Chrome.lua", "modules/Bar_B
     }
 end
 
+-- The title-bar controls' tooltip (NS.ShowTitleTip, LibKa0s v1.105.0 smoke round 1 SR-OR).
+files["core/CoreSetup.lua"] = { read_globals = { "GameTooltip" } }
+
 -- The published slash surface is colon-called by the host and the suites and forwards to the
 -- dispatcher upvalue.
 files["settings/Slash.lua"] = {

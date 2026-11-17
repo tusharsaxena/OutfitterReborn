@@ -1,0 +1,147 @@
+-- tests/test_titlebar.lua — the title-bar controls of the windows this addon draws itself (LibKa0s
+-- v1.105.0 smoke round 1, rulings 3 and 4; SR-OR of Ka0sAddonsCommonTasks
+-- docs/2026-11-16-LIBKA0S_ISSUES_75_PLUS/SR1_SMOKE_ROUND1.md).
+--
+-- One case per window, over every control on its title band:
+--   - a tooltip on hover: the game tooltip owned by the control, a non-empty first line in the
+--     owner's `gtip.title`, hidden again on leave;
+--   - its colors in every shipped skin, Ka0s Default first: `icon.tint` at rest for every control,
+--     the close X included; under the pointer `text.link` for a mark (the window's gear, the bar's
+--     lock) and `close.hot` for the close.
+-- The windows: the outfit window (close, settings gear), the outfit bar (close, lock) and the four
+-- dialogs (close). The library's own windows (console, copy, perf, sim, picker, icon browser) are the
+-- library's to pin. Every case builds its own instance through tests/skin_surfaces.lua.
+
+local T = _G.OUTFITTERREBORN_TEST
+local test, assertEqual, assertTrue = T.test, T.assertEqual, T.assertTrue
+
+local OWNER = "OutfitterReborn"
+
+local function live()
+    local facts = dofile(T.root .. "/tests/skin_surfaces.lua")(T)
+    local NS, M = facts.live()
+    return NS, M, M.LibStub("LibKa0s-Skin-1.0")
+end
+
+--- Switch the owner onto the kit's probe skin, which gives every token a value of its own
+--- (tests/_kit/skin_switch.lua), so gtip.title is told apart from the tooltip's own gold.
+local function probe(Skin)
+    local W = dofile(T.root .. "/tests/_kit/skin_switch.lua")
+    if not Skin:GetSkin(W.PROBE_KEY) then
+        Skin:RegisterSkin({ key = W.PROBE_KEY, label = "Probe", tokens = W.probeTokens(Skin) })
+    end
+    Skin:SetChoice(OWNER, "ka0s", W.PROBE_KEY)
+end
+
+local function rgb(r, g, b) return ("%.3f %.3f %.3f"):format(r or -1, g or -1, b or -1) end
+local function tint(tex) return rgb(tex:GetVertexColor()) end
+local function token(NS, name) return rgb(NS.Skin.Color(name)) end
+
+--- Every control's tooltip, under the probe skin: owned by it, a first line, in gtip.title, gone on
+--- leave.
+local function assertTips(NS, M, Skin, controls)
+    local tip = M.GameTooltip
+    probe(Skin)
+    assertTrue(token(NS, "gtip.title") ~= rgb(1, 0.82, 0), "the probe's gtip.title is the tooltip's own gold")
+    for _, c in ipairs(controls) do
+        tip:Hide()
+        c.btn:__fire("OnEnter")
+        assertTrue(tip:IsShown(), c.name .. ": no tooltip on hover")
+        assertTrue(tip:GetOwner() == c.btn, c.name .. ": the tooltip is not owned by the control")
+        local line = tip.TextLeft1
+        local words = line and line:GetText()
+        assertTrue(type(words) == "string" and words ~= "", c.name .. ": the tooltip says nothing")
+        assertEqual(rgb(line.__r, line.__g, line.__b), token(NS, "gtip.title"), c.name .. ": not in gtip.title")
+        c.btn:__fire("OnLeave")
+        assertTrue(not tip:IsShown(), c.name .. ": the tooltip stays up after leave")
+    end
+    Skin:SetChoice(OWNER, "ka0s", "ka0s")
+end
+
+--- Every control's rest and hover colors under each shipped skin, Ka0s Default first.
+local function assertColors(NS, Skin, controls)
+    -- The shipped skins only: the probe gives close.rest a value of its own, which no shipped skin does.
+    local W = dofile(T.root .. "/tests/_kit/skin_switch.lua")
+    local keys = { "ka0s" }
+    for _, def in ipairs(Skin:Skins()) do
+        if def.key ~= "ka0s" and def.key ~= W.PROBE_KEY then keys[#keys + 1] = def.key end
+    end
+    assertTrue(#keys > 2, "too few shipped skins to switch through")
+    local moved = false
+    for _, key in ipairs(keys) do
+        Skin:SetChoice(OWNER, "ka0s", key)
+        local rest, link, hot = token(NS, "icon.tint"), token(NS, "text.link"), token(NS, "close.hot")
+        if key ~= "ka0s" and rest ~= rgb(0.7, 0.7, 0.72) then moved = true end
+        for _, c in ipairs(controls) do
+            local what = key .. ": " .. c.name
+            assertEqual(tint(c.btn.icon), rest, what .. " at rest is not icon.tint")
+            c.btn:__fire("OnEnter")
+            assertEqual(tint(c.btn.icon), c.close and hot or link,
+                what .. " under the pointer is not " .. (c.close and "close.hot" or "text.link"))
+            c.btn:__fire("OnLeave")
+            assertEqual(tint(c.btn.icon), rest, what .. " did not go back to icon.tint")
+        end
+    end
+    Skin:SetChoice(OWNER, "ka0s", "ka0s")
+    assertTrue(moved, "no shipped skin moved icon.tint, so the walk proved nothing")
+end
+
+local function check(NS, M, Skin, controls)
+    for _, c in ipairs(controls) do
+        assertTrue(c.btn ~= nil and c.btn.icon ~= nil, c.name .. " was not built with art")
+    end
+    assertTips(NS, M, Skin, controls)
+    assertColors(NS, Skin, controls)
+end
+
+test("title bar: the outfit window's close and gear carry tooltips and the skin's rest and hover colors", function()
+    -- red under: modules/Window.lua's gear without NS.TitleControl (no tooltip, close.hot on hover).
+    local NS, M, Skin = live()
+    local win = M.OutfitterRebornWindow
+    check(NS, M, Skin, {
+        { name = "the window's close", btn = win.close, close = true },
+        { name = "the window's gear", btn = M.OutfitterRebornWindowSettings },
+    })
+end)
+
+test("title bar: the outfit bar's close and lock carry tooltips and the skin's rest and hover colors", function()
+    -- red under: modules/Bar_Chrome.lua's lock painted by S.CloseButton (close.hot on hover) or its
+    -- tooltip owned at ANCHOR_TOP in the tooltip's own color.
+    local NS, M, Skin = live()
+    local f = NS.Bar.Frame()
+    check(NS, M, Skin, {
+        { name = "the bar's close", btn = f.close, close = true },
+        { name = "the bar's lock", btn = f.lock },
+    })
+end)
+
+test("title bar: every dialog's close carries a tooltip and the skin's rest and hover colors", function()
+    -- red under: a dialog close built past NS.MakeCloseButton (no owner: no tooltip, no skin colors).
+    local NS, M, Skin = live()
+    check(NS, M, Skin, {
+        { name = "the outfit dialog's close", btn = NS.OutfitDialog.Frame().close, close = true },
+        { name = "the trigger dialog's close", btn = NS.TriggerDialog.Frame().close, close = true },
+        { name = "the rebuild dialog's close", btn = NS.RebuildDialog.Frame().close, close = true },
+        { name = "the progress dialog's close", btn = NS.ProgressDialog.Frame().close, close = true },
+    })
+end)
+
+test("title bar: the bar's lock keeps its body line, and the drag strip's tip takes gtip.title", function()
+    -- The lock's second line names the switch it shares (General > Master controls); the strip says
+    -- how to move the bar. red under: the strip's tooltip set in the tooltip's own color.
+    local NS, M, Skin = live()
+    local f, tip = NS.Bar.Frame(), M.GameTooltip
+    probe(Skin)
+    f.lock:__fire("OnEnter")
+    assertEqual(tip.TextLeft1:GetText(), NS.L["Lock or unlock the outfit bar"])
+    assertEqual(tip.TextLeft2:GetText(), NS.L["The same switch as Lock frame on General > Master controls."])
+    f.lock:__fire("OnLeave")
+    f.drag:__fire("OnEnter")
+    assertTrue(tip:IsShown() and tip:GetOwner() == f.drag, "the drag strip shows no tooltip")
+    local line = tip.TextLeft1
+    assertEqual(line:GetText(), NS.L["Outfit bar"])
+    assertEqual(rgb(line.__r, line.__g, line.__b), token(NS, "gtip.title"))
+    f.drag:__fire("OnLeave")
+    assertTrue(not tip:IsShown(), "the drag strip's tooltip stays up")
+    Skin:SetChoice(OWNER, "ka0s", "ka0s")
+end)
