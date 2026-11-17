@@ -403,7 +403,7 @@ test("dock: the footer's New outfit opens the outfit dialog, the title-strip but
     NS.OpenOptionsPanel = function() opened_ = opened_ + 1 end
     M.OutfitterRebornNewOutfitButton:__fire("OnClick", "LeftButton")
     assertEqual(fakes.OutfitDialog.__count("OpenNew"), 1)
-    M.OutfitterRebornWindowSettings:__fire("OnClick", "LeftButton")
+    M.OutfitterRebornWindow.settingsButton:__fire("OnClick", "LeftButton")
     assertEqual(opened_, 1)
 end)
 
@@ -802,24 +802,26 @@ end)
 test("window: the close button is anchored at the header's top right", function()
     -- G10: NS.MakeCloseButton makes the x but anchors nothing, so a close with no point never drew.
     -- red under: drop the close's SetPoint from modules/Window.lua's titleStrip.
-    local _, M, _, win = opened()
+    local _, _, _, win = opened()
     local close = win.close
     assertTrue(close ~= nil, "the window keeps no close button (win.close)")
     local p = close.__pts[#close.__pts]
     assertTrue(p ~= nil, "the close button was never anchored")
     assertEqual(p[1], "TOPRIGHT"); assertEqual(p[2], win); assertEqual(p[3], "TOPRIGHT")
     assertEqual(p[4], -6); assertEqual(p[5], -5)
-    assertTrue(M.OutfitterRebornWindowSettings ~= close, "the close is the settings button")
+    assertTrue(win.settingsButton ~= close, "the close is the settings button")
 end)
 
 test("window: the gear sits left of the close button", function()
-    -- Both 18 px, both TOPRIGHT-anchored to the window: the gear's right edge (-28) clears the
-    -- close's left edge (-6 - 18 = -24). red under: the gear moved onto the close's -6.
-    local _, M, _, win = opened()
-    local gear, close = M.OutfitterRebornWindowSettings, win.close
+    -- Both 18 px, both TOPRIGHT-anchored to the window: the gear's right edge (-30) clears the
+    -- close's left edge (-6 - 18 = -24). Re-pinned by AD-86-OR from -28 to W.HeaderButtons' pitch
+    -- (6 from the corner, 6 apart; standalone-windows, *Title-bar controls*). red under: the gear
+    -- moved onto the close's -6.
+    local _, _, _, win = opened()
+    local gear, close = win.settingsButton, win.close
     local g, c = gear.__pts[#gear.__pts], close.__pts[#close.__pts]
     assertEqual(g[1], "TOPRIGHT"); assertEqual(g[2], win); assertEqual(g[3], "TOPRIGHT")
-    assertEqual(g[4], -28); assertEqual(g[5], c[5])
+    assertEqual(g[4], -30); assertEqual(g[5], c[5])
     local CLOSE_SIZE = 18
     assertTrue(g[4] < c[4] - CLOSE_SIZE, "the gear overlaps the close button")
 end)
@@ -828,15 +830,17 @@ local function rgb(tex) return ("%.3f %.3f %.3f"):format(tex:GetVertexColor()) e
 
 test("window: the gear's art is the close X's size, centered, in the X's rest tint and text.link on hover", function()
     -- Smoke round 2 design G5 (D7): the gear drew 18 x 18 (SetAllPoints) against the X's 12 x 12.
-    local NS, M, _, win = opened()
-    local gear, close = M.OutfitterRebornWindowSettings, win.close
+    local NS, _, _, win = opened()
+    local gear, close = win.settingsButton, win.close
     assertTrue(close.icon ~= nil, "the close has no art texture to measure")
     local art = close.icon:GetWidth()
     assertEqual(art, 12, "LibKa0s Core's CLOSE_ART")
     -- red under: gear.icon:SetAllPoints(gear) (the art fills the 18 px button).
     assertEqual(gear.icon:GetWidth(), art); assertEqual(gear.icon:GetHeight(), art)
     local p = { gear.icon:GetPoint(1) }
-    assertEqual(p[1], "CENTER"); assertEqual(p[2], gear)
+    -- W.HeaderButton anchors its art by SetPoint("CENTER"), no relative frame: the client takes the
+    -- parent, the gear (AD-86-OR re-pin; the hand-built gear named it).
+    assertEqual(p[1], "CENTER"); assertTrue(p[2] == gear or p[2] == nil, "the art is not centered on the gear")
     -- red under: the gear left untinted (white) beside the X's gray, or no hover. Under the pointer
     -- the gear takes text.link, as the library's header marks do, and the X its own close.hot
     -- (LibKa0s v1.105.0 smoke round 1, ruling 4, which superseded G5's shared close.hot hover).
@@ -857,7 +861,7 @@ test("window: without a close art texture the gear's art falls back to 12 px", f
     M.__sheets.place(M.CharacterFrame, 300, 500)
     M.__world:openCharacter()
     NS.Dock.Open()
-    local gear = M.OutfitterRebornWindowSettings
+    local gear = M.OutfitterRebornWindow.settingsButton
     assertEqual(gear.icon:GetWidth(), 12); assertEqual(gear.icon:GetHeight(), 12)
 end)
 

@@ -243,6 +243,24 @@ hairline in the skin's `divider`), with *New outfit* on its left and *Slots: All
 the list ends above it. The bar has no footer. The dialogs' Done / Cancel rows are a modal's button
 row, which the footer rule does not cover.
 
+**Title-bar marks** (standalone-windows' *Title-bar controls*; AD-86-OR, LibKa0s#86, 2026-11-17). Every
+window this addon draws builds its marks with the library's `W.HeaderButtons` through one seam,
+`NS.HeaderButtons` (`core/WidgetsSetup.lua`): right-aligned, left to right extras · settings · close,
+18 px marks with 12 px art, 6 px from the corner and 6 apart, `icon.tint` at rest and `text.link` under
+the pointer (the close `close.hot`), each with its tooltip above it; the owner is always the addon's
+folder, the launcher's `name`, and the close is built through `NS.MakeCloseButton`. Without the
+library the seam builds the same strip by hand. The **outfit window** reads settings · close at the
+top right (y -5); its settings mark opens the settings panel, refused while the addon stands down, and
+leaves the window shown (it sits beside the character sheet, not over the panel). The **outfit bar**
+reads lock · settings · close, laid on its title band by `S.Header` from the strip's offsets: the lock
+keeps its state art and its two-line tooltip, the settings mark opens the bar's own settings page
+(as the header's right click does), and the drag strip stops 2 px short of the lock; the bar's narrowest
+width (`Bar.Layout.MIN_WIDTH`) is 136 to hold the title beside three marks. The **dialogs** (outfit,
+trigger, rebuild, progress) carry the close alone, their settings mark **opted out** with the reason
+the strip records (`settingsOptOut`): a dialog is a `MODAL`-tier editor over an unsaved draft, so the
+settings panel would open under it, and hiding it first would drop the draft, since every Hide
+discards. The addon builds no LibKa0s `DragHandle`, so the drag strip's settings mark does not arise.
+
 ## Taint Notes
 
 Every secure-environment write goes through `NS.SecureQueue.Run(key, fn)`: it runs at once out of

@@ -158,7 +158,7 @@ return function(T)
 
     local surfaces = {
         { name = "the window's shell", build = function() return named("OutfitterRebornWindow") end },
-        { name = "the window's settings button", build = function() return named("OutfitterRebornWindowSettings").icon end },
+        { name = "the window's settings button", build = function() return named("OutfitterRebornWindow").settingsButton.icon end },
         { name = "the window's scroll bar", build = function() return named("OutfitterRebornWindowScroll") end },
         { name = "a category row", build = function() return row("category") end },
         { name = "an outfit row", build = function() return row("outfit") end },

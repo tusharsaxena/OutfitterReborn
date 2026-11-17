@@ -26,7 +26,7 @@ local _, NS = ...
 --
 -- CALLS (at call time; design §12): NS.Dock.Close, NS.WindowRows, NS.WindowListModel, NS.Stack.Selected,
 -- NS.Outfits.SetAllSlotsEnabled, NS.OutfitDialog.OpenNew, NS.OpenOptionsPanel, NS.Preview.IsActive,
--- NS.MakeTestStrip, NS.MakeFooter.
+-- NS.MakeTestStrip, NS.MakeFooter, NS.HeaderButtons.
 
 -- SCALE: the window's own scale, 1.25 (Forever smoke feedback 3, owner 2026-11-09: the window drawn
 -- as at a 1.25 scale, on both clients). Its sizes stay in its own units; the dock converts the sheet's
@@ -212,17 +212,6 @@ local function labeledButton(name, parent, w, h, text, opts)
     return b
 end
 
--- The close X's art size, read off its own art (LibKa0s Core's CLOSE_ART is a file-local), so the
--- gear follows it; 12, that value, when the close draws a font glyph or is not there.
-local GEAR_ART_FALLBACK = 12
-
-local function closeArtSize(close)
-    local icon = close and rawget(close, "icon")
-    local w = type(icon) == "table" and type(icon.GetWidth) == "function" and NS.SafeNumber(icon:GetWidth(), 0) or 0
-    if w <= 0 then return GEAR_ART_FALLBACK end
-    return w
-end
-
 local function titleStrip(f)
     f.title = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     f.title:SetPoint("TOPLEFT", f, "TOPLEFT", 10, -8)
@@ -240,29 +229,22 @@ local function titleStrip(f)
     bar:EnableMouse(false)
     f.titleBar = bar
     NS.ApplySkin(f)
-    -- NS.MakeCloseButton makes and skins the x but anchors nothing: the caller places it, as
-    -- modules/UIDialogs.lua does. Unanchored it never drew (design G10).
-    local close = NS.MakeCloseButton(f, function() NS.Dock.Close() end)
-    if close then
-        close:SetPoint("TOPRIGHT", f, "TOPRIGHT", -6, -5)
-        f.close = close
-        chrome[#chrome + 1] = close
-    end
-    local gear = CreateFrame("Button", "OutfitterRebornWindowSettings", f)
-    gear:SetSize(18, 18)
-    gear:SetPoint("TOPRIGHT", f, "TOPRIGHT", -28, -5)
-    -- The art at the close X's art size, centered in the unchanged 18 px click target (smoke round 2
-    -- design G5). Painted as the library's header marks are (LibKa0s v1.105.0 smoke round 1, ruling
-    -- 4): icon.tint at rest, as the X is, and text.link under the pointer, where the X takes
-    -- close.hot; "Open settings" above it on hover (ruling 3). NS.TitleControl, core/CoreSetup.lua.
-    local art = closeArtSize(close)
-    gear.icon = gear:CreateTexture(nil, "ARTWORK")
-    gear.icon:SetPoint("CENTER", gear, "CENTER", 0, 0)
-    gear.icon:SetSize(art, art)
-    gear.icon:SetTexture(NS.Icon("settings"))
-    NS.TitleControl(gear, L["Open settings"])
-    gear:SetScript("OnClick", function() if not NS.IsStoodDown() then NS.OpenOptionsPanel() end end)
-    chrome[#chrome + 1] = gear
+    -- The marks (AD-86-OR, LibKa0s#86; standalone-windows' *Title-bar controls*): W.HeaderButtons'
+    -- strip through NS.HeaderButtons, left to right settings, close, the close 6 px in from the top
+    -- right and the gear 6 px past it, both at y -5 on the title band, each an 18 px mark with 12 px
+    -- art in icon.tint, lit text.link under the pointer (the close close.hot), each with its tooltip
+    -- above it ("Open settings", "Close"). The close's click closes through the dock; the gear opens
+    -- the settings panel, refused while the addon stands down. The window sits beside the character
+    -- sheet, not over the panel, so it stays shown (no hideOnSettings).
+    local hb = NS.HeaderButtons(f, {
+        frame = f, point = "TOPRIGHT", y = -5,
+        close = function() NS.Dock.Close() end,
+        settings = function() if not NS.IsStoodDown() then NS.OpenOptionsPanel() end end,
+        settingsTip = L["Open settings"],
+    })
+    f.close, f.settingsButton = hb.close, hb.settings
+    if hb.close then chrome[#chrome + 1] = hb.close end
+    if hb.settings then chrome[#chrome + 1] = hb.settings end
 end
 
 local function body(f)

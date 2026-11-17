@@ -1685,12 +1685,17 @@ Total.
 - skin: without the library a dialog's error line still draws of.dialog.error's red
 - skin: a switch marks the window, and its next tick recolors an item row's name
 
-### test_titlebar.lua (4)
+### test_titlebar.lua (9)
 
 - title bar: the outfit window's close and gear carry tooltips and the skin's rest and hover colors
-- title bar: the outfit bar's close and lock carry tooltips and the skin's rest and hover colors
+- title bar: the outfit bar's close, settings and lock carry tooltips and the skin's rest and hover colors
 - title bar: every dialog's close carries a tooltip and the skin's rest and hover colors
 - title bar: the bar's lock keeps its body line, and the drag strip's tip takes gtip.title
+- title bar: the outfit window's marks are W.HeaderButtons', settings beside the close
+- title bar: the outfit window's settings mark opens the settings panel, never while stood down
+- title bar: the outfit bar's marks read lock, settings, close on the band
+- title bar: the outfit bar's settings mark opens the bar's settings page
+- title bar: every dialog's close is W.HeaderButtons', its settings mark opted out with a reason
 
 ### test_skin_values.lua (3)
 
@@ -1929,7 +1934,7 @@ Total.
 | test_diagnostics.lua | 12 |
 | test_credits.lua | 8 |
 | test_skin.lua | 14 |
-| test_titlebar.lua | 4 |
+| test_titlebar.lua | 9 |
 | test_skin_values.lua | 3 |
 | test_skin_switch.lua | 84 |
 | test_client_globals.lua | 3 |
@@ -1939,4 +1944,4 @@ Total.
 | test_lizard_sighted.lua | 8 |
 | test_prose.lua | 15 |
 | Skipped | 1 |
-| **Total** | **1601** |
+| **Total** | **1606** |

@@ -19,13 +19,15 @@ local _, NS = ...
 -- THE HEADER stands on the chrome's title band: LibKa0s's S.Band, laid by Shell at the skin's inset
 -- and `title.height` (flush and 25 px under EllesmereUI, NS.SkinBandGeometry), or a host holder 1 px
 -- in when the library is absent (DpsRace modules/Style.lua:559-575 bandOf). The title,
--- L["Outfits"], is LEFT; the controls are RIGHT, outermost first: close (NS.MakeCloseButton through
--- Bar.Close, which writes `bar.shown = false`, or in test mode dismisses the bar for that test
--- session) and lock (the Master `locked` row, through the one seam). Both are
--- 18 px slots with the close X's art size. The lock is painted as the window's gear is
--- (NS.TitleControl, core/CoreSetup.lua; LibKa0s v1.105.0 smoke round 1, rulings 3 and 4): icon.tint at
--- rest, as the X is, text.link under the pointer, where the X takes close.hot, and its tooltip above
--- it in gtip.title. The drag strip covers the band left of the controls: it moves the
+-- L["Outfits"], is LEFT; the marks are RIGHT, W.HeaderButtons' strip (NS.HeaderButtons; AD-86-OR,
+-- LibKa0s#86, standalone-windows' *Title-bar controls*), left to right extras · settings · close:
+-- the lock (the Master `locked` row, through the one seam, its art closed or open by state), the
+-- settings mark (the bar's settings page) and the close (NS.MakeCloseButton through Bar.Close, which
+-- writes `bar.shown = false`, or in test mode dismisses the bar for that test session). Each is an
+-- 18 px mark with 12 px art, 6 px from the band's right edge and 6 apart, laid by S.Header from the
+-- strip's offsets (or by hand on the host band): icon.tint at rest, text.link under the pointer, the
+-- X close.hot, each with its tooltip above it in gtip.title (the lock's keeps its second line,
+-- through NS.ShowTitleTip). The drag strip covers the band left of the marks: it moves the
 -- bar unless locked, saves the place on release, and a right click opens the bar's settings page;
 -- its tooltip is placed and colored the same way (NS.ShowTitleTip).
 -- The separate drag handle above the bar is retired.
@@ -44,16 +46,15 @@ local _, NS = ...
 -- skin change re-renders the bar (modules/Bar.lua), which draws them again.
 --
 -- CALLS (at call time): NS.Skin (Shell through NS.ApplySkin, and again for Show border's `noBorder`, Band, Header, CloseButton, BarBorder,
--- Resolve, Color, HudFont, HudFontSize, HudLabelColor), NS.SkinBandGeometry, NS.ResolveColor, NS.MakeCloseButton, NS.MakeTestStrip,
--- NS.TitleControl, NS.ShowTitleTip, NS.HideTitleTip, NS.SetByPath, NS.OpenOptionsPanel.
+-- Resolve, Color, HudFont, HudFontSize, HudLabelColor), NS.SkinBandGeometry, NS.ResolveColor, NS.HeaderButtons, NS.MakeTestStrip,
+-- NS.ShowTitleTip, NS.HideTitleTip, NS.SetByPath, NS.OpenOptionsPanel.
 
 local Bar = NS.Bar
 
 local L = NS.L
 local LAYERS = NS.Constants.LAYERS
 
-local CONTROL, CONTROL_PITCH, CONTROL_PAD = 18, 22, 6   -- DpsRace Style: 18 px slots, 22 apart, 6 in
-local ART_FALLBACK = 12                                 -- the close X's art size, when it cannot say
+local CONTROL = NS.HEADER.SIZE                          -- W.HEADER's 18 px mark
 local TITLE_H_FALLBACK = 30                             -- Ka0s Default's title.height
 local WHITE = "Interface\\Buttons\\WHITE8X8"
 local SOLID = "Solid"
@@ -110,26 +111,32 @@ end
 
 -- ── the controls ──────────────────────────────────────────────────────────────────────────────
 
-local function artSize(close)
-    local icon = close and rawget(close, "icon")
-    local w = type(icon) == "table" and type(icon.GetWidth) == "function" and num(icon:GetWidth(), 0) or 0
-    if w <= 0 then return ART_FALLBACK end
-    return w
-end
-
---- The lock control: the Master `locked` row, flipped through the one write seam.
-local function lockControl(parent, art)
-    local b = CreateFrame("Button", nil, parent)
-    b:SetSize(CONTROL, CONTROL)
-    b.icon = b:CreateTexture(nil, "ARTWORK")
-    b.icon:SetPoint("CENTER", b, "CENTER", 0, 0)
-    b.icon:SetSize(art, art)
-    NS.TitleControl(b, L["Lock or unlock the outfit bar"],
-        L["The same switch as Lock frame on General > Master controls."])
-    b:SetScript("OnClick", function() NS.SetByPath("locked", not locked()) end)
-    b:HookScript("OnEnter", function() Bar.HoverIn() end)
-    b:HookScript("OnLeave", function() Bar.HoverOut() end)
-    return b
+--- The marks (AD-86-OR): lock · settings · close, made on `header` and laid on the band by
+--- placeHeader. The lock keeps its two-line tooltip, hooked over the strip's own hover paint.
+local function marks(f, header)
+    local hb = NS.HeaderButtons(header, {
+        frame = f, place = false,
+        close = function() Bar.Close() end,
+        settings = function() NS.OpenOptionsPanel("bar") end,
+        settingsTip = L["Open settings"],
+        extras = { { key = "lock", icon = locked() and "lock" or "unlock",
+                     onClick = function() NS.SetByPath("locked", not locked()) end } },
+    })
+    f.close, f.settingsButton, f.lock = hb.close, hb.settings, hb.extras.lock
+    if f.lock then
+        f.lock:HookScript("OnEnter", function(self)
+            NS.ShowTitleTip(self, L["Lock or unlock the outfit bar"],
+                L["The same switch as Lock frame on General > Master controls."])
+        end)
+        f.lock:HookScript("OnLeave", function(self) NS.HideTitleTip(self) end)
+    end
+    -- Hooked, so each mark's own hover paint stays: the bar keeps full alpha under every mark.
+    for _, b in ipairs({ f.close or false, f.settingsButton or false, f.lock or false }) do
+        if b then
+            b:HookScript("OnEnter", function() Bar.HoverIn() end)
+            b:HookScript("OnLeave", function() Bar.HoverOut() end)
+        end
+    end
 end
 
 --- The drag strip: drag to move (refused while locked), right-click for the bar's settings.
@@ -156,23 +163,22 @@ local function dragStrip(f, parent)
     return d
 end
 
---- Lay the title, the controls and the drag strip on the band: S.Header while the library lays the
---- band (recorded, so a skin switch lays them again), else the same anchors set once by hand.
+--- Lay the title, the marks and the drag strip on the band: S.Header while the library lays the
+--- band (recorded, so a skin switch lays them again), else the same anchors set once by hand. The
+--- marks' offsets are the strip's (`f.headerButtons.right`, outermost first); the drag strip stops
+--- 2 px short of the innermost.
 local function placeHeader(f)
     local band, fromLib = bandOf(f)
-    local right, n = {}, 0
-    for _, b in ipairs({ f.close or false, f.lock }) do
-        n = n + 1
-        if b then
-            local x = CONTROL_PAD + (n - 1) * CONTROL_PITCH
-            right[#right + 1] = { frame = b, width = CONTROL, x = x }
-            if not fromLib then
-                b:ClearAllPoints()
-                b:SetPoint("RIGHT", band, "RIGHT", -x, 0)
-            end
+    local right, reach = {}, NS.HEADER.PAD
+    for _, e in ipairs(f.headerButtons.right) do
+        right[#right + 1] = { frame = e.frame, width = CONTROL, x = e.x }
+        reach = e.x + CONTROL
+        if not fromLib then
+            e.frame:ClearAllPoints()
+            e.frame:SetPoint("RIGHT", band, "RIGHT", -e.x, 0)
         end
     end
-    local reach = CONTROL_PAD + (n - 1) * CONTROL_PITCH + CONTROL + 2
+    reach = reach + 2
     f.drag:ClearAllPoints()
     f.drag:SetPoint("TOPLEFT", band, "TOPLEFT", 0, 0)
     f.drag:SetPoint("BOTTOMRIGHT", band, "BOTTOMRIGHT", -reach, 0)
@@ -206,13 +212,7 @@ function Bar.BuildChrome(f)
     -- Shell paints `frame.title` in the skin's title face and color.
     f.chrome.title = f.title
     NS.ApplySkin(f.chrome)
-    f.close = NS.MakeCloseButton(header, function() Bar.Close() end)
-    -- Hooked, so Core's own hover tint stays: the bar keeps full alpha under the X as under the lock.
-    if f.close then
-        f.close:HookScript("OnEnter", function() Bar.HoverIn() end)
-        f.close:HookScript("OnLeave", function() Bar.HoverOut() end)
-    end
-    f.lock = lockControl(header, artSize(f.close))
+    marks(f, header)
     f.drag = dragStrip(f, header)
     placeHeader(f)
     Bar.SetLockIcon(locked())
@@ -222,7 +222,7 @@ end
 --- @param on boolean
 function Bar.SetLockIcon(on)
     local f = Bar.Frame()
-    if not (f and f.lock) then return end
+    if not (f and f.lock and f.lock.icon) then return end
     f.lock.icon:SetTexture(NS.Icon(on and "lock" or "unlock"))
 end
 

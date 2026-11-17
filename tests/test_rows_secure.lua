@@ -551,7 +551,7 @@ test("rows: the worn box and the EM mark wash in the skin's accent; the gear is 
         assertEqual(p.layer, "HIGHLIGHT")
     end
     -- red under: NS.Skin.Button's noBg pass (no tint on the gear's art, so no hover color either).
-    local title = M.__paint(M.OutfitterRebornWindowSettings.icon)
+    local title = M.__paint(M.OutfitterRebornWindow.settingsButton.icon)
     local gear = M.__paint(row.menu.icon)
     assertTrue(gear.vertex ~= nil, "the row gear's art is tinted")
     assertEqual(table.concat(gear.vertex, ","), table.concat(title.vertex or {}, ","), "as the title gear's is")

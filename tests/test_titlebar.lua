@@ -8,12 +8,14 @@
 --   - its colors in every shipped skin, Ka0s Default first: `icon.tint` at rest for every control,
 --     the close X included; under the pointer `text.link` for a mark (the window's gear, the bar's
 --     lock) and `close.hot` for the close.
--- The windows: the outfit window (close, settings gear), the outfit bar (close, lock) and the four
--- dialogs (close). The library's own windows (console, copy, perf, sim, picker, icon browser) are the
--- library's to pin. Every case builds its own instance through tests/skin_surfaces.lua.
+-- The windows: the outfit window (close, settings gear), the outfit bar (close, settings, lock) and
+-- the four dialogs (close). Since AD-86-OR (LibKa0s#86) every one builds its marks with W.HeaderButtons
+-- (NS.HeaderButtons, core/WidgetsSetup.lua): the strip cases at the end pin the order, the pitch, the
+-- settings mark's click and the dialogs' recorded opt-out. The library's own windows (console, copy,
+-- perf, sim, picker, icon browser) are the library's to pin. Every case builds its own instance through tests/skin_surfaces.lua.
 
 local T = _G.OUTFITTERREBORN_TEST
-local test, assertEqual, assertTrue = T.test, T.assertEqual, T.assertTrue
+local test, assertEqual, assertTrue, assertNil = T.test, T.assertEqual, T.assertTrue, T.assertNil
 
 local OWNER = "OutfitterReborn"
 
@@ -100,17 +102,18 @@ test("title bar: the outfit window's close and gear carry tooltips and the skin'
     local win = M.OutfitterRebornWindow
     check(NS, M, Skin, {
         { name = "the window's close", btn = win.close, close = true },
-        { name = "the window's gear", btn = M.OutfitterRebornWindowSettings },
+        { name = "the window's gear", btn = win.settingsButton },
     })
 end)
 
-test("title bar: the outfit bar's close and lock carry tooltips and the skin's rest and hover colors", function()
+test("title bar: the outfit bar's close, settings and lock carry tooltips and the skin's rest and hover colors", function()
     -- red under: modules/Bar_Chrome.lua's lock painted by S.CloseButton (close.hot on hover) or its
     -- tooltip owned at ANCHOR_TOP in the tooltip's own color.
     local NS, M, Skin = live()
     local f = NS.Bar.Frame()
     check(NS, M, Skin, {
         { name = "the bar's close", btn = f.close, close = true },
+        { name = "the bar's settings", btn = f.settingsButton },
         { name = "the bar's lock", btn = f.lock },
     })
 end)
@@ -144,4 +147,103 @@ test("title bar: the bar's lock keeps its body line, and the drag strip's tip ta
     f.drag:__fire("OnLeave")
     assertTrue(not tip:IsShown(), "the drag strip's tooltip stays up")
     Skin:SetChoice(OWNER, "ka0s", "ka0s")
+end)
+
+-- ── the strip: W.HeaderButtons (AD-86-OR, LibKa0s#86; standalone-windows, *Title-bar controls*) ──
+
+-- The geometry cases run on the suites' own scenes, which record every point a frame is given
+-- (`__pts`): the dock's (tests/dock_scene.lua) for the window, the bar's (tests/bar_scene.lua).
+local function lastPoint(r) return r.__pts[#r.__pts] end
+
+local function openedWindow()
+    local NS, M = dofile(T.root .. "/tests/dock_scene.lua")(T)()
+    M.__sheets.place(M.CharacterFrame, 300, 500)
+    M.__world:openCharacter()
+    NS.Dock.Open()
+    return NS, M, M.OutfitterRebornWindow
+end
+
+local function shownBar()
+    local B = dofile(T.root .. "/tests/bar_scene.lua")(T)
+    local NS, M, Bar = B.scene()
+    B.complete(NS, "A")
+    B.settle(M)
+    return NS, M, Bar.Frame()
+end
+
+local function strip(hb)
+    assertTrue(type(hb) == "table", "no headerButtons answer recorded on the window")
+    return table.concat(hb.order, ",")
+end
+
+test("title bar: the outfit window's marks are W.HeaderButtons', settings beside the close", function()
+    -- red under: modules/Window.lua's hand-placed close and gear (no headerButtons, the gear at -28).
+    local NS, M, win = openedWindow()
+    local hb = win.headerButtons
+    assertEqual(strip(hb), "settings,close")
+    assertTrue(hb.close == win.close and hb.settings == win.settingsButton, "the window keeps its marks")
+    assertNil(hb.optOut, "the window has a settings mark")
+    local H = M.LibStub("LibKa0s-Widgets-1.0").HEADER
+    -- One pitch: the close PAD in from the corner, settings a SIZE and a GAP further in.
+    assertEqual(hb.offsets.close, -H.PAD)
+    assertEqual(hb.offsets.settings, -(H.PAD + H.SIZE + H.GAP))
+    local p = lastPoint(win.settingsButton)
+    assertEqual(p[1], "TOPRIGHT"); assertEqual(p[2], win); assertEqual(p[4], -(H.PAD + H.SIZE + H.GAP))
+    assertEqual(win.settingsButton.__tip, NS.L["Open settings"])
+end)
+
+test("title bar: the outfit window's settings mark opens the settings panel, never while stood down", function()
+    local NS, M = live()
+    local opened = {}
+    NS.OpenOptionsPanel = function(page) opened[#opened + 1] = page or "root" end
+    M.OutfitterRebornWindow.settingsButton:__fire("OnClick", "LeftButton")
+    assertEqual(table.concat(opened, ","), "root")
+    local real = NS.IsStoodDown
+    NS.IsStoodDown = function() return true end
+    M.OutfitterRebornWindow.settingsButton:__fire("OnClick", "LeftButton")
+    NS.IsStoodDown = real
+    assertEqual(#opened, 1, "the settings mark opened the panel while stood down")
+end)
+
+test("title bar: the outfit bar's marks read lock, settings, close on the band", function()
+    -- red under: modules/Bar_Chrome.lua's hand-laid lock and close at a 22 px pitch, no settings mark.
+    local _, M, f = shownBar()
+    local hb = f.headerButtons
+    assertEqual(strip(hb), "lock,settings,close")
+    assertTrue(hb.close == f.close and hb.extras.lock == f.lock and hb.settings == f.settingsButton,
+        "the bar keeps its marks")
+    local H = M.LibStub("LibKa0s-Widgets-1.0").HEADER
+    local pitch = H.SIZE + H.GAP
+    assertEqual(hb.offsets.close, -H.PAD)
+    assertEqual(hb.offsets.settings, -(H.PAD + pitch))
+    assertEqual(hb.offsets.lock, -(H.PAD + 2 * pitch))
+    -- The drag strip stops short of the innermost mark (the lock), 2 px clear of it.
+    local dp
+    for _, q in ipairs(f.drag.__pts) do
+        if q[1] == "BOTTOMRIGHT" then dp = q end
+    end
+    assertTrue(dp ~= nil, "the drag strip has no BOTTOMRIGHT point")
+    assertEqual(dp[4], -(H.PAD + 2 * pitch + H.SIZE + 2))
+end)
+
+test("title bar: the outfit bar's settings mark opens the bar's settings page", function()
+    local NS = live()
+    local opened = {}
+    NS.OpenOptionsPanel = function(page) opened[#opened + 1] = page or "root" end
+    NS.Bar.Frame().settingsButton:__fire("OnClick", "LeftButton")
+    assertEqual(table.concat(opened, ","), "bar")
+end)
+
+test("title bar: every dialog's close is W.HeaderButtons', its settings mark opted out with a reason", function()
+    -- red under: modules/UIDialogs.lua's hand-placed close (no headerButtons, no recorded opt-out).
+    local NS, M = live()
+    local H = M.LibStub("LibKa0s-Widgets-1.0").HEADER
+    for _, d in ipairs({ NS.OutfitDialog, NS.TriggerDialog, NS.RebuildDialog, NS.ProgressDialog }) do
+        local f = d.Frame()
+        local hb = f.headerButtons
+        assertEqual(strip(hb), "close")
+        assertTrue(hb.close == f.close, "the dialog keeps its close")
+        assertTrue(type(hb.optOut) == "string" and hb.optOut ~= "", "the opt-out names no reason")
+        assertEqual(hb.offsets.close, -H.PAD)
+    end
 end)
