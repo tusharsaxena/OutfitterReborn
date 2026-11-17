@@ -697,6 +697,30 @@ test("preview window: the strip shows under the title and pushes the list; off p
     assertEqual(height, NS.Window.HEIGHT)
 end)
 
+test("preview window: the list's push follows the strip's own body offset, not the constant", function()
+    local NS, M = testScene()
+    local make = NS.MakeTestStrip
+    -- A strip that wraps to 30 px (the library answers BodyOffset from the strip's own height).
+    NS.MakeTestStrip = function(...)
+        local strip = make(...)
+        if strip then rawset(strip, "GetHeight", function() return 30 end) end
+        return strip
+    end
+    local w, height = NS.Window.Build(), nil
+    rawset(w, "SetHeight", function(_, h) height = h end)
+    NS.Preview.Start()
+    -- red under: a push read from NS.TEST_STRIP_HEIGHT (18 + 2), which the strip no longer matches
+    assertEqual(w.strip:BodyOffset(), 30)
+    assertEqual(lastPoint(M.OutfitterRebornWindowList)[5], -30 - 32, "the list was not pushed by the strip's offset")
+    assertEqual(height, NS.Window.HEIGHT + 32)
+    assertEqual(select(2, NS.Window.Size()), NS.Window.HEIGHT + 32)
+    NS.Preview.Stop()
+    M.__world:openCharacter()
+    NS.Dock.Open()
+    assertEqual(lastPoint(M.OutfitterRebornWindowList)[5], -30)
+    assertEqual(height, NS.Window.HEIGHT)
+end)
+
 test("preview window: without the library's strip the title says test mode", function()
     local NS, M = testScene()
     NS.MakeTestStrip = function() return nil end

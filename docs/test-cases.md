@@ -1300,7 +1300,7 @@ Total.
 - list model: Status caches O.Status in the table it is handed, until that is wiped
 - list model: in test mode the list is the sample outfits under their headers, no item section
 
-### test_rows_secure.lua (27)
+### test_rows_secure.lua (28)
 
 - rows: NS.WindowRows is published with the secure surface
 - rows: fourteen rows and their secure children are created once, each SetAllPoints'd at birth
@@ -1329,6 +1329,7 @@ Total.
 - rows: the worn box and the EM mark wash in the skin's accent; the gear is painted as the title gear
 - window: the footer's three buttons share the plain look; All and None dim their label (R2-3, R2-4)
 - window: the footer is the library's W.Footer, its buttons on it and the list above it (AD-89-OR)
+- window: with no library footer, New outfit and the Slots trio sit on a bare 24 px frame on the bottom edge
 
 ### test_slot_enables.lua (29)
 
@@ -1482,7 +1483,7 @@ Total.
 - parity: the menu sorts as legacy's, and a renamed or refiled row by the same rule
 - parity: a class row is offered to its own class only, as the legacy menu filtered it
 
-### test_preview.lua (35)
+### test_preview.lua (36)
 
 - preview: NS.Preview publishes the §8 surface and starts off
 - preview: the placeholders are five Test Outfits in two rows, each stamped placeholder and preview:<n>
@@ -1509,6 +1510,7 @@ Total.
 - preview window: the stand-down hides it and the stand-up does not bring it back
 - preview window: a window parked in the sheet holder docks again when the sheet reopens
 - preview window: the strip shows under the title and pushes the list; off puts it back
+- preview window: the list's push follows the strip's own body offset, not the constant
 - preview window: without the library's strip the title says test mode
 - preview window: New outfit is disabled in test mode and enabled after
 - preview window: entering test mode clears the selection, and no slot box or Slots button acts
@@ -1910,14 +1912,14 @@ Total.
 | test_dock.lua | 51 |
 | test_dock_forever.lua | 9 |
 | test_list_model.lua | 8 |
-| test_rows_secure.lua | 27 |
+| test_rows_secure.lua | 28 |
 | test_slot_enables.lua | 29 |
 | test_bar.lua | 46 |
 | test_bar_look.lua | 13 |
 | test_outfit_icons.lua | 17 |
 | test_broker.lua | 16 |
 | test_triggers_parity.lua | 13 |
-| test_preview.lua | 35 |
+| test_preview.lua | 36 |
 | test_preview_place.lua | 8 |
 | test_window_settings.lua | 12 |
 | test_flyout_tint.lua | 12 |
@@ -1937,4 +1939,4 @@ Total.
 | test_lizard_sighted.lua | 8 |
 | test_prose.lua | 15 |
 | Skipped | 1 |
-| **Total** | **1599** |
+| **Total** | **1601** |

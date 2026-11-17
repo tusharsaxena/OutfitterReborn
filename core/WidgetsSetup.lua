@@ -290,7 +290,8 @@ end
 --- places it through its docking (AD-88-OR; Widgets minor 27, preview-mode's *Where the strip sits*):
 --- `{ dock = "title", titleBar = band }` in `opts` puts it directly under that title band, full width,
 --- placed again by the library on every show, hide and resize of the band; the caller never anchors
---- it, and moves its body down by `NS.TEST_STRIP_HEIGHT` while it shows.
+--- it, and moves its body down by the strip's `strip:BodyOffset()` while it shows (the outfit bar,
+--- which lays out from config before the strip is shown, reads `NS.TEST_STRIP_HEIGHT` instead).
 --- @param parent table the frame to parent it to
 --- @param label string the localized line it says
 --- @param opts table|nil any further W.TestStrip option (`dock`, `titleBar`, `kind`, `panel`, `L`,

@@ -13,7 +13,7 @@ local _, NS = ...
 --
 -- TEST MODE (smoke round 2 design G7). Win.SetTestMode, called by Dock.Refresh before every show and
 -- so never in lockdown, shows the amber strip (NS.MakeTestStrip, the bar's own), pushes the list down
--- by its height and grows the window to match, and disables New outfit (it would make a real outfit);
+-- by its body offset (strip:BodyOffset(), read after the show) and grows the window to match, and disables New outfit (it would make a real outfit);
 -- the Slots buttons stay hidden. The strip is docked by the library under `frame.titleBar`, the title
 -- band's frame down to the divider (`dock = "title"`; AD-88-OR, preview-mode's *Where the strip
 -- sits*): this file never anchors it. One marker per mode: the title says test mode only when the
@@ -184,7 +184,12 @@ function Win.SetTestMode(on)
     Win.testMode = on
     local strip = on and ensureStrip()
     if strip then strip:Show() elseif frame.strip then frame.strip:Hide() end
-    local push = strip and (NS.TEST_STRIP_HEIGHT + STRIP_GAP) or 0
+    -- The push is the strip's own body offset (its height while it shows, read after Show), so a
+    -- strip that ever outgrows NS.TEST_STRIP_HEIGHT still clears the list; plus the gap below it.
+    -- NS.TEST_STRIP_HEIGHT stands in when a shown strip answers no height (its rect not laid yet).
+    local offset = strip and type(strip.BodyOffset) == "function" and NS.SafeNumber(strip:BodyOffset(), 0) or 0
+    if strip and offset <= 0 then offset = NS.TEST_STRIP_HEIGHT end
+    local push = strip and (offset + STRIP_GAP) or 0
     Win.push = push
     list:SetPoint("TOPLEFT", frame, "TOPLEFT", LEFT_PAD + shiftOf(Win.inset), LIST_TOP - push)
     frame:SetHeight(Win.HEIGHT + push)
