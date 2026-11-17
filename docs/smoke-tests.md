@@ -9,7 +9,8 @@ outfit bar and test mode), the owner's CP5 pass; section 13 is smoke round 3 of 
 the sheet button's icon, the bar's options, test mode's placement and menu, the Outfit Window page),
 the owner's R7 pass. Sections 14 to 18 are the WoW Forever port (2026-11-08 design): each runs on the
 Forever client unless a row says Retail, and a row tagged with a probe settles a value the build took
-from the inventory's best evidence (`-- PROBE Pn` at the code site).
+from the inventory's best evidence (`-- PROBE Pn` at the code site). Section 22 is the window chrome
+of the LibKa0s v1.105.0 adoption (2026-11-17): the docked test strips and the window's footer.
 
 ## Sign-off
 
@@ -558,3 +559,17 @@ The owner's third pass. On both clients unless a row says WoW Forever.
 | # | Do | See |
 |---|---|---|
 | FS3-11 (Forever) | On Chonky, the stock sheet and EllesmereUI, open the ammo slot's flyout; then open another slot's | The yellow glow hugs the ammo slot, centered and only slightly larger than it, on every sheet. Another slot's glow is as before |
+
+## 22. Window chrome: the docked test strip and the footer (LibKa0s v1.105.0 adoption, AD-88-OR, AD-89-OR, 2026-11-17)
+
+Retail and Forever. Preview-mode's *Where the strip sits* and standalone-windows' *The footer* (standard
+v2.113.0): the strips are placed by the library's docking, and the window's bottom row is the library's
+footer.
+
+| # | Do | See |
+|---|---|---|
+| WCF1 (AD-88-OR) | With the sheet closed, `/or test`; look at the alone window's top | The amber *Test mode: sample outfits, nothing equipped* strip sits directly under the title divider, full width, with nothing between them; the list starts right under it, nothing covered; the title reads *Outfitter Reborn* with no mode word |
+| WCF2 (AD-88-OR) | Same session: look at the outfit bar; switch the skin (Ka0s Default, EllesmereUI, another) from the Skin tab | The bar's strip hangs flush under its header band, full width, and the icons start below it. After each switch the strip still sits flush under the band (EllesmereUI's flush 25 px band included) |
+| WCF3 (AD-88-OR, Forever) | Stock sheet with the side-tab strip down the window's edge: `/or test`, press `C` | Docked, the window's strip starts at the divider's left edge, right of the tabs, as the title and list do |
+| WCF4 (AD-89-OR) | `/or test` off; open the window and select an outfit; look at its bottom edge under each skin | A 1 px hairline in the skin's divider color runs across the bottom band, with no filled strip under it. *New outfit* sits on the left and *Slots: All None* on the right, each centered in the 24 px band below the hairline; the list's last row ends above the hairline. Labels, tooltips and clicks are as before |
+| WCF5 (AD-89-OR, Forever) | Stock, EllesmereUI and Chonky with the side-tab strip down the window's edge: open the window | The footer's hairline starts right of the tabs, as the title divider does, and *New outfit* starts flush with the rows |

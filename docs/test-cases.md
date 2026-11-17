@@ -1300,7 +1300,7 @@ Total.
 - list model: Status caches O.Status in the table it is handed, until that is wiped
 - list model: in test mode the list is the sample outfits under their headers, no item section
 
-### test_rows_secure.lua (26)
+### test_rows_secure.lua (27)
 
 - rows: NS.WindowRows is published with the secure surface
 - rows: fourteen rows and their secure children are created once, each SetAllPoints'd at birth
@@ -1328,6 +1328,7 @@ Total.
 - rows: a blank row takes no hover, and a rebind keeps the stripe and selection
 - rows: the worn box and the EM mark wash in the skin's accent; the gear is painted as the title gear
 - window: the footer's three buttons share the plain look; All and None dim their label (R2-3, R2-4)
+- window: the footer is the library's W.Footer, its buttons on it and the list above it (AD-89-OR)
 
 ### test_slot_enables.lua (29)
 
@@ -1909,7 +1910,7 @@ Total.
 | test_dock.lua | 51 |
 | test_dock_forever.lua | 9 |
 | test_list_model.lua | 8 |
-| test_rows_secure.lua | 26 |
+| test_rows_secure.lua | 27 |
 | test_slot_enables.lua | 29 |
 | test_bar.lua | 46 |
 | test_bar_look.lua | 13 |
@@ -1936,4 +1937,4 @@ Total.
 | test_lizard_sighted.lua | 8 |
 | test_prose.lua | 15 |
 | Skipped | 1 |
-| **Total** | **1598** |
+| **Total** | **1599** |

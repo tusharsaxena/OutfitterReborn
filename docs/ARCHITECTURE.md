@@ -232,6 +232,17 @@ the dialogs and the icon browser `MODAL` (the browser in a band over the dialogs
 (each cascading level of a menu in the same strata) and the compare tooltips `CURSOR`. The full stack
 is in the design's §7.1 and the limitations it leaves are in [`known-limitations.md`](known-limitations.md).
 
+**Window chrome** (standalone-windows' *Window chrome geometry* and *The footer*, preview-mode's *Where
+the strip sits*; AD-88-OR and AD-89-OR, 2026-11-17). Both test strips are the library's `TestStrip`,
+placed by its own docking (`dock = "title"`), never anchored by the addon: the window's under
+`frame.titleBar`, a mouse-transparent frame over the title band down to 1 px under the divider, which
+`Win.SetLeftInset` moves with the divider; the bar's under its header band (`Bar.Band`). Each body moves
+down by `TEST_STRIP.HEIGHT` (plus the window's 2 px gap) while its strip shows, laid from config. The
+window's bottom row is the library's `Footer` (`NS.MakeFooter`, `FOOTER.HEIGHT` 24 px, no fill, a
+hairline in the skin's `divider`), with *New outfit* on its left and *Slots: All None* on its right;
+the list ends above it. The bar has no footer. The dialogs' Done / Cancel rows are a modal's button
+row, which the footer rule does not cover.
+
 ## Taint Notes
 
 Every secure-environment write goes through `NS.SecureQueue.Run(key, fn)`: it runs at once out of

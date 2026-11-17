@@ -918,6 +918,14 @@ test("bar: test mode shows the sample outfits with the strip, even with the bar 
     local sp = point(f.strip)
     -- red under: the strip anchored at the container's top, over the header band
     assertTrue(sp[2] == Bar.Band() and sp[3] == "BOTTOMLEFT", "the strip hangs under the band")
+    -- AD-88-OR (preview-mode, *Where the strip sits*): the library's docking places it, the band as
+    -- its title bar. red under: a strip the bar anchors by hand (no Place, no BodyOffset).
+    assertEqual(type(f.strip.Place), "function", "the strip is not docked")
+    assertEqual(type(f.strip.BodyOffset), "function", "the strip is not docked")
+    f.strip:ClearAllPoints()
+    f.strip:Place()
+    local again = point(f.strip)
+    assertTrue(again ~= nil and again[2] == Bar.Band() and again[3] == "BOTTOMLEFT", "its dock is the band")
     local first = point(Bar.Buttons()[1]:GetParent())
     assertEqual(first[5], -(Bar.HeaderHeight(true) + NS.GetSetting("bar.layout.padding")), "the rows sit below the strip")
     assertTrue(Bar.HeaderHeight(true) >= Bar.HeaderHeight() + NS.TEST_STRIP_HEIGHT, "the strip adds its height")

@@ -336,12 +336,19 @@ test("parity: the Widgets seam answers on both arms, nil being a real answer", f
     bothArms("NS", function(NS) return NS end, {
         MakeDropdown = "function", OpenMenu = "function", CloseMenu = "function", CloseMenuFrom = "function",
         MakeTestStrip = "function", TEST_STRIP_HEIGHT = "number",
+        MakeFooter = "function", FOOTER_HEIGHT = "number",
     })
     local l, d = pair()
     assertNil(l.NS.ShowCopy, "the live load exports a copy window no feature opens")
     assertNil(d.NS.ShowCopy, "the stub exports a copy window no feature opens")
     T.assertLibraryConstant(d.NS.TEST_STRIP_HEIGHT, "LibKa0s-Widgets-1.0", "TEST_STRIP.HEIGHT",
         "the stub's strip height")
+    -- AD-89-OR: the footer's height is the library's FOOTER.HEIGHT on both arms (standalone-windows,
+    -- *Window chrome geometry*). red under: a stub fallback other than 24.
+    T.assertLibraryConstant(d.NS.FOOTER_HEIGHT, "LibKa0s-Widgets-1.0", "FOOTER.HEIGHT",
+        "the stub's footer height")
+    assertTrue(l.NS.MakeFooter(l.mocks.UIParent) ~= nil, "the live load drew no footer")
+    assertNil(d.NS.MakeFooter(d.mocks.UIParent), "the stub drew a library footer")
     assertTrue(l.NS.MakeDropdown(l.mocks.UIParent, 100) ~= nil, "the live load drew no dropdown")
     assertTrue(l.NS.MakeTestStrip(l.mocks.UIParent, "Test mode") ~= nil, "the live load drew no strip")
     assertNil(d.NS.MakeDropdown(d.mocks.UIParent, 100), "the stub drew a dead dropdown")

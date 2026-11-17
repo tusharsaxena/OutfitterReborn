@@ -30,8 +30,10 @@ local _, NS = ...
 -- its tooltip is placed and colored the same way (NS.ShowTitleTip).
 -- The separate drag handle above the bar is retired.
 --
--- THE TEST STRIP hangs flush under the band (DpsRace modules/Hud.lua:501-512), and Bar.HeaderHeight
--- adds its height above the icons, only while a strip is drawn. Without the library there is none:
+-- THE TEST STRIP hangs flush under the band, placed there by the library's docking (`dock = "title"`,
+-- the band as its title bar; AD-88-OR, preview-mode's *Where the strip sits*), never anchored here,
+-- and Bar.HeaderHeight adds TEST_STRIP.HEIGHT above the icons, only while a strip is drawn (the bar
+-- lays out from config, so it reads the published constant rather than the strip's measured height). Without the library there is none:
 -- the title then says test mode (Bar.SetTitle), as the window's does.
 --
 -- THE LABELS (one per category, over its row) are HUD text (skinning-§6): face, size, flags and
@@ -224,19 +226,17 @@ function Bar.SetLockIcon(on)
     f.lock.icon:SetTexture(NS.Icon(on and "lock" or "unlock"))
 end
 
---- The test strip, built the first time test mode shows the bar, flush under the band.
+--- The test strip, built the first time test mode shows the bar, docked under the band by the
+--- library (`dock = "title"`, the band as the title bar: AD-88-OR), which places it again whenever
+--- the band shows, hides or changes size (a skin switch re-lays it). The bar never anchors it.
 --- @return table|nil
 function Bar.EnsureStrip()
     local f = Bar.Frame()
     if f.strip == nil then
-        local strip = NS.MakeTestStrip(f, L["Test mode: sample outfits. Nothing is equipped or saved"])
+        local strip = NS.MakeTestStrip(f, L["Test mode: sample outfits. Nothing is equipped or saved"],
+            { dock = "title", titleBar = (bandOf(f)) })
         f.strip = strip or false
-        if strip then
-            local band = bandOf(f)
-            strip:SetFrameLevel(num(f:GetFrameLevel(), 0) + LAYERS.LEVEL.MARKER)
-            strip:SetPoint("TOPLEFT", band, "BOTTOMLEFT", 0, 0)
-            strip:SetPoint("TOPRIGHT", band, "BOTTOMRIGHT", 0, 0)
-        end
+        if strip then strip:SetFrameLevel(num(f:GetFrameLevel(), 0) + LAYERS.LEVEL.MARKER) end
     end
     return f.strip or nil
 end

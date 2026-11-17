@@ -571,3 +571,25 @@ test("window: the footer's three buttons share the plain look; All and None dim 
         assertTrue(o.primary ~= true)
     end
 end)
+
+test("window: the footer is the library's W.Footer, its buttons on it and the list above it (AD-89-OR)", function()
+    local NS, M = opened()
+    local w = M.OutfitterRebornWindow
+    local foot = w.footer
+    -- red under: the hand-built row of buttons on the window's bottom edge (no footer frame, no
+    -- hairline: standalone-windows, *The footer*; anti-pattern #118).
+    assertTrue(foot ~= nil, "the window has no footer")
+    assertTrue(foot.line ~= nil and type(foot.SetLeft) == "function", "the footer is not W.Footer")
+    assertTrue(foot:IsShown(), "the footer is hidden")
+    local function anchoredTo(f, point)
+        for _, p in ipairs(f.__pts) do if p[1] == point and p[2] == foot then return true end end
+        return false
+    end
+    assertTrue(anchoredTo(M.OutfitterRebornNewOutfitButton, "LEFT"), "New outfit is not on the footer")
+    assertTrue(anchoredTo(M.OutfitterRebornSlotsNone, "RIGHT"), "the Slots trio is not on the footer")
+    -- The body ends FOOTER.HEIGHT above the window's bottom edge (Window chrome geometry), laid from config.
+    local Rows = NS.WindowRows
+    assertEqual(NS.FOOTER_HEIGHT, 24)
+    assertTrue(30 + Rows.COUNT * Rows.ROW_H <= NS.Window.HEIGHT - NS.FOOTER_HEIGHT,
+        "the list passes under the footer's divider")
+end)

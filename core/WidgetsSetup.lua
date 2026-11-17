@@ -1,6 +1,6 @@
 local addonName, NS = ...
--- core/WidgetsSetup.lua — NS.MakeDropdown / NS.OpenMenu / NS.CloseMenu / NS.CloseMenuFrom / NS.MakeTestStrip from
--- LibKa0s-Widgets-1.0 (BP §6.13).
+-- core/WidgetsSetup.lua — NS.MakeDropdown / NS.OpenMenu / NS.CloseMenu / NS.CloseMenuFrom / NS.MakeTestStrip /
+-- NS.MakeFooter from LibKa0s-Widgets-1.0 (BP §6.13).
 --
 -- A seam, nothing else (library-stack-§7): one file leases the major, so the art the controls draw
 -- is resolved once, here, and every control is handed this addon's skin owner. The library is
@@ -10,8 +10,9 @@ local addonName, NS = ...
 --
 -- The users, as they land in P4: the outfit context menu (modules/OutfitMenu.lua, through
 -- NS.OpenMenu; it replaces LibDropdown and the MC2 menus, design §7.5), the dialogs' dropdowns
--- (NS.MakeDropdown, §7.6) and the outfit bar's test strip (NS.MakeTestStrip, §7.7, H17). The seam
--- exports no copy window: the diagnostics report is copied from the debug console's own Copy button.
+-- (NS.MakeDropdown, §7.6), the outfit bar's and the window's test strips (NS.MakeTestStrip, §7.7, H17)
+-- and the outfit window's footer (NS.MakeFooter). The seam exports no copy window: the diagnostics
+-- report is copied from the debug console's own Copy button.
 --
 -- THE POPUP IS A PROCESS-WIDE SINGLETON parented to UIParent, so hiding a window does not reach it.
 -- Every non-click close path of a window that opens a menu calls NS.CloseMenu(): the character
@@ -22,8 +23,9 @@ local addonName, NS = ...
 -- anchor. The outfit bar does that from every path that hides it (modules/Bar.lua hideFrames), so a
 -- menu the window opened stays up when the bar goes.
 --
--- DEGRADED (the library absent): NS.MakeDropdown and NS.MakeTestStrip answer nil, and the caller
--- draws no control rather than a dead one; NS.OpenMenu hands the same `fill` to the client's
+-- DEGRADED (the library absent): NS.MakeDropdown, NS.MakeTestStrip and NS.MakeFooter answer nil, and
+-- the caller draws no control rather than a dead one (the window lays its footer's buttons on a bare
+-- frame of FOOTER_HEIGHT instead); NS.OpenMenu hands the same `fill` to the client's
 -- MenuUtil; NS.CloseMenu is a no-op, because no Ka0s menu can be open.
 
 local W = LibStub and LibStub("LibKa0s-Widgets-1.0", true)
@@ -283,12 +285,16 @@ local function endTestMode()
     if P and P.IsActive and P.IsActive() and P.Stop then P.Stop() end
 end
 
---- The test-mode strip (the library's W.TestStrip, born hidden and unanchored), or nil when the
---- library is absent. The caller anchors it and shows it. Its mark is the catalog's info icon and its
---- right-click ends test mode.
+--- The test-mode strip (the library's W.TestStrip, born hidden), or nil when the library is absent.
+--- Its mark is the catalog's info icon and its right-click ends test mode. The caller shows it, and
+--- places it through its docking (AD-88-OR; Widgets minor 27, preview-mode's *Where the strip sits*):
+--- `{ dock = "title", titleBar = band }` in `opts` puts it directly under that title band, full width,
+--- placed again by the library on every show, hide and resize of the band; the caller never anchors
+--- it, and moves its body down by `NS.TEST_STRIP_HEIGHT` while it shows.
 --- @param parent table the frame to parent it to
 --- @param label string the localized line it says
---- @param opts table|nil any further W.TestStrip option (`kind`, `panel`, `L`, `onEnd`), which wins
+--- @param opts table|nil any further W.TestStrip option (`dock`, `titleBar`, `kind`, `panel`, `L`,
+--- `onEnd`), which wins
 --- @return table|nil
 function NS.MakeTestStrip(parent, label, opts)
     if not W then return nil end
@@ -297,4 +303,27 @@ function NS.MakeTestStrip(parent, label, opts)
         for k, v in pairs(opts) do o[k] = v end
     end
     return W.TestStrip(parent, o)
+end
+
+-- ── the window footer ────────────────────────────────────────────────────────────────────────────
+
+--- The footer's height (W.FOOTER.HEIGHT, skin-invariant: standalone-windows, *Window chrome
+--- geometry*), read where the library publishes it; 24, its published value, with no library.
+NS.FOOTER_HEIGHT = (W and W.FOOTER and W.FOOTER.HEIGHT) or 24
+
+--- A window footer (the library's W.Footer, Widgets minor 27; standalone-windows' *The footer*,
+--- AD-89-OR): no fill, a hairline in the skin's `divider` along its top, `FOOTER.HEIGHT` tall across
+--- `parent`'s bottom edge, born shown, painted for this addon's skin owner. Nil when the library is
+--- absent; the caller then lays the same controls on a bare frame of the same height.
+--- @param parent table the window whose bottom edge it spans
+--- @param opts table|nil W.Footer's opts; `owner` is always this addon
+--- @return table|nil
+function NS.MakeFooter(parent, opts)
+    if not (W and type(W.Footer) == "function") then return nil end
+    local o = {}
+    if type(opts) == "table" then
+        for k, v in pairs(opts) do o[k] = v end
+    end
+    o.owner = addonName
+    return W.Footer(parent, o)
 end
