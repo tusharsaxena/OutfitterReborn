@@ -82,6 +82,11 @@ places in Lua, and the kit's sighted shadow is what the complexity suite measure
   `tools/legacy_capture.lua` and never hand-edited (its README says how to regenerate it). The new
   suites assert against it: a *keep* pin asserts the legacy value, a *fix* pin the corrected one with
   a `-- legacy:` note.
+- **Made-up players are the collection's sample characters** (LibKa0s#87, preview-mode): a suite
+  that names a player reads it from the vendored `LibKa0s-Sim-1.0`'s `Sample("retail")` (`Name-Realm`,
+  `Samplerealm`, and `Mockrealm` for another realm) or `Sample("forever")` (`First Surname`, no realm),
+  never a hand-made name or a real realm. The legacy capture's credits are real data and stay as
+  captured.
 - **A suite holds every frame it makes.** The kit tracks frames and their event registrations in
   weak-keyed tables, so a frame only those tables reach is collected at the next GC cycle and stops
   hearing its events; a client frame never is. When the cycle lands depends on the heap the earlier
