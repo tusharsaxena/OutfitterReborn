@@ -11,6 +11,8 @@ the owner's R7 pass. Sections 14 to 18 are the WoW Forever port (2026-11-08 desi
 Forever client unless a row says Retail, and a row tagged with a probe settles a value the build took
 from the inventory's best evidence (`-- PROBE Pn` at the code site). Section 22 is the window chrome
 of the LibKa0s v1.105.0 adoption (2026-11-17): the docked test strips and the window's footer.
+Section 24 is that adoption's report verbs (2026-11-18): `missing`, `zone` and `iteminfo` in the
+debug console.
 
 ## Sign-off
 
@@ -107,7 +109,7 @@ of the LibKa0s v1.105.0 adoption (2026-11-17): the docked test strips and the wi
 |---|---|---|
 | B1 | Show the outfit bar; drag it by its header; lock; vertical | Position saved; opacity in combat applies |
 | B2 | Test mode | The bar and the window fill with sample outfits under a Test mode strip each; nothing is worn |
-| B3 | Bank open: deposit, withdraw, `missing` | Items move; the missing list is right |
+| B3 | Bank open: deposit, withdraw, `missing` | Items move; the missing list (in the debug console since RP1) is right |
 | B4 | An item's tooltip | Lists the outfits that use it; comparisons draw (O34, O41) |
 | B5 | Click an empty slot | The flyout opens, sorted |
 | B6 | With Pawn, then WeightsWatcher, loaded: open Rebuild (optimize) and pick each addon's stat category | Pawn lists one stat per visible scale and WeightsWatcher one per active weight; values match the addon's own tooltip; hiding a Pawn scale removes it the next time the list opens; nothing errors without either addon |
@@ -592,3 +594,16 @@ the cursor, never at the element's corner. Title-bar tooltips (SK7) are unchange
 | TP5 (AD-92-OR) | Show the outfit bar; hover a button, then move the bar to the screen's right edge and hover it again; `/or test` and hover a sample button and a sample row | Each tooltip opens beside the whole bar (right, then left at the edge), top level with the button, never over the bar. The samples read *Sample outfit (test mode). Nothing is equipped.* |
 | TP6 (AD-92-OR) | Hover the outfit tab on the character frame, and an item in a bag with an outfit holding it | Unchanged (out of scope): the tab's tooltip sits at its right as before, and the bag item's tooltip is where the client puts it, the compare tooltips beside it |
 | TP7 (AD-92-OR review fixes) | Clear the item cache (a fresh login), open the window and hover an item row of an item not seen this session, near the screen's bottom edge | When the item's lines arrive the tooltip grows and is placed again: still beside the window, its bottom on the screen, top level with the row where it fits |
+
+## 24. Reports in the debug console (LibKa0s v1.105.0 adoption, AD-79-OR, 2026-11-18)
+
+Retail and Forever. Debug-logging-§15 (standard v2.113.0): a report is written to the debug console
+whether or not logging is on, the console opens, and chat gets exactly one pointer line; refusals stay
+in chat.
+
+| # | Do | See |
+|---|---|---|
+| RP1 (AD-79-OR) | `/or debug off`, close the console; open the bank with an outfit holding an item you no longer have; `/or missing` | The console opens with a `/or missing` header, the intro and the missing item under `[Report]`; chat has one line, *missing: N lines written to the debug console. Use Copy to share it.*; logging is still off (the console's toggle reads Off) |
+| RP2 (AD-79-OR) | Close the bank, `/or missing`; open it with nothing missing, `/or missing` | Bank closed: *You must have your bank open ...* in chat, the console stays closed and gains nothing. Nothing missing: *No items are missing* in chat, nothing in the console |
+| RP3 (AD-79-OR) | Close the console; `/or zone` (in the open world, then in a battleground or arena) | The console opens with the instance line, the zone outfits line and the equipment lines; one pointer line in chat. Copy pastes plain text |
+| RP4 (AD-79-OR) | Close the console; `/or iteminfo ` then shift-click an item into the line; then `/or iteminfo nonsense` | The link line reads `[Item name]` in Copy, then `id`, `bonus`, `mods` and the other fields; one pointer in chat. `nonsense`: *Not a readable item link.* in chat, the console stays closed |

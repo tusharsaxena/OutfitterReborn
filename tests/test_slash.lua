@@ -331,6 +331,29 @@ local function spy(tbl, name)
     return calls
 end
 
+--- The messages of the last `/or <title>` report in the console, header excluded (buffer lines are
+--- `<ts> | [<tag>] <msg>`, plain text).
+local function reportBody(NS, title)
+    local buf, at = NS.DebugLog.buffer, nil
+    for i = #buf, 1, -1 do
+        if buf[i]:find("| [Report] /or " .. title, 1, true) and buf[i]:sub(-#title) == title then at = i; break end
+    end
+    if not at then return {} end
+    local out = {}
+    for i = at + 1, #buf do
+        local msg = buf[i]:match("^.- | %[Report%] (.*)$")
+        if not msg then break end
+        out[#out + 1] = msg
+    end
+    return out
+end
+
+--- The one chat line a report prints, through the library's own string.
+local function pointer(_, title, n)
+    local lib = T.mocks.LibStub("LibKa0s-DebugLog-1.0")
+    return lib.STRINGS.REPORT_WRITTEN:format(title, n)
+end
+
 local function readSource(path)
     local f = assert(io.open(T.root .. "/" .. path, "rb"))
     local src = f:read("*a")
@@ -477,26 +500,34 @@ test("slash: wear, wear <unknown> and zone print the lines legacy printed (fixtu
     -- red under: a missing-name line without the article ("Couldn't find outfit named %s.")
     local runs = {}
     for _, run in ipairs(T.legacy.commands.runs) do runs[run.input] = run end
+    -- Re-pinned at AD-79-OR (debug-logging-§15): `zone` is a report, so its lines are the console's
+    -- report body, not chat's; the wording is still legacy's.
     for _, input in ipairs({ "wear", "wear NoSuchOutfit", "zone" }) do
         local NS, M = scene()
         M.__world.instance = { name = "Somewhere", type = "none" }
+        NS.DebugLog:Clear()
         NS.Slash:OnSlash(input)
         local want = legacyLines(runs[input])
+        local got = bare(M)
         if input == "zone" then
             for _, l in ipairs(NS.Equip.Diagnostic()) do want[#want + 1] = l end
+            got = reportBody(NS, "zone")
         end
-        assertEqual(table.concat(bare(M), "|"), table.concat(want, "|"), input)
+        assertEqual(table.concat(got, "|"), table.concat(want, "|"), input)
     end
 end)
 
 test("slash: /or zone routes to Commands.Zone: the zone lines, then the equipment bracket's", function()
+    -- Re-pinned at AD-79-OR: the lines are the console report's body; chat carries the one pointer.
     local NS, M = scene()
     local zone = spy(NS.Commands, "Zone")
+    NS.DebugLog:Clear()
     NS.Slash:OnSlash("zone")
     assertEqual(#zone, 1, "the verb did not reach Commands.Zone")
     local want = NS.States.ZoneInfo()
     for _, l in ipairs(NS.Equip.Diagnostic()) do want[#want + 1] = l end
-    assertEqual(table.concat(bare(M), "|"), table.concat(want, "|"))
+    assertEqual(table.concat(reportBody(NS, "zone"), "|"), table.concat(want, "|"))
+    assertEqual(table.concat(bare(M), "|"), pointer(NS, "zone", #want + 1))
 end)
 
 -- ── the old verbs (design §4.3.2) ────────────────────────────────────────────────────────────────
@@ -662,11 +693,100 @@ test("slash: `unequip` takes the argument, moves one item, and stops after a mis
     assertEqual(NS.ItemInfo.FromSlot("HeadSlot"), nil, "slot 1 was not emptied")
 end)
 
-test("slash: `iteminfo` prints the link's fields through the secret-safe reader", function()
+test("slash: `iteminfo` reports the link's fields through the secret-safe reader", function()
+    -- Re-pinned at AD-79-OR: the fields are the console report's body (Copy's plain text, so the
+    -- link line reads `[Hearthstone]`); chat carries the one pointer.
     local NS, M = scene()
     local link = "|cffffffff|Hitem:6948::::::::|h[Hearthstone]|h|r"
+    NS.DebugLog:Clear()
     NS.Slash.Route("iteminfo " .. link)
-    assertEqual(table.concat(bare(M), "|"), table.concat(NS.ItemInfo.LinkInfoLines(link), "|"))
+    local want = NS.ItemInfo.LinkInfoLines(link)
+    want[1] = "link: [Hearthstone]"
+    assertEqual(table.concat(reportBody(NS, "iteminfo"), "|"), table.concat(want, "|"))
+    assertEqual(table.concat(bare(M), "|"), pointer(NS, "iteminfo", #want + 1))
+end)
+
+-- ── the report verbs (debug-logging-§15, LibKa0s#79) ─────────────────────────────────────────────
+
+--- A scene with one outfit whose hood is nowhere, the bank open: `missing` has a two-line report.
+local function missingScene()
+    local NS, M = scene(nil, true)
+    NS.Outfits.Create("Ghost", { HeadSlot = { id = 424242, name = "Ghostly Hood" }, ChestSlot = { id = 0 } })
+    M.__resetPrinted()
+    return NS, M
+end
+
+local REPORTS = {
+    { verb = "missing", scene = missingScene, input = "missing" },
+    { verb = "zone", scene = scene, input = "zone" },
+    { verb = "iteminfo", scene = scene, input = "iteminfo |cffffffff|Hitem:6948::::::::|h[Hearthstone]|h|r" },
+}
+
+test("slash: each report verb writes to the console with logging off, reveals it and points once", function()
+    for _, r in ipairs(REPORTS) do
+        local NS, M = r.scene()
+        local D = NS.DebugLog
+        D:Clear()
+        if D:IsShown() then D:Hide() end
+        assertFalse(D:IsEnabled(), r.verb .. ": the scene starts with logging on")
+        NS.Slash.Route(r.input)
+        local body = reportBody(NS, r.verb)
+        -- red under: a verb that prints its lines through NS.Print (no report, nothing in the console).
+        assertTrue(#body > 1, r.verb .. ": no report in the console")
+        -- red under: a report written through the gated NS.Debug (dropped while logging is off).
+        assertFalse(D:IsEnabled(), r.verb .. ": the report turned logging on")
+        assertTrue(D:IsShown(), r.verb .. ": the console stayed hidden")
+        -- red under: printAll left beside the report (the lines in chat as well as the pointer).
+        assertEqual(#M.__printed(), 1, r.verb .. ": " .. table.concat(bare(M), "|"))
+        assertEqual(bare(M)[1], pointer(NS, r.verb, #body + 1), r.verb)
+    end
+end)
+
+test("slash: a refusal or a one-line answer inside a report verb stays in chat and writes nothing", function()
+    local closed = function() return scene() end
+    local fine = function()
+        local NS, M = scene(nil, true)
+        M.__resetPrinted()
+        return NS, M
+    end
+    local cases = {
+        { "missing", closed, "You must have your bank open to generate a missing items report" },
+        { "missing", fine, "No items are missing" },
+        { "iteminfo nonsense", scene, "Not a readable item link." },
+        { "iteminfo", scene, "Not a readable item link." },
+    }
+    for _, c in ipairs(cases) do
+        local NS, M = c[2]()
+        local D = NS.DebugLog
+        D:Clear()
+        if D:IsShown() then D:Hide() end
+        local before = #D.buffer
+        NS.Slash.Route(c[1])
+        -- red under: a refusal written through Report (the console gains a header and opens).
+        assertEqual(#D.buffer, before, c[1] .. ": the console gained lines")
+        assertFalse(D:IsShown(), c[1] .. ": the console opened")
+        assertEqual(table.concat(bare(M), "|"), c[3], c[1])
+    end
+end)
+
+test("slash: library absent, a report verb streams its lines to chat with no pointer", function()
+    local inst = T.load{ libFiles = {} }
+    local NS, M = inst.NS, inst.mocks
+    M.__resetPrinted()
+    local n = NS.DebugLog:Report("Report", "zone", function(write) write("one"); write(2) end)
+    assertEqual(n, 2)
+    -- red under: a stub Report that writes nothing (the read-out the player asked for is lost).
+    assertEqual(table.concat(bare(M), "|"), "one|2")
+    assertEqual(NS.DebugLog:Report("Report", "zone", function() end), 0, "an empty body")
+    assertEqual(#M.__printed(), 2, "an empty body printed")
+    local lines = NS.DebugLog:Serialize({ a = 1 })
+    assertEqual(type(lines), "table")
+    assertEqual(lines[1], "<table>")
+    M.__resetPrinted()
+    NS.Slash:OnSlash("zone")
+    local said = bare(M)
+    assertTrue(#said > 1, "zone did not stream: " .. table.concat(said, "|"))
+    assertFalse(table.concat(said, "|"):find("written to the debug console", 1, true) ~= nil, "a pointer")
 end)
 
 test("slash: `bar show|hide|toggle` writes bar.shown through the CLI; no word toggles", function()

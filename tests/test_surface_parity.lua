@@ -121,6 +121,8 @@ test("parity: the DebugLog stub carries every member this addon calls", function
         Toggle = "function", IsShown = "function", IsEnabled = "function", SetEnabled = "function",
         ConsoleCheckbox = "function", RunDiagnostics = "function", DebugVerb = "function",
         DebugOnce = "function", DebugChanged = "function", DebugAtEnable = "function",
+        -- the report seam (debug-logging-§15): modules/Commands.lua's report verbs call Report
+        Report = "function", Serialize = "function",
     })
     bothArms("NS", function(NS) return NS end, {
         Debug = "function", DebugOnce = "function", DebugChanged = "function", DebugAtEnable = "function",

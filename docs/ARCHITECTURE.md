@@ -153,7 +153,9 @@ The outfit verbs (`show`, `hide`, `wear`, `unwear`, `toggle`, `update`, the bank
 `zone`, `iteminfo`, `test`, `bar`, `lock`, `unlock`, `deleteall` and the rest) follow `version`, with
 their handlers in `modules/Commands.lua` (`bar show|hide|toggle` writes `bar.shown` in
 `settings/Slash.lua`, or in test mode only dismisses the bar for that test session; the *Toggle outfit bar* key runs it). The live-while-disabled rules, the macro-conditional routing and
-the full verb set are in [`slash-dispatch.md`](slash-dispatch.md).
+the full verb set are in [`slash-dispatch.md`](slash-dispatch.md). The three report verbs (`missing`,
+`zone`, `iteminfo`) write to the debug console through `NS.DebugLog:Report` with one chat pointer,
+and their refusals stay in chat (debug-logging-§15; [`debug.md`](debug.md#reports)).
 
 ## Public API
 

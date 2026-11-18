@@ -275,7 +275,7 @@ Total.
 - settings: the Profiles page says outfits are per character, above AceDBOptions' controls
 - settings: library absent, the addon still loads and the reset still lands
 
-### test_slash.lua (45)
+### test_slash.lua (48)
 
 - slash: the reserved verbs open NS.COMMANDS, in the DpsRace order
 - slash: bare /or opens the settings panel
@@ -319,7 +319,10 @@ Total.
 - slash: the bank verbs and `missing` print the refusal while the bank is closed
 - slash: `withdrawothers` brings every other outfit's banked items (INV §3.7 Fix)
 - slash: `unequip` takes the argument, moves one item, and stops after a miss
-- slash: `iteminfo` prints the link's fields through the secret-safe reader
+- slash: `iteminfo` reports the link's fields through the secret-safe reader
+- slash: each report verb writes to the console with logging off, reveals it and points once
+- slash: a refusal or a one-line answer inside a report verb stays in chat and writes nothing
+- slash: library absent, a report verb streams its lines to chat with no pointer
 - slash: `bar show|hide|toggle` writes bar.shown through the CLI; no word toggles
 - slash: `test` flips test mode
 
@@ -1898,7 +1901,7 @@ Total.
 | test_perf_harness.lua | 19 |
 | test_schema.lua | 25 |
 | test_settings.lua | 16 |
-| test_slash.lua | 45 |
+| test_slash.lua | 48 |
 | test_launcher.lua | 12 |
 | test_keybinds.lua | 22 |
 | test_disabled.lua | 24 |
@@ -1968,4 +1971,4 @@ Total.
 | test_lizard_sighted.lua | 8 |
 | test_prose.lua | 15 |
 | Skipped | 1 |
-| **Total** | **1626** |
+| **Total** | **1629** |
