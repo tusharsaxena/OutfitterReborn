@@ -101,11 +101,12 @@ function Commands.Bank(method, rest)
 end
 
 --- /or missing: the report in the console; the refusal while the bank is closed, and the one
---- none-missing line, in chat.
+--- none-missing line, in chat. The chat answer is keyed on that line itself, not on the report's
+--- length, so a one-line report still reaches the console.
 function Commands.Missing()
     local lines, why = NS.Bank.MissingReport()
     if not lines then return out(why) end
-    if #lines == 1 then return out(lines[1]) end
+    if #lines == 1 and lines[1] == L["No items are missing"] then return out(lines[1]) end
     return report("missing", lines)
 end
 

@@ -769,6 +769,21 @@ test("slash: a refusal or a one-line answer inside a report verb stays in chat a
     end
 end)
 
+test("slash: `missing` keys its chat answer on the none-missing line, not on a one-line report", function()
+    local NS, M = scene(nil, true)
+    M.__resetPrinted()
+    local D = NS.DebugLog
+    D:Clear()
+    if D:IsShown() then D:Hide() end
+    NS.Bank.MissingReport = function() return { "Ghostly Hood" } end
+    NS.Slash.Route("missing")
+    local body = reportBody(NS, "missing")
+    -- red under: Commands.Missing reading any one-line report as the none-missing answer (chat).
+    assertEqual(table.concat(body, "|"), "Ghostly Hood")
+    assertTrue(D:IsShown(), "the console stayed hidden")
+    assertEqual(table.concat(bare(M), "|"), pointer(NS, "missing", #body + 1))
+end)
+
 test("slash: library absent, a report verb streams its lines to chat with no pointer", function()
     local inst = T.load{ libFiles = {} }
     local NS, M = inst.NS, inst.mocks
