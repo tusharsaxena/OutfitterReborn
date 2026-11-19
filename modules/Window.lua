@@ -1,6 +1,6 @@
 local _, NS = ...
 -- modules/Window.lua — NS.Window: the outfit window's chrome, the list body, the scroll bar and the
--- footer, and its render (design §7.1, §7.3, INV §7.1-§7.2).
+-- footer (W.Footer), and its render (design §7.1, §7.3, INV §7.1-§7.2).
 --
 -- `OutfitterRebornWindow` is built once, by modules/Dock.lua, which owns every Show and Hide of it,
 -- its position and its layers. This file draws what is in it. No tabs: the old Options and About
@@ -12,14 +12,21 @@ local _, NS = ...
 -- while the window is shown (Window.RenderIfDirty). Nothing renders while the window is hidden.
 --
 -- TEST MODE (smoke round 2 design G7). Win.SetTestMode, called by Dock.Refresh before every show and
--- so never in lockdown, puts the amber strip (NS.MakeTestStrip, the bar's own) under the title divider,
--- pushes the list down by its height and grows the window to match, and disables New outfit (it would
--- make a real outfit); the Slots buttons stay hidden. One marker per mode: the title says test mode
--- only when the library is degraded and there is no strip.
+-- so never in lockdown, shows the amber strip (NS.MakeTestStrip, the bar's own), pushes the list down
+-- by its body offset (strip:BodyOffset(), read after the show) and grows the window to match, and disables New outfit (it would make a real outfit);
+-- the Slots buttons stay hidden. The strip is docked by the library under `frame.titleBar`, the title
+-- band's frame down to the divider (`dock = "title"`; AD-88-OR, preview-mode's *Where the strip
+-- sits*): this file never anchors it. One marker per mode: the title says test mode only when the
+-- library is degraded and there is no strip.
+--
+-- THE FOOTER (AD-89-OR, standalone-windows' *The footer*) is the library's W.Footer (NS.MakeFooter):
+-- no fill, a hairline in the skin's divider, FOOTER_HEIGHT (24) tall along the window's bottom edge.
+-- New outfit sits on its left and the Slots: [All] [None] trio on its right, each centered on it; the
+-- list ends above it. With no library the same buttons sit on a bare frame of the same height.
 --
 -- CALLS (at call time; design §12): NS.Dock.Close, NS.WindowRows, NS.WindowListModel, NS.Stack.Selected,
 -- NS.Outfits.SetAllSlotsEnabled, NS.OutfitDialog.OpenNew, NS.OpenOptionsPanel, NS.Preview.IsActive,
--- NS.MakeTestStrip.
+-- NS.MakeTestStrip, NS.MakeFooter, NS.HeaderButtons.
 
 -- SCALE: the window's own scale, 1.25 (Forever smoke feedback 3, owner 2026-11-09: the window drawn
 -- as at a 1.25 scale, on both clients). Its sizes stay in its own units; the dock converts the sheet's
@@ -117,8 +124,9 @@ end
 
 -- ── test mode ─────────────────────────────────────────────────────────────────────────────────
 
--- The list's top under the title divider, and the strip's gap below it.
-local LIST_TOP, STRIP_TOP, STRIP_GAP = -30, -27, 2
+-- The list's top under the title divider, the title band's height (its frame's bottom, where the
+-- docked strip hangs, is 1 px under the divider), and the strip's gap below it.
+local LIST_TOP, TITLE_BAND, STRIP_GAP = -30, 27, 2
 
 -- The contents' shift for an inset: the list's own 8 px left padding is taken up by the band, so the
 -- rows start flush with the strip's edge (Forever smoke feedback 2, R2-2) and the window widens by
@@ -127,13 +135,13 @@ local LEFT_PAD = 8
 local function shiftOf(px) return math.max(0, px - LEFT_PAD) end
 
 -- The strip, built the first time test mode shows the window; false when the library is degraded.
+-- Docked under the title band's frame, which carries the inset, so the strip follows it.
 local function ensureStrip()
     if frame.strip == nil then
-        local strip = NS.MakeTestStrip(frame, L["Test mode: sample outfits, nothing equipped"])
+        local strip = NS.MakeTestStrip(frame, L["Test mode: sample outfits, nothing equipped"],
+            { dock = "title", titleBar = frame.titleBar })
         frame.strip = strip or false
         if strip then
-            strip:SetPoint("TOPLEFT", frame, "TOPLEFT", 1 + shiftOf(Win.inset), STRIP_TOP)
-            strip:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -1, STRIP_TOP)
             chrome[#chrome + 1] = strip
             strip:SetFrameLevel(NS.SafeNumber(frame:GetFrameLevel(), 0) + LEVEL.CHROME)
         end
@@ -161,9 +169,9 @@ function Win.SetLeftInset(px)
     frame:SetWidth(Win.WIDTH + shift)
     frame.title:SetPoint("TOPLEFT", frame, "TOPLEFT", 10 + shift, -8)
     frame.divider:SetPoint("TOPLEFT", frame, "TOPLEFT", 1 + shift, -26)
-    if frame.strip then frame.strip:SetPoint("TOPLEFT", frame, "TOPLEFT", 1 + shift, STRIP_TOP) end
+    frame.titleBar:SetPoint("TOPLEFT", frame, "TOPLEFT", 1 + shift, 0)
     list:SetPoint("TOPLEFT", frame, "TOPLEFT", LEFT_PAD + shift, LIST_TOP - (Win.push or 0))
-    newButton:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", LEFT_PAD + shift, 8)
+    frame.footer:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", shift, 0)
 end
 
 --- Dress the window for test mode or take it off: the strip, the list's push, the height, New outfit
@@ -176,7 +184,12 @@ function Win.SetTestMode(on)
     Win.testMode = on
     local strip = on and ensureStrip()
     if strip then strip:Show() elseif frame.strip then frame.strip:Hide() end
-    local push = strip and (NS.TEST_STRIP_HEIGHT + STRIP_GAP) or 0
+    -- The push is the strip's own body offset (its height while it shows, read after Show), so a
+    -- strip that ever outgrows NS.TEST_STRIP_HEIGHT still clears the list; plus the gap below it.
+    -- NS.TEST_STRIP_HEIGHT stands in when a shown strip answers no height (its rect not laid yet).
+    local offset = strip and type(strip.BodyOffset) == "function" and NS.SafeNumber(strip:BodyOffset(), 0) or 0
+    if strip and offset <= 0 then offset = NS.TEST_STRIP_HEIGHT end
+    local push = strip and (offset + STRIP_GAP) or 0
     Win.push = push
     list:SetPoint("TOPLEFT", frame, "TOPLEFT", LEFT_PAD + shiftOf(Win.inset), LIST_TOP - push)
     frame:SetHeight(Win.HEIGHT + push)
@@ -199,17 +212,6 @@ local function labeledButton(name, parent, w, h, text, opts)
     return b
 end
 
--- The close X's art size, read off its own art (LibKa0s Core's CLOSE_ART is a file-local), so the
--- gear follows it; 12, that value, when the close draws a font glyph or is not there.
-local GEAR_ART_FALLBACK = 12
-
-local function closeArtSize(close)
-    local icon = close and rawget(close, "icon")
-    local w = type(icon) == "table" and type(icon.GetWidth) == "function" and NS.SafeNumber(icon:GetWidth(), 0) or 0
-    if w <= 0 then return GEAR_ART_FALLBACK end
-    return w
-end
-
 local function titleStrip(f)
     f.title = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     f.title:SetPoint("TOPLEFT", f, "TOPLEFT", 10, -8)
@@ -218,30 +220,31 @@ local function titleStrip(f)
     f.divider:SetHeight(1)
     f.divider:SetPoint("TOPLEFT", f, "TOPLEFT", 1, -26)
     f.divider:SetPoint("TOPRIGHT", f, "TOPRIGHT", -1, -26)
+    -- The title band as a frame, the test strip's dock (it draws nothing and takes no mouse): the
+    -- window's top, 1 px in as the divider is, TITLE_BAND high. Win.SetLeftInset moves its left edge.
+    local bar = CreateFrame("Frame", nil, f)
+    bar:SetPoint("TOPLEFT", f, "TOPLEFT", 1, 0)
+    bar:SetPoint("TOPRIGHT", f, "TOPRIGHT", -1, 0)
+    bar:SetHeight(TITLE_BAND)
+    bar:EnableMouse(false)
+    f.titleBar = bar
     NS.ApplySkin(f)
-    -- NS.MakeCloseButton makes and skins the x but anchors nothing: the caller places it, as
-    -- modules/UIDialogs.lua does. Unanchored it never drew (design G10).
-    local close = NS.MakeCloseButton(f, function() NS.Dock.Close() end)
-    if close then
-        close:SetPoint("TOPRIGHT", f, "TOPRIGHT", -6, -5)
-        f.close = close
-        chrome[#chrome + 1] = close
-    end
-    local gear = CreateFrame("Button", "OutfitterRebornWindowSettings", f)
-    gear:SetSize(18, 18)
-    gear:SetPoint("TOPRIGHT", f, "TOPRIGHT", -28, -5)
-    -- The art at the close X's art size, centered in the unchanged 18 px click target (smoke round 2
-    -- design G5). Painted as the library's header marks are (LibKa0s v1.105.0 smoke round 1, ruling
-    -- 4): icon.tint at rest, as the X is, and text.link under the pointer, where the X takes
-    -- close.hot; "Open settings" above it on hover (ruling 3). NS.TitleControl, core/CoreSetup.lua.
-    local art = closeArtSize(close)
-    gear.icon = gear:CreateTexture(nil, "ARTWORK")
-    gear.icon:SetPoint("CENTER", gear, "CENTER", 0, 0)
-    gear.icon:SetSize(art, art)
-    gear.icon:SetTexture(NS.Icon("settings"))
-    NS.TitleControl(gear, L["Open settings"])
-    gear:SetScript("OnClick", function() if not NS.IsStoodDown() then NS.OpenOptionsPanel() end end)
-    chrome[#chrome + 1] = gear
+    -- The marks (AD-86-OR, LibKa0s#86; standalone-windows' *Title-bar controls*): W.HeaderButtons'
+    -- strip through NS.HeaderButtons, left to right settings, close, the close 6 px in from the top
+    -- right and the gear 6 px past it, both at y -5 on the title band, each an 18 px mark with 12 px
+    -- art in icon.tint, lit text.link under the pointer (the close close.hot), each with its tooltip
+    -- above it ("Open settings", "Close"). The close's click closes through the dock; the gear opens
+    -- the settings panel, refused while the addon stands down. The window sits beside the character
+    -- sheet, not over the panel, so it stays shown (no hideOnSettings).
+    local hb = NS.HeaderButtons(f, {
+        frame = f, point = "TOPRIGHT", y = -5,
+        close = function() NS.Dock.Close() end,
+        settings = function() if not NS.IsStoodDown() then NS.OpenOptionsPanel() end end,
+        settingsTip = L["Open settings"],
+    })
+    f.close, f.settingsButton = hb.close, hb.settings
+    if hb.close then chrome[#chrome + 1] = hb.close end
+    if hb.settings then chrome[#chrome + 1] = hb.settings end
 end
 
 local function body(f)
@@ -267,12 +270,25 @@ local function body(f)
     scroll:SetScript("OnValueChanged", function(_, value) Win.SetOffset(value) end)
 end
 
+-- The footer with no library: a bare frame of the same height on the same edge (no hairline).
+local function bareFooter(f)
+    local foot = CreateFrame("Frame", nil, f)
+    foot:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", 0, 0)
+    foot:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", 0, 0)
+    foot:SetHeight(NS.FOOTER_HEIGHT)
+    return foot
+end
+
 local function footerRow(f)
+    -- The library's footer (AD-89-OR), re-leveled with the chrome; its two text lines stay empty.
+    local foot = NS.MakeFooter(f) or bareFooter(f)
+    f.footer = foot
+    chrome[#chrome + 1] = foot
     -- One look for the footer's three buttons (Forever smoke feedback 2, R2-4): the skin's plain button,
     -- not the primary one, whose fill made the label hard to read under several skins; All and None
-    -- draw their label in the muted text color, a step dimmer.
-    local new = labeledButton("OutfitterRebornNewOutfitButton", f, 120, 20, L["New outfit"])
-    new:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", 8, 8)
+    -- draw their label in the muted text color, a step dimmer. Each is centered on the footer.
+    local new = labeledButton("OutfitterRebornNewOutfitButton", foot, 120, 20, L["New outfit"])
+    new:SetPoint("LEFT", foot, "LEFT", LEFT_PAD, 0)
     new.mark = new:CreateTexture(nil, "ARTWORK")
     new.mark:SetSize(12, 12)
     new.mark:SetPoint("LEFT", new, "LEFT", 4, 0)
@@ -283,11 +299,11 @@ local function footerRow(f)
     end)
     newButton = new
     local dim = { tokens = { text = "text.muted" } }
-    local none = labeledButton("OutfitterRebornSlotsNone", f, 40, 18, L["None"], dim)
-    none:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -8, 9)
-    local all = labeledButton("OutfitterRebornSlotsAll", f, 40, 18, L["All"], dim)
+    local none = labeledButton("OutfitterRebornSlotsNone", foot, 40, 18, L["None"], dim)
+    none:SetPoint("RIGHT", foot, "RIGHT", -8, 0)
+    local all = labeledButton("OutfitterRebornSlotsAll", foot, 40, 18, L["All"], dim)
     all:SetPoint("RIGHT", none, "LEFT", -4, 0)
-    local label = f:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    local label = foot:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     label:SetPoint("RIGHT", all, "LEFT", -4, 0)
     label:SetText(L["Slots:"])
     NS.Skin.Text(label, "muted")

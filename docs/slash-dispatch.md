@@ -63,12 +63,12 @@ makes 36 entries in `NS.COMMANDS`, and the key bindings number 15 (`Bindings.xml
 | `toggle [outfit]` | Wear an outfit, or take it off if it is worn | refused |
 | `update [outfit]` | Update an outfit to the items you have equipped | refused |
 | `deposit`, `depositunique`, `depositothers`, `withdraw`, `withdrawothers` `[outfit]` | The bank verbs (bank must be open) | refused |
-| `missing` | List the outfit items you no longer have (bank must be open) | refused |
+| `missing` | List the outfit items you no longer have (bank must be open); a report in the debug console | refused |
 | `unequip item-or-slot` | Move one equipped item to your bags | refused |
 | `updatetitle` | Re-apply the title of the outfit you are wearing | refused |
 | `auto [on\|off]` | Automatic outfit changes; no word prints the state | answers |
-| `zone` | Show what the addon knows about where you are | answers (read-only) |
-| `iteminfo link` | Print an item link's fields | answers (read-only) |
+| `zone` | Show what the addon knows about where you are; a report in the debug console | answers (read-only) |
+| `iteminfo link` | Print an item link's fields; a report in the debug console | answers (read-only) |
 | `test` | Sample outfits on the outfit bar and window | refused |
 | `bar` | Show, hide or toggle the outfit bar (`show`, `hide`, `toggle`; no word toggles), writing `bar.shown` | refused |
 | `lock` / `unlock` | Lock or unlock the outfit bar | refused |
@@ -76,6 +76,11 @@ makes 36 entries in `NS.COMMANDS`, and the key bindings number 15 (`Bindings.xml
 
 `auto`, `zone` and `iteminfo` join `HOST_LIVE_VERBS`, on both the live dispatcher and the
 library-absent stub.
+
+**Reports go to the console** (debug-logging-§15, LibKa0s#79). `missing`, `zone` and `iteminfo`
+write their read-out into the debug console through `NS.DebugLog:Report`, ungated, revealing the
+console and printing one chat pointer; a refusal or a one-line answer inside them stays in chat and
+writes nothing. The verbs and what stays in chat are in [`debug.md`](debug.md#reports).
 
 **`bar` is a feature noun with sub-verbs.** `/or bar show` and `/or bar hide` write `bar.shown`
 `true` and `false`; `/or bar toggle`, or `/or bar` alone, flips it; any other word prints

@@ -275,7 +275,7 @@ Total.
 - settings: the Profiles page says outfits are per character, above AceDBOptions' controls
 - settings: library absent, the addon still loads and the reset still lands
 
-### test_slash.lua (45)
+### test_slash.lua (49)
 
 - slash: the reserved verbs open NS.COMMANDS, in the DpsRace order
 - slash: bare /or opens the settings panel
@@ -319,7 +319,11 @@ Total.
 - slash: the bank verbs and `missing` print the refusal while the bank is closed
 - slash: `withdrawothers` brings every other outfit's banked items (INV §3.7 Fix)
 - slash: `unequip` takes the argument, moves one item, and stops after a miss
-- slash: `iteminfo` prints the link's fields through the secret-safe reader
+- slash: `iteminfo` reports the link's fields through the secret-safe reader
+- slash: each report verb writes to the console with logging off, reveals it and points once
+- slash: a refusal or a one-line answer inside a report verb stays in chat and writes nothing
+- slash: `missing` keys its chat answer on the none-missing line, not on a one-line report
+- slash: library absent, a report verb streams its lines to chat with no pointer
 - slash: `bar show|hide|toggle` writes bar.shown through the CLI; no word toggles
 - slash: `test` flips test mode
 
@@ -895,7 +899,7 @@ Total.
 - equip bracket: a stand-down between the load screen's two events clears the load flag
 - equip bracket: Diagnostic reports depth, the next update, the last error and the tripwire
 
-### test_tooltips.lua (18)
+### test_tooltips.lua (21)
 
 - tooltips: the line lands on bag, player inventory and hyperlink tooltips
 - tooltips: another unit's inventory item gets no line
@@ -911,6 +915,9 @@ Total.
 - compare: the gates: stood down, the row, the client's wish, the modifier, a plain link, armor
 - compare: releasing the modifier over the same item hides ours on the next frame
 - compare: placed beside the shopping tooltips, left to right on secret geometry
+- compare: on an item row's tooltip ours open further out on the side this addon placed it (body rule 5)
+- compare: Reside draws ours again only while they show
+- compare: the item post-call places a row's item tooltip again after late growth
 - compare: GameTooltip's OnHide, Refresh and the stand-down hide every compare tooltip
 - outfit tooltip: the name, the trigger description, Missing: in red and Banked: in blue
 - outfit tooltip: nothing missing falls back to the newbie tip, which follows UberTooltips
@@ -1300,7 +1307,7 @@ Total.
 - list model: Status caches O.Status in the table it is handed, until that is wiped
 - list model: in test mode the list is the sample outfits under their headers, no item section
 
-### test_rows_secure.lua (26)
+### test_rows_secure.lua (28)
 
 - rows: NS.WindowRows is published with the secure surface
 - rows: fourteen rows and their secure children are created once, each SetAllPoints'd at birth
@@ -1328,6 +1335,8 @@ Total.
 - rows: a blank row takes no hover, and a rebind keeps the stripe and selection
 - rows: the worn box and the EM mark wash in the skin's accent; the gear is painted as the title gear
 - window: the footer's three buttons share the plain look; All and None dim their label (R2-3, R2-4)
+- window: the footer is the library's W.Footer, its buttons on it and the list above it (AD-89-OR)
+- window: with no library footer, New outfit and the Slots trio sit on a bare 24 px frame on the bottom edge
 
 ### test_slot_enables.lua (29)
 
@@ -1481,7 +1490,7 @@ Total.
 - parity: the menu sorts as legacy's, and a renamed or refiled row by the same rule
 - parity: a class row is offered to its own class only, as the legacy menu filtered it
 
-### test_preview.lua (35)
+### test_preview.lua (36)
 
 - preview: NS.Preview publishes the §8 surface and starts off
 - preview: the placeholders are five Test Outfits in two rows, each stamped placeholder and preview:<n>
@@ -1508,6 +1517,7 @@ Total.
 - preview window: the stand-down hides it and the stand-up does not bring it back
 - preview window: a window parked in the sheet holder docks again when the sheet reopens
 - preview window: the strip shows under the title and pushes the list; off puts it back
+- preview window: the list's push follows the strip's own body offset, not the constant
 - preview window: without the library's strip the title says test mode
 - preview window: New outfit is disabled in test mode and enabled after
 - preview window: entering test mode clears the selection, and no slot box or Slots button acts
@@ -1682,12 +1692,37 @@ Total.
 - skin: without the library a dialog's error line still draws of.dialog.error's red
 - skin: a switch marks the window, and its next tick recolors an item row's name
 
-### test_titlebar.lua (4)
+### test_titlebar.lua (12)
 
 - title bar: the outfit window's close and gear carry tooltips and the skin's rest and hover colors
-- title bar: the outfit bar's close and lock carry tooltips and the skin's rest and hover colors
+- title bar: the outfit bar's close, settings and lock carry tooltips and the skin's rest and hover colors
 - title bar: every dialog's close carries a tooltip and the skin's rest and hover colors
 - title bar: the bar's lock keeps its body line, and the drag strip's tip takes gtip.title
+- title bar: the outfit window's marks are W.HeaderButtons', settings beside the close
+- title bar: the outfit window's settings mark opens the settings panel, never while stood down
+- title bar: the outfit bar's marks read lock, settings, close on the band
+- title bar: the outfit bar's settings mark opens the bar's settings page
+- title bar: every dialog's close is W.HeaderButtons', its settings mark opted out with a reason
+- title bar: every dialog's opt-out reason holds for a draft, a confirm and a running search alike
+- title bar: the bar's lock mark carries its own tip, so every mark has a __tip
+- title bar: without the library the bar's degraded strip matches the library's order and offsets
+
+### test_tooltip_place.lua (14)
+
+- tooltip place: a body tooltip opens right of the group, top level with the element, else left
+- tooltip place: the comparison side follows the side taken, and the side is remembered for its owner
+- tooltip place: a body tooltip that grows after it is placed is placed again
+- tooltip place: unreadable geometry attaches above the element, never at the cursor
+- tooltip place: a category row's tooltip opens beside the outfit window
+- tooltip place: the EM mark's tooltip opens beside the outfit window, top level with the mark
+- tooltip place: an item row's tooltip opens beside the outfit window
+- tooltip place: an item row hands the side it took to the compare tooltips, after placing
+- tooltip place: a sample outfit row's tooltip opens beside the outfit window
+- tooltip place: an outfit row hands the outfit window to the outfit tooltip as its group
+- tooltip place: the outfit tooltip is owned at ANCHOR_NONE and placed beside the group it is given
+- tooltip place: a bar button's outfit tooltip takes the whole bar as its group, with always
+- tooltip place: a sample bar button's tooltip opens beside the whole bar
+- tooltip place: no source file owns a tooltip at the cursor or a corner anchor
 
 ### test_skin_values.lua (3)
 
@@ -1867,7 +1902,7 @@ Total.
 | test_perf_harness.lua | 19 |
 | test_schema.lua | 25 |
 | test_settings.lua | 16 |
-| test_slash.lua | 45 |
+| test_slash.lua | 49 |
 | test_launcher.lua | 12 |
 | test_keybinds.lua | 22 |
 | test_disabled.lua | 24 |
@@ -1891,7 +1926,7 @@ Total.
 | test_quickslots.lua | 19 |
 | test_drawer.lua | 35 |
 | test_equip_bracket.lua | 32 |
-| test_tooltips.lua | 18 |
+| test_tooltips.lua | 21 |
 | test_stack.lua | 27 |
 | test_em_sync.lua | 27 |
 | test_bank.lua | 14 |
@@ -1909,14 +1944,14 @@ Total.
 | test_dock.lua | 51 |
 | test_dock_forever.lua | 9 |
 | test_list_model.lua | 8 |
-| test_rows_secure.lua | 26 |
+| test_rows_secure.lua | 28 |
 | test_slot_enables.lua | 29 |
 | test_bar.lua | 46 |
 | test_bar_look.lua | 13 |
 | test_outfit_icons.lua | 17 |
 | test_broker.lua | 16 |
 | test_triggers_parity.lua | 13 |
-| test_preview.lua | 35 |
+| test_preview.lua | 36 |
 | test_preview_place.lua | 8 |
 | test_window_settings.lua | 12 |
 | test_flyout_tint.lua | 12 |
@@ -1926,7 +1961,8 @@ Total.
 | test_diagnostics.lua | 12 |
 | test_credits.lua | 8 |
 | test_skin.lua | 14 |
-| test_titlebar.lua | 4 |
+| test_titlebar.lua | 12 |
+| test_tooltip_place.lua | 14 |
 | test_skin_values.lua | 3 |
 | test_skin_switch.lua | 84 |
 | test_client_globals.lua | 3 |
@@ -1936,4 +1972,4 @@ Total.
 | test_lizard_sighted.lua | 8 |
 | test_prose.lua | 15 |
 | Skipped | 1 |
-| **Total** | **1598** |
+| **Total** | **1630** |

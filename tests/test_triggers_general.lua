@@ -19,6 +19,14 @@ local test, assertEqual, assertTrue, assertFalse, assertNil =
 -- Arenas are Retail's alone (clients-§4): on the forever kit profile IN_DUNGEON has no enableArena.
 local FOREVER = dofile("tests/_kit/mock_client.lua").current() == "forever"
 
+-- The made-up players are the collection's sample characters (LibKa0s#87, preview-mode), read from
+-- the vendored library per client: Retail keys `Name-Realm`, WoW Forever `First Surname`.
+local SIM = T.mocks.LibStub("LibKa0s-Sim-1.0")
+local RETAIL, FOREVER_SET = SIM.Sample("retail"), SIM.Sample("forever")
+local HUNTER, BLADE = RETAIL[1], RETAIL[2]       -- Samplehunter, Sampleblade (Samplerealm)
+local OTHER_REALM = RETAIL[3].realm              -- Mockrealm
+local FHUNTER, FOTHER = FOREVER_SET[1], FOREVER_SET[2]
+
 local IDS = { "PVP_FLAGGED", "IN_DUNGEON", "TRINKET_QUEUE", "FEET_QUEUE", "IN_ZONES", "TALENT_TREE",
               "INSTANCE_DIFFICULTY", "HAS_BUFF", "TARGET" }
 
@@ -211,19 +219,19 @@ end)
 
 test("general: TARGET matches NPCs by creatureID and players by full name", function()
     local NS, M = fresh()
-    local npcs = { targets = { { npcID = 39710 }, { player = "Ann-Realm" }, { player = "Bob" } } }
+    local npcs = { targets = { { npcID = 39710 }, { player = HUNTER.fullName }, { player = BLADE.name } } }
     M.__units.target = { guid = "Creature-0-3767-571-11063-39710-0000ABCDEF" }
     assertEqual(call(NS, "TARGET", { params = npcs }), "equip", "by creatureID")
     M.__units.target = { guid = "Creature-0-3767-571-11063-39711-0000ABCDEF" }
-    M.UnitName = function() return "Bob", "Realm" end
+    M.UnitName = function() return BLADE.name, BLADE.realm end
     -- red under: a name match for creatures (the NPC answers to a listed player's name).
     assertNil(call(NS, "TARGET", { params = npcs }), "another creature, whatever its name")
     M.__units.target = { guid = "Player-1-0000BEEF" }
-    M.UnitName = function() return "Ann", "Realm" end
-    assertEqual(call(NS, "TARGET", { params = npcs }), "equip", "Ann-Realm")
-    M.UnitName = function() return "Ann", "Elsewhere" end
-    assertNil(call(NS, "TARGET", { params = npcs }), "another realm's Ann")
-    M.UnitName = function() return "Bob", "Anywhere" end
+    M.UnitName = function() return HUNTER.name, HUNTER.realm end
+    assertEqual(call(NS, "TARGET", { params = npcs }), "equip", HUNTER.fullName)
+    M.UnitName = function() return HUNTER.name, OTHER_REALM end
+    assertNil(call(NS, "TARGET", { params = npcs }), "another realm's " .. HUNTER.name)
+    M.UnitName = function() return BLADE.name, OTHER_REALM end
     assertEqual(call(NS, "TARGET", { params = npcs }), "equip", "an entry without a realm")
 end)
 
@@ -240,39 +248,40 @@ test("general: TARGET is nil-safe and secret-guarded, and unequips on a change w
     M.__units.target = { guid = T.secret("Creature-0-3767-571-11063-39710-0000ABCDEF") }
     assertEqual(call(NS, "TARGET", { params = list, did = true }), "unequip", "a secret GUID is no match")
     M.__units.target = { guid = "Player-1-0000BEEF" }
-    M.UnitName = function() return T.secret("Ann"), "Realm" end
-    assertNil(call(NS, "TARGET", { params = { targets = { { player = "Ann-Realm" } } } }), "a secret name")
+    M.UnitName = function() return T.secret(HUNTER.name), HUNTER.realm end
+    assertNil(call(NS, "TARGET", { params = { targets = { { player = HUNTER.fullName } } } }), "a secret name")
 end)
 
 test("general: TARGET keys a player as 'First Surname', no realm, under regional names (OR-F4)", function()
     local NS, M = fresh()
     M.RegionalUniqueNamesEnabled = function() return true end
-    M.GetNormalizedRealmName = function() return "Ourrealm" end
+    M.GetNormalizedRealmName = function() return FHUNTER.realm end
     M.__units.target = { guid = "Player-1-0000BEEF" }
-    M.UnitName = function() return "Ryz", "Rockheart" end
-    -- red under: UnitName's second return (the surname on WoW Forever) read as a realm: "Ryz-Rockheart".
-    assertEqual(NS.TriggerParams.CaptureTarget().player, "Ryz Rockheart", "no realm is appended")
-    local list = { targets = { { player = "Ryz Rockheart" } } }
+    M.UnitName = function() return FHUNTER.name, FHUNTER.surname end
+    -- red under: UnitName's second return (the surname on WoW Forever) read as a realm:
+    -- "Samplehunter-Mockstride".
+    assertEqual(NS.TriggerParams.CaptureTarget().player, FHUNTER.fullName, "no realm is appended")
+    local list = { targets = { { player = FHUNTER.fullName } } }
     assertEqual(call(NS, "TARGET", { params = list }), "equip")
-    M.UnitName = function() return "Ryz", "Stonefist" end
-    assertNil(call(NS, "TARGET", { params = list }), "another Ryz is another character")
-    M.UnitName = function() return "Ryz", nil end
-    assertEqual(NS.TriggerParams.CaptureTarget().player, "Ryz", "a character with no surname")
+    M.UnitName = function() return FHUNTER.name, FOTHER.surname end
+    assertNil(call(NS, "TARGET", { params = list }), "another " .. FHUNTER.name .. " is another character")
+    M.UnitName = function() return FHUNTER.name, nil end
+    assertEqual(NS.TriggerParams.CaptureTarget().player, FHUNTER.name, "a character with no surname")
 end)
 
 test("general: Compat.UnitCharacterName is 'First Surname' with no realm under regional names (OR-F4)", function()
     local NS, M = fresh()
     local C = NS.Compat
-    M.UnitName = function() return "Ryz", "Rockheart" end
+    M.UnitName = function() return FHUNTER.name, FHUNTER.surname end
     local name, realm = C.UnitCharacterName("target")
-    assertEqual(name, "Ryz"); assertEqual(realm, "Rockheart")
+    assertEqual(name, FHUNTER.name); assertEqual(realm, FHUNTER.surname)
     assertFalse(C.RegionalNames(), "no RegionalUniqueNamesEnabled: not regional")
     M.RegionalUniqueNamesEnabled = function() return true end
     name, realm = C.UnitCharacterName("target")
-    assertEqual(name, "Ryz Rockheart"); assertNil(realm)
+    assertEqual(name, FHUNTER.fullName); assertNil(realm)
     assertTrue(C.RegionalNames())
     M.RegionalUniqueNamesEnabled = nil
-    M.UnitName = function() return T.secret("Ryz"), T.secret("Realm") end
+    M.UnitName = function() return T.secret(FHUNTER.name), T.secret(FHUNTER.realm) end
     name, realm = C.UnitCharacterName("target")
     -- red under: UnitCharacterName passing the library's answer through unguarded.
     assertNil(name, "a secret name never leaves Compat"); assertNil(realm)

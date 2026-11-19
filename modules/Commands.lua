@@ -9,8 +9,13 @@ local _, NS = ...
 -- it was. An empty argument names the current Complete outfit. Every wear, unwear, toggle and update
 -- is a hardware event (`hw = true`, INV §16 quirk 22): the legacy verbs ran inside HasHWEvent.
 --
+-- REPORTS (debug-logging-§15, LibKa0s#79). `missing`, `zone` and `iteminfo` are reports: their lines
+-- go to the debug console through NS.DebugLog:Report, ungated, the console revealed and one pointer in
+-- chat. A refusal (the bank closed, an unreadable link) and a one-line answer (no items missing) stay
+-- in chat and write no report. Without the library the stub streams the report to chat, no pointer.
+--
 -- CALLS (at call time, no nil guard; design §12): NS.Slash.ParseArgument, NS.Outfits, NS.Stack,
--- NS.Bank, NS.States.ZoneInfo, NS.Equip.Diagnostic.
+-- NS.Bank, NS.States.ZoneInfo, NS.Equip.Diagnostic, NS.ItemInfo, NS.DebugLog:Report.
 
 local Commands = {}
 NS.Commands = Commands
@@ -19,8 +24,17 @@ local L = NS.L
 
 local function out(line) NS.Print(line) end
 
-local function printAll(lines)
-    for _, line in ipairs(lines) do out(line) end
+local REPORT_TAG = "Report"
+
+-- One report verb's lines into the debug console (debug-logging-§15): `title` is the verb, so the
+-- header reads `/or <verb>` and the pointer `<verb>: N lines written ...`.
+local function report(title, ...)
+    local parts = { ... }
+    return NS.DebugLog:Report(REPORT_TAG, title, function(write)
+        for _, lines in ipairs(parts) do
+            for _, line in ipairs(lines) do write(line) end
+        end
+    end)
 end
 
 --- The outfit a verb's argument names, or nil. Prints the one line for no Complete outfit and for an
@@ -86,21 +100,25 @@ function Commands.Bank(method, rest)
     return ok
 end
 
---- /or missing: the report's lines, or the one refusal line while the bank is closed.
+--- /or missing: the report in the console; the refusal while the bank is closed, and the one
+--- none-missing line, in chat. The chat answer is keyed on that line itself, not on the report's
+--- length, so a one-line report still reaches the console.
 function Commands.Missing()
     local lines, why = NS.Bank.MissingReport()
     if not lines then return out(why) end
-    printAll(lines)
+    if #lines == 1 and lines[1] == L["No items are missing"] then return out(lines[1]) end
+    return report("missing", lines)
 end
 
 --- /or zone (ShowZoneInfo, Outfitter.lua:5008-5042): what the zone detection sees, then the equipment
---- bracket's state with its STUCK tripwire.
+--- bracket's state with its STUCK tripwire, as one report.
 function Commands.Zone()
-    printAll(NS.States.ZoneInfo())
-    printAll(NS.Equip.Diagnostic())
+    return report("zone", NS.States.ZoneInfo(), NS.Equip.Diagnostic())
 end
 
---- /or iteminfo <link>: every field, through the secret-safe reader.
+--- /or iteminfo <link>: every field, through the secret-safe reader, as a report; a link it cannot
+--- read is a refusal, in chat.
 function Commands.ItemInfo(rest)
-    printAll(NS.ItemInfo.LinkInfoLines(rest))
+    if not NS.ItemInfo.ParseLink(rest) then return out(L["Not a readable item link."]) end
+    return report("iteminfo", NS.ItemInfo.LinkInfoLines(rest))
 end

@@ -35,6 +35,7 @@ A tag is one word; a trigger id, an outfit name or a slot goes in the message, n
 | `Skin` | `core/SkinSetup.lua`: the skin choice and the picker |
 | `Perf` | The performance harness |
 | `Diag` | The diagnostics report |
+| `Report` | `modules/Commands.lua`: the report verbs' lines (`missing`, `zone`, `iteminfo`; see *Reports* below) |
 | `Equip` | `modules/Equip.lua`: a surfaced bracket error (`update`, `flush`, `batch`, `execute`, or a depth stranded at `PLAYER_ENTERING_WORLD`), with its message |
 | `Trigger` | The trigger binder: bind, unbind, dispatch and the verdict; the catalog (`modules/Triggers.lua`): an event that is neither a pseudo key nor a game event |
 | `States` | `modules/States.lua`: a write to an unknown state |
@@ -46,6 +47,23 @@ A tag is one word; a trigger id, an outfit name or a slot goes in the message, n
 
 The library writes the latch's stand-down and stand-up edges with their holds, and the launcher's
 registration lines, through the same sink.
+
+## Reports
+
+A report is a multi-line read-out a player asks for by name (debug-logging-§15, LibKa0s#79). Three
+verbs write one, through `NS.DebugLog:Report`, into the debug console under the `Report` tag after a
+`/or <verb>` header: **ungated** (it lands with logging off and leaves it off), the console opens if
+it is hidden, and chat gets exactly one pointer line, `<verb>: N lines written to the debug console.
+Use Copy to share it.` (N counts the header).
+
+| Verb | The report | Stays in chat instead |
+|---|---|---|
+| `/or missing` | The intro and one line per missing item of every outfit | The bank-closed refusal; *No items are missing* (a one-line answer) |
+| `/or zone` | What the zone detection sees (instance, map id, a map the zone table misses, the zone outfits in force), then the equipment bracket's state with its STUCK line | Nothing: it always reports |
+| `/or iteminfo <link>` | The link, then every parsed field through the secret-safe reader | *Not a readable item link.* (no link, a non-item, a secret link) |
+
+Without the library the stub streams the same lines to chat, with no pointer. Everything else a verb
+says (acknowledgments, refusals, usage, `/or help`, `/or list`) stays in chat.
 
 ## The diagnostics report
 

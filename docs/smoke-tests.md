@@ -9,7 +9,10 @@ outfit bar and test mode), the owner's CP5 pass; section 13 is smoke round 3 of 
 the sheet button's icon, the bar's options, test mode's placement and menu, the Outfit Window page),
 the owner's R7 pass. Sections 14 to 18 are the WoW Forever port (2026-11-08 design): each runs on the
 Forever client unless a row says Retail, and a row tagged with a probe settles a value the build took
-from the inventory's best evidence (`-- PROBE Pn` at the code site).
+from the inventory's best evidence (`-- PROBE Pn` at the code site). Section 22 is the window chrome
+of the LibKa0s v1.105.0 adoption (2026-11-17): the docked test strips and the window's footer.
+Section 24 is that adoption's report verbs (2026-11-18): `missing`, `zone` and `iteminfo` in the
+debug console.
 
 ## Sign-off
 
@@ -106,7 +109,7 @@ from the inventory's best evidence (`-- PROBE Pn` at the code site).
 |---|---|---|
 | B1 | Show the outfit bar; drag it by its header; lock; vertical | Position saved; opacity in combat applies |
 | B2 | Test mode | The bar and the window fill with sample outfits under a Test mode strip each; nothing is worn |
-| B3 | Bank open: deposit, withdraw, `missing` | Items move; the missing list is right |
+| B3 | Bank open: deposit, withdraw, `missing` | Items move; the missing list (in the debug console since RP1) is right |
 | B4 | An item's tooltip | Lists the outfits that use it; comparisons draw (O34, O41) |
 | B5 | Click an empty slot | The flyout opens, sorted |
 | B6 | With Pawn, then WeightsWatcher, loaded: open Rebuild (optimize) and pick each addon's stat category | Pawn lists one stat per visible scale and WeightsWatcher one per active weight; values match the addon's own tooltip; hiding a Pawn scale removes it the next time the list opens; nothing errors without either addon |
@@ -133,7 +136,10 @@ checked by eye in the client.
 | SK4 | Item icons in the list, the icon browser and the bar | Cropped with no art border showing; a 1 px edge in the window, in the icon browser and on the bar (the window outline: the bar always draws a window background) |
 | SK5 | A dialog open over the window, then Escape twice | The dialog closes first, then the window |
 | SK6 | Another addon moves the character sheet with the window open | The sheet still moves, and the window follows it |
-| SK7 | Under Ka0s Default and one other skin, hover each title-bar control: the window's gear and close, the bar's lock and close, each dialog's close (LibKa0s v1.105.0 smoke round 1, rulings 3 and 4) | Each shows a tooltip above it (below only at the screen's top edge) in the skin's tooltip title color: "Open settings", "Lock or unlock the outfit bar" with its second line, "Close"; at rest every control, the X included, draws the skin's icon color; under the pointer the gear and the lock take the link color and the X turns red |
+| SK7 | Under Ka0s Default and one other skin, hover each title-bar control: the window's gear and close, the bar's lock, gear and close, each dialog's close (LibKa0s v1.105.0 smoke round 1, rulings 3 and 4; AD-86-OR) | Each shows a tooltip above it (below only at the screen's top edge) in the skin's tooltip title color: "Open settings", "Lock or unlock the outfit bar" with its second line, "Close"; at rest every control, the X included, draws the skin's icon color; under the pointer the gears and the lock take the link color and the X turns red |
+| HB1 | Open the outfit window; look at its header, then click the gear (AD-86-OR) | Left to right at the top right: the gear, then the X, both the same size, evenly spaced, the X near the corner. The gear opens the Ka0s Outfitter Reborn settings and the window stays where it is; the X still closes the window |
+| HB2 | Show the outfit bar (`/or bar show`); look at its header, then click its gear; click the lock twice (AD-86-OR) | Left to right at the band's right end: the lock, a gear, the X, evenly spaced, none overlapping the *Outfits* title, also on a bar holding a single outfit. The gear opens the settings on the Outfit Bar page. The lock still toggles (closed and open art) and the X still hides the bar; dragging the band left of the lock still moves an unlocked bar |
+| HB3 | Open each dialog (an outfit's *Rename...*, *Trigger settings...*, a rebuild, an optimize) and look at its header (AD-86-OR) | Only the X sits at the top right, near the corner, with no gear (the dialogs opt out of settings); it closes the dialog and discards its edits, as before; on the optimize's progress dialog the X cancels the running search |
 
 ## 10. What the headless run cannot reach
 
@@ -558,3 +564,46 @@ The owner's third pass. On both clients unless a row says WoW Forever.
 | # | Do | See |
 |---|---|---|
 | FS3-11 (Forever) | On Chonky, the stock sheet and EllesmereUI, open the ammo slot's flyout; then open another slot's | The yellow glow hugs the ammo slot, centered and only slightly larger than it, on every sheet. Another slot's glow is as before |
+
+## 22. Window chrome: the docked test strip and the footer (LibKa0s v1.105.0 adoption, AD-88-OR, AD-89-OR, 2026-11-17)
+
+Retail and Forever. Preview-mode's *Where the strip sits* and standalone-windows' *The footer* (standard
+v2.113.0): the strips are placed by the library's docking, and the window's bottom row is the library's
+footer.
+
+| # | Do | See |
+|---|---|---|
+| WCF1 (AD-88-OR) | With the sheet closed, `/or test`; look at the alone window's top | The amber *Test mode: sample outfits, nothing equipped* strip sits directly under the title divider, full width, with nothing between them; the list starts right under it, nothing covered; the title reads *Outfitter Reborn* with no mode word |
+| WCF2 (AD-88-OR) | Same session: look at the outfit bar; switch the skin (Ka0s Default, EllesmereUI, another) from the Skin tab | The bar's strip hangs flush under its header band, full width, and the icons start below it. After each switch the strip still sits flush under the band (EllesmereUI's flush 25 px band included) |
+| WCF3 (AD-88-OR, Forever) | Stock sheet with the side-tab strip down the window's edge: `/or test`, press `C` | Docked, the window's strip starts at the divider's left edge, right of the tabs, as the title and list do |
+| WCF4 (AD-89-OR) | `/or test` off; open the window and select an outfit; look at its bottom edge under each skin | A 1 px hairline in the skin's divider color runs across the bottom band, with no filled strip under it. *New outfit* sits on the left and *Slots: All None* on the right, each centered in the 24 px band below the hairline; the list's last row ends above the hairline. Labels, tooltips and clicks are as before |
+| WCF5 (AD-89-OR, Forever) | Stock, EllesmereUI and Chonky with the side-tab strip down the window's edge: open the window | The footer's hairline starts right of the tabs, as the title divider does, and *New outfit* starts flush with the rows |
+
+## 23. Tooltip placement (LibKa0s v1.105.0 adoption, AD-92-OR, 2026-11-18)
+
+Retail and Forever. Standalone-windows' *Tooltip placement* (standard v2.113.0): a body element's
+tooltip opens beside the whole window group, right then left, its top level with the element; never at
+the cursor, never at the element's corner. Title-bar tooltips (SK7) are unchanged.
+
+| # | Do | See |
+|---|---|---|
+| TP1 (AD-92-OR) | Open the window alone (sheet closed) in the screen's middle; hover a category with a description, an outfit with a missing or banked item, an outfit's EM mark, and an item row under a selected outfit | Each tooltip opens just right of the window's right edge (a 2 px gap), its top level with the hovered row's (the mark's) top, and it does not move with the pointer. The words are as before |
+| TP2 (AD-92-OR) | Drag the alone window against the screen's right edge; hover the same rows | Each tooltip opens just left of the window's left edge, top level with the row, never over the window |
+| TP3 (AD-92-OR, amended by the review fixes) | Hover an item row whose slot another outfit fills with a different item, then hold Shift (comparisons on), with the window in the middle, then at the right edge | The item tooltip sits beside the window as in TP1 / TP2. Both the stock comparison tooltips and Outfitter's own (line 1 *<outfit> \| Outfitter*) open further out on the same side, never back over the item tooltip or the window; the item tooltip's point is not undone by them |
+| TP4 (AD-92-OR) | Press `C` with the window docked to the sheet; hover rows | The tooltips open right of the window; with no room there, left of it (over the sheet, which is Blizzard's) |
+| TP5 (AD-92-OR) | Show the outfit bar; hover a button, then move the bar to the screen's right edge and hover it again; `/or test` and hover a sample button and a sample row | Each tooltip opens beside the whole bar (right, then left at the edge), top level with the button, never over the bar. The samples read *Sample outfit (test mode). Nothing is equipped.* |
+| TP6 (AD-92-OR) | Hover the outfit tab on the character frame, and an item in a bag with an outfit holding it | Unchanged (out of scope): the tab's tooltip sits at its right as before, and the bag item's tooltip is where the client puts it, the compare tooltips beside it |
+| TP7 (AD-92-OR review fixes) | Clear the item cache (a fresh login), open the window and hover an item row of an item not seen this session, near the screen's bottom edge | When the item's lines arrive the tooltip grows and is placed again: still beside the window, its bottom on the screen, top level with the row where it fits |
+
+## 24. Reports in the debug console (LibKa0s v1.105.0 adoption, AD-79-OR, 2026-11-18)
+
+Retail and Forever. Debug-logging-§15 (standard v2.113.0): a report is written to the debug console
+whether or not logging is on, the console opens, and chat gets exactly one pointer line; refusals stay
+in chat.
+
+| # | Do | See |
+|---|---|---|
+| RP1 (AD-79-OR) | `/or debug off`, close the console; open the bank with an outfit holding an item you no longer have; `/or missing` | The console opens with a `/or missing` header, the intro and the missing item under `[Report]`; chat has one line, *missing: N lines written to the debug console. Use Copy to share it.*; logging is still off (the console's toggle reads Off) |
+| RP2 (AD-79-OR) | Close the bank, `/or missing`; open it with nothing missing, `/or missing` | Bank closed: *You must have your bank open ...* in chat, the console stays closed and gains nothing. Nothing missing: *No items are missing* in chat, nothing in the console |
+| RP3 (AD-79-OR) | Close the console; `/or zone` (in the open world, then in a battleground or arena) | The console opens with the instance line, the zone outfits line and the equipment lines; one pointer line in chat. Copy pastes plain text |
+| RP4 (AD-79-OR) | Close the console; `/or iteminfo ` then shift-click an item into the line; then `/or iteminfo nonsense` | The link line reads `[Item name]` in Copy, then `id`, `bonus`, `mods` and the other fields; one pointer in chat. `nonsense`: *Not a readable item link.* in chat, the console stays closed |

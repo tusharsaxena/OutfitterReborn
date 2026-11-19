@@ -3,8 +3,8 @@ local _, NS = ...
 --
 -- ONE SHAPE FOR EVERY DIALOG. `Dialogs.New{ name, key, width, height, title, onHide }` answers a
 -- hidden frame on UIParent at the MODAL tier (C.LAYERS, frame-layering-§5), toplevel, clamped,
--- movable by its title band, painted by NS.ApplySkin with the close mark from NS.MakeCloseButton, and
--- named in UISpecialFrames so Escape hides it. OnShow re-raises a shown StaticPopup over it
+-- movable by its title band, painted by NS.ApplySkin with the close mark from W.HeaderButtons' strip
+-- (NS.HeaderButtons, AD-86-OR), and named in UISpecialFrames so Escape hides it. OnShow re-raises a shown StaticPopup over it
 -- (NS.RaiseStaticPopups); OnHide closes the shared menu (NS.CloseMenu: the popup menu is a
 -- process-wide singleton no Hide reaches) and then runs the dialog's own `onHide`, which is where a
 -- dialog drops its draft. Every close path is a Hide, so the close mark, Escape and CloseAll all
@@ -24,6 +24,13 @@ local _, NS = ...
 -- (`S.EditBox`, padded), Label (`S.Text` in a role) and ErrorLine (the `of.dialog.error` token), so the
 -- five dialogs draw the same controls the same way.
 --
+-- NO SETTINGS MARK (standalone-windows' *Title-bar controls*: an opt-out with its reason, which the
+-- strip records as `settingsOptOut`; docs/ARCHITECTURE.md, Windows and dialogs). A dialog is
+-- MODAL-tier: the settings panel would open under it, and hiding it first, as `hideOnSettings` does,
+-- would discard or cancel what it holds (the outfit and trigger dialogs' draft, the rebuild's
+-- unapplied stat choice, the progress dialog's running optimize), since every Hide does. Its strip
+-- is the close alone, 6 px in from the top right.
+--
 -- CALLS (at call time, no nil guard; design §12): NS.ProgressDialog.Install (Resume), NS.Window.Frame.
 
 local D = {}
@@ -34,6 +41,8 @@ local STRATA = C.LAYERS.STRATA
 
 local frames = {}           -- every frame New built, in build order
 local TITLE_BAND = 26
+-- Why a dialog's strip carries no settings mark (the header above, NO SETTINGS MARK).
+local SETTINGS_OPT_OUT = "a modal dialog: settings would open under it, and hiding it first discards or cancels what it holds"
 
 -- ── the controls ──────────────────────────────────────────────────────────────────────────────
 
@@ -147,8 +156,12 @@ local function chrome(f, spec)
     f.divider:SetPoint("TOPLEFT", f, "TOPLEFT", 6, -TITLE_BAND)
     f.divider:SetPoint("TOPRIGHT", f, "TOPRIGHT", -6, -TITLE_BAND)
     NS.ApplySkin(f)
-    f.close = NS.MakeCloseButton(f, function() f:Hide() end)
-    if f.close then f.close:SetPoint("TOPRIGHT", f, "TOPRIGHT", -4, -4) end
+    local hb = NS.HeaderButtons(f, {
+        frame = f, point = "TOPRIGHT", y = -4,
+        close = function() f:Hide() end,
+        settings = false, settingsOptOut = SETTINGS_OPT_OUT,
+    })
+    f.close = hb.close
     titleBand(f)
 end
 

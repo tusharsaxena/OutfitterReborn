@@ -57,6 +57,77 @@ function NS.ShowTitleTip(owner, title, body)
     tip:SetPoint("BOTTOM", owner, "TOP", 0, 2)
 end
 
+-- ── a body element's tooltip (AD-92-OR, LibKa0s#92; standalone-windows, *Tooltip placement*) ──
+--
+-- Every tooltip this addon places on a BODY element (an outfit window row, the EM mark in a row, an
+-- outfit bar button) is owned at ANCHOR_NONE, filled, shown, and then placed here: beside the whole
+-- window group by LibKa0s-Tooltip-1.0's PlaceBeside (right of the group, else left, top level with
+-- the element, comparisons on the same side). Unreadable geometry falls back to PlaceAttached above
+-- the element, then to a plain attach above it by a relative point; never the cursor. Resolved at
+-- call time, as ShowTitleTip resolves the major.
+--
+-- THE SIDE IS REMEMBERED per tooltip (weakly keyed), with the element it was placed against, so the
+-- addon's own compare tooltips chained off an item row's tooltip open further out on the same side
+-- (NS.BodyTipSide, read by Compare.Placement; body rule 5), and so a tooltip that grows after it is
+-- placed (item data arriving late) is placed again (NS.ReplaceBodyTip, from the item post-call). The
+-- record holds only while the tooltip's owner is still that element: a tooltip re-owned by anything
+-- else (a bag slot, a link) is the client's again and answers nil.
+
+local bodySides = setmetatable({}, { __mode = "k" })   -- [tip] = { el = element, side = side }
+
+local function placeBody(tip, el, g)
+    local Tip = LibStub and LibStub("LibKa0s-Tooltip-1.0", true)
+    local side = Tip and type(Tip.PlaceBeside) == "function" and Tip.PlaceBeside(tip, el, g) or nil
+    if side then return side end
+    side = Tip and type(Tip.PlaceAttached) == "function" and Tip.PlaceAttached(tip, el) or nil
+    if side then return side end
+    tip:ClearAllPoints()
+    tip:SetPoint("BOTTOM", el, "TOP", 0, 2)
+    return "above"
+end
+
+--- Place the shown tooltip `tip`, owned by body element `el`, beside window group `group` (a frame,
+--- a list of frames or a group table; anything else lets the library find the group from `el`).
+--- @param tip table
+--- @param el table
+--- @param group table|function|nil
+--- @return string|nil side the side the tooltip took ("right", "left", "above", "below")
+function NS.PlaceBodyTip(tip, el, group)
+    if not (tip and el) then return nil end
+    local g = group
+    if type(g) ~= "table" and type(g) ~= "function" then g = nil end
+    local side = placeBody(tip, el, g)
+    local rec = bodySides[tip] or {}
+    rec.el, rec.side = el, side
+    bodySides[tip] = rec
+    return side
+end
+
+--- The side body tooltip `tip` took at its last NS.PlaceBodyTip, while it is still owned by the
+--- element it was placed against; nil for a tooltip this addon did not place (or no longer owns).
+--- @param tip table
+--- @return string|nil side "right", "left", "above" or "below"
+function NS.BodyTipSide(tip)
+    local rec = type(tip) == "table" and bodySides[tip]
+    if not rec then return nil end
+    local get = tip.GetOwner
+    if type(get) ~= "function" or get(tip) ~= rec.el then return nil end
+    return rec.side
+end
+
+--- Place body tooltip `tip` again after it grew (item data arriving after Show): LibKa0s-Tooltip-1.0's
+--- Replace, for a tooltip NS.BodyTipSide still answers for. Answers the side it holds now, or nil.
+--- @param tip table
+--- @return string|nil
+function NS.ReplaceBodyTip(tip)
+    if not NS.BodyTipSide(tip) then return nil end
+    local rec = bodySides[tip]
+    local Tip = LibStub and LibStub("LibKa0s-Tooltip-1.0", true)
+    local side = Tip and type(Tip.Replace) == "function" and Tip.Replace(tip) or nil
+    if side then rec.side = side end
+    return rec.side
+end
+
 --- Hide the game tooltip when `owner` holds it.
 --- @param owner table
 function NS.HideTitleTip(owner)

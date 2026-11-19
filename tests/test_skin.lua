@@ -260,7 +260,7 @@ test("window: the header gear has no border", function()
     -- pointer), which draws no box. red under: modules/Window.lua's NS.Skin.Button(gear) (a box).
     local _, M, Skin, built = buildAll()
     local art = built["the window's settings button"]
-    local gear = M.OutfitterRebornWindowSettings
+    local gear = M.OutfitterRebornWindow.settingsButton
     assertTrue(art == gear.icon, "the surface is the gear's art")
     assertTrue(Skin.painted[art].calls.Mark ~= nil, "the gear's art is not painted as a header mark")
     assertTrue(Skin.painted[gear] == nil, "the gear button itself is painted (a box)")

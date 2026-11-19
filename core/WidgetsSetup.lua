@@ -1,6 +1,6 @@
 local addonName, NS = ...
--- core/WidgetsSetup.lua — NS.MakeDropdown / NS.OpenMenu / NS.CloseMenu / NS.CloseMenuFrom / NS.MakeTestStrip from
--- LibKa0s-Widgets-1.0 (BP §6.13).
+-- core/WidgetsSetup.lua — NS.MakeDropdown / NS.OpenMenu / NS.CloseMenu / NS.CloseMenuFrom / NS.MakeTestStrip /
+-- NS.MakeFooter / NS.HeaderButtons from LibKa0s-Widgets-1.0 (BP §6.13).
 --
 -- A seam, nothing else (library-stack-§7): one file leases the major, so the art the controls draw
 -- is resolved once, here, and every control is handed this addon's skin owner. The library is
@@ -10,8 +10,10 @@ local addonName, NS = ...
 --
 -- The users, as they land in P4: the outfit context menu (modules/OutfitMenu.lua, through
 -- NS.OpenMenu; it replaces LibDropdown and the MC2 menus, design §7.5), the dialogs' dropdowns
--- (NS.MakeDropdown, §7.6) and the outfit bar's test strip (NS.MakeTestStrip, §7.7, H17). The seam
--- exports no copy window: the diagnostics report is copied from the debug console's own Copy button.
+-- (NS.MakeDropdown, §7.6), the outfit bar's and the window's test strips (NS.MakeTestStrip, §7.7, H17)
+-- the outfit window's footer (NS.MakeFooter) and the title-bar marks of every window this addon
+-- draws, the outfit window, the outfit bar and the dialogs (NS.HeaderButtons, AD-86-OR). The seam exports no copy window: the diagnostics
+-- report is copied from the debug console's own Copy button.
 --
 -- THE POPUP IS A PROCESS-WIDE SINGLETON parented to UIParent, so hiding a window does not reach it.
 -- Every non-click close path of a window that opens a menu calls NS.CloseMenu(): the character
@@ -22,8 +24,10 @@ local addonName, NS = ...
 -- anchor. The outfit bar does that from every path that hides it (modules/Bar.lua hideFrames), so a
 -- menu the window opened stays up when the bar goes.
 --
--- DEGRADED (the library absent): NS.MakeDropdown and NS.MakeTestStrip answer nil, and the caller
--- draws no control rather than a dead one; NS.OpenMenu hands the same `fill` to the client's
+-- DEGRADED (the library absent): NS.MakeDropdown, NS.MakeTestStrip and NS.MakeFooter answer nil, and
+-- the caller draws no control rather than a dead one (the window lays its footer's buttons on a bare
+-- frame of FOOTER_HEIGHT instead); NS.HeaderButtons builds the same strip by hand (the close through
+-- NS.MakeCloseButton, which then answers nil, so the marks beside it alone); NS.OpenMenu hands the same `fill` to the client's
 -- MenuUtil; NS.CloseMenu is a no-op, because no Ka0s menu can be open.
 
 local W = LibStub and LibStub("LibKa0s-Widgets-1.0", true)
@@ -283,12 +287,17 @@ local function endTestMode()
     if P and P.IsActive and P.IsActive() and P.Stop then P.Stop() end
 end
 
---- The test-mode strip (the library's W.TestStrip, born hidden and unanchored), or nil when the
---- library is absent. The caller anchors it and shows it. Its mark is the catalog's info icon and its
---- right-click ends test mode.
+--- The test-mode strip (the library's W.TestStrip, born hidden), or nil when the library is absent.
+--- Its mark is the catalog's info icon and its right-click ends test mode. The caller shows it, and
+--- places it through its docking (AD-88-OR; Widgets minor 27, preview-mode's *Where the strip sits*):
+--- `{ dock = "title", titleBar = band }` in `opts` puts it directly under that title band, full width,
+--- placed again by the library on every show, hide and resize of the band; the caller never anchors
+--- it, and moves its body down by the strip's `strip:BodyOffset()` while it shows (the outfit bar,
+--- which lays out from config before the strip is shown, reads `NS.TEST_STRIP_HEIGHT` instead).
 --- @param parent table the frame to parent it to
 --- @param label string the localized line it says
---- @param opts table|nil any further W.TestStrip option (`kind`, `panel`, `L`, `onEnd`), which wins
+--- @param opts table|nil any further W.TestStrip option (`dock`, `titleBar`, `kind`, `panel`, `L`,
+--- `onEnd`), which wins
 --- @return table|nil
 function NS.MakeTestStrip(parent, label, opts)
     if not W then return nil end
@@ -297,4 +306,120 @@ function NS.MakeTestStrip(parent, label, opts)
         for k, v in pairs(opts) do o[k] = v end
     end
     return W.TestStrip(parent, o)
+end
+
+-- ── the window footer ────────────────────────────────────────────────────────────────────────────
+
+--- The footer's height (W.FOOTER.HEIGHT, skin-invariant: standalone-windows, *Window chrome
+--- geometry*), read where the library publishes it; 24, its published value, with no library.
+NS.FOOTER_HEIGHT = (W and W.FOOTER and W.FOOTER.HEIGHT) or 24
+
+--- A window footer (the library's W.Footer, Widgets minor 27; standalone-windows' *The footer*,
+--- AD-89-OR): no fill, a hairline in the skin's `divider` along its top, `FOOTER.HEIGHT` tall across
+--- `parent`'s bottom edge, born shown, painted for this addon's skin owner. Nil when the library is
+--- absent; the caller then lays the same controls on a bare frame of the same height.
+--- @param parent table the window whose bottom edge it spans
+--- @param opts table|nil W.Footer's opts; `owner` is always this addon
+--- @return table|nil
+function NS.MakeFooter(parent, opts)
+    if not (W and type(W.Footer) == "function") then return nil end
+    local o = {}
+    if type(opts) == "table" then
+        for k, v in pairs(opts) do o[k] = v end
+    end
+    o.owner = addonName
+    return W.Footer(parent, o)
+end
+
+-- ── the title-bar marks ──────────────────────────────────────────────────────────────────────────
+
+--- W.HEADER's figures (an 18 px slot, 12 px art, 6 in from the corner, 6 apart), read where the
+--- library publishes them; its published values with no library, for the degraded strip below.
+NS.HEADER = (W and W.HEADER) or { SIZE = 18, ART = 12, PAD = 6, GAP = 6 }
+
+--- The degraded strip's settings click: as the library's (hide `hideOnSettings`, then the window's
+--- own opener), else the settings panel.
+local function hostSettings(spec)
+    return function()
+        local hide = spec.hideOnSettings
+        if type(hide) == "table" and type(hide.Hide) == "function" then hide:Hide() end
+        if type(spec.settings) == "function" then spec.settings() else NS.OpenOptionsPanel() end
+    end
+end
+
+--- One degraded mark: an 18 px Button with its art centered at 12 px, a title-bar control
+--- (NS.TitleControl, core/CoreSetup.lua: the colors and the tooltip).
+local function hostMark(bar, icon, tip, onClick)
+    local H = NS.HEADER
+    local b = CreateFrame("Button", nil, bar)
+    b:SetSize(H.SIZE, H.SIZE)
+    b.icon = b:CreateTexture(nil, "ARTWORK")
+    b.icon:SetPoint("CENTER", b, "CENTER", 0, 0)
+    b.icon:SetSize(H.ART, H.ART)
+    b.icon:SetTexture(NS.Icon(icon))
+    b.__tip = tip
+    NS.TitleControl(b, tip)
+    b:SetScript("OnClick", function(self, button) if onClick then onClick(self, button) end end)
+    return b
+end
+
+--- The strip with no W.HeaderButtons: the same marks in the same order at the same offsets, and the
+--- same answer, so a window reads one shape either way.
+local function hostStrip(bar, spec)
+    local H = NS.HEADER
+    if spec.settings == false and (type(spec.settingsOptOut) ~= "string" or spec.settingsOptOut == "") then
+        error("NS.HeaderButtons: settings = false needs spec.settingsOptOut, the reason", 3)
+    end
+    local hb = { extras = {}, order = {}, optOut = spec.settings == false and spec.settingsOptOut or nil }
+    if spec.settings ~= false then
+        hb.settings = hostMark(bar, "settings", spec.settingsTip or "Open settings", hostSettings(spec))
+    end
+    if spec.close ~= false then
+        local win = spec.frame or bar
+        local onClose = type(spec.close) == "function" and spec.close or function() win:Hide() end
+        hb.close = spec.makeClose(bar, onClose)
+    end
+    local list = {}
+    if hb.close then list[1] = { key = "close", btn = hb.close } end
+    if hb.settings then list[#list + 1] = { key = "settings", btn = hb.settings } end
+    local extras = type(spec.extras) == "table" and spec.extras or {}
+    for i = #extras, 1, -1 do
+        local x = extras[i]
+        local b = hostMark(bar, x.icon, x.tip, x.onClick)
+        hb.extras[x.key] = b
+        list[#list + 1] = { key = x.key, btn = b }
+    end
+    for i = #list, 1, -1 do hb.order[#hb.order + 1] = list[i].key end
+    hb.offsets, hb.right = {}, {}
+    local off = H.PAD
+    for _, e in ipairs(list) do
+        if spec.place ~= false then e.btn:SetPoint(spec.point or "RIGHT", bar, spec.point or "RIGHT", -off, spec.y or 0) end
+        hb.offsets[e.key] = -off
+        hb.right[#hb.right + 1] = { frame = e.btn, x = off }
+        off = off + H.SIZE + H.GAP
+    end
+    local host = spec.frame or bar
+    host.headerButtons = hb
+    return hb
+end
+
+--- A window's title-bar marks (LibKa0s-Widgets-1.0's W.HeaderButtons, WidgetsHeader minor 1;
+--- standalone-windows' *Title-bar controls*, AD-86-OR): right-aligned, left to right `spec.extras`,
+--- settings, close, each an 18 px mark 6 px from the corner and 6 apart, in `icon.tint` at rest and
+--- `text.link` under the pointer (the close `close.hot`), each with its tooltip. The owner is always
+--- this addon, so the marks wear its skin and the default settings click reaches the opener the
+--- launcher registered under its folder; the close is built through NS.MakeCloseButton (the one close
+--- wrapper, read at call time). `spec` is W.HeaderButtons' own: `close` (the click, or false),
+--- `settings` (nil, a function, or false with `settingsOptOut`), `settingsTip`, `extras`, `point`,
+--- `y`, `place`, `frame`. Without the library the same strip is built by hand (hostStrip above).
+--- @param bar table the frame the marks are made on and, unless `place = false`, anchored to
+--- @param spec table
+--- @return table hb { close, settings, extras, order, offsets, right, optOut }, also `(spec.frame or bar).headerButtons`
+function NS.HeaderButtons(bar, spec)
+    local o = {}
+    for k, v in pairs(spec) do o[k] = v end
+    o.owner = addonName
+    o.makeClose = function(parent, onClick) return NS.MakeCloseButton(parent, onClick) end
+    if W and type(W.HeaderButtons) == "function" then return W.HeaderButtons(bar, o) end
+    return hostStrip(bar, o)
 end

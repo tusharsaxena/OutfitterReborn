@@ -13,7 +13,7 @@ local lib = LibStub and LibStub("LibKa0s-DebugLog-1.0", true)
 if not lib then
     -- Degrade, never error. Every member the addon calls, and SetEnabled still flips OUR flag and
     -- still acknowledges, because a player who types `/or debug on` must not be told nothing. What
-    -- is lost is the window, said once.
+    -- is lost is the window, said once; a report verb's lines come to chat instead (Report below).
     local missing = NS.LIBKA0S_MISSING .. ", so the debug console window is unavailable."
     local announced = false
     local function sayOnce()
@@ -48,6 +48,16 @@ if not lib then
             NS.Print(L["%s is unavailable: the LibKa0s library did not load."]:format(NS.SLASH .. " diagnostics"))
             return 0
         end,
+        -- A report (debug-logging-§15) is the read-out the player asked for by name, so without the
+        -- library it streams to chat, every line, with no pointer: the opposite of RunDiagnostics.
+        Report          = function(_, _, _, fn)
+            local n = 0
+            if type(fn) == "function" then
+                fn(function(line) n = n + 1; NS.Print(NS.SafeToString(line)) end)
+            end
+            return n
+        end,
+        Serialize       = function(_, v) return { NS.SafeToString(type(v) == "table" and "<table>" or v) } end,
         DebugVerb       = function() return false end,
         DebugOnce       = function() return false end,
         DebugChanged    = function() return false end,

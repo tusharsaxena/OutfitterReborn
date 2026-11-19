@@ -12,6 +12,9 @@ local test, assertEqual, assertTrue, assertFalse, assertNil =
     T.test, T.assertEqual, T.assertTrue, T.assertFalse, T.assertNil
 local scene = dofile(T.root .. "/tests/dialog_scene.lua")(T)
 
+-- The made-up player is one of the collection's sample characters (LibKa0s#87, preview-mode).
+local OTHER = T.mocks.LibStub("LibKa0s-Sim-1.0").Sample("retail")[3]  -- Mockflame-Mockrealm
+
 local NINE = { "bool", "number", "string", "spelllist", "itemlist", "maplist", "subzonelist", "unitlist", "pet" }
 
 local function same(a, b)
@@ -69,7 +72,7 @@ test("trigger dialog: every field type builds and round-trips its value", functi
     local TF = NS.TriggerFields
     local values = {
         bool = true, number = 12, string = "Hello", spelllist = { 33, 44 }, itemlist = { 1001 },
-        maplist = { 85, 1453 }, subzonelist = { "The Docks" }, unitlist = { { npcID = 42 }, { player = "Bob-Realm" } },
+        maplist = { 85, 1453 }, subzonelist = { "The Docks" }, unitlist = { { npcID = 42 }, { player = OTHER.fullName } },
         pet = "BattlePet-0-000000000002",
     }
     for _, t in ipairs(NINE) do

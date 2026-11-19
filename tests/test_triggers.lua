@@ -12,6 +12,9 @@ local test, assertEqual, assertTrue, assertFalse, assertNil =
     T.test, T.assertEqual, T.assertTrue, T.assertFalse, T.assertNil
 
 local NS = T.NS
+-- The made-up players are the collection's sample characters (LibKa0s#87, preview-mode).
+local SAMPLE = T.mocks.LibStub("LibKa0s-Sim-1.0").Sample("retail")
+local HUNTER, BLADE = SAMPLE[1], SAMPLE[2]
 
 -- The bespoke ids (no family), whose conditions P4.16a, P4.16b and P4.16c wrote. This suite answers
 -- them with stand-ins; the real conditions are covered by the test_triggers_* suites.
@@ -316,10 +319,10 @@ test("triggers: the nine types validate and normalize", function()
     assertFalse(ok("spelllist", { x = 1 }), "not a list")
     assertTrue(ok("subzonelist", { "Bank" })); assertFalse(ok("subzonelist", { "" }))
     assertEqual(table.concat(norm("subzonelist", { " Bank ", "Bank", "Inn" }), ","), "Bank,Inn")
-    assertTrue(ok("unitlist", { { npcID = 33790 }, { player = "Ann-Realm" } }))
+    assertTrue(ok("unitlist", { { npcID = 33790 }, { player = HUNTER.fullName } }))
     assertFalse(ok("unitlist", { { npcID = 1, player = "x" } }), "exactly one key")
     assertFalse(ok("unitlist", { { npcID = -1 } }))
-    assertEqual(#norm("unitlist", { { npcID = 5 }, { npcID = 5 }, { player = "A" } }), 2)
+    assertEqual(#norm("unitlist", { { npcID = 5 }, { npcID = 5 }, { player = BLADE.name } }), 2)
     assertTrue(ok("pet", "")); assertTrue(ok("pet", "BattlePet-0-000000000001")); assertFalse(ok("pet", "Whiskers"))
 end)
 
@@ -329,9 +332,9 @@ test("triggers: the capture helpers answer IDs, plain only", function()
     local P = ns.TriggerParams
     M.__units.target = { guid = "Vehicle-0-3767-571-11063-33790-0000ABCDEF" }
     assertEqual(P.CaptureTarget().npcID, 33790)
-    M.__units.target = { guid = "Player-1-0000BEEF", name = "Ann" }
-    M.UnitName = function(unit) if unit == "target" then return "Ann", "Realm" end end
-    assertEqual(P.CaptureTarget().player, "Ann-Realm")
+    M.__units.target = { guid = "Player-1-0000BEEF", name = HUNTER.name }
+    M.UnitName = function(unit) if unit == "target" then return HUNTER.name, HUNTER.realm end end
+    assertEqual(P.CaptureTarget().player, HUNTER.fullName)
     M.__units.target = { guid = T.secret("Creature-0-1-2-3-55-6") }
     -- red under: ParseGUID matching the raw argument instead of Secrets.PlainString's answer.
     assertNil(P.CaptureTarget(), "a secret GUID is not captured")

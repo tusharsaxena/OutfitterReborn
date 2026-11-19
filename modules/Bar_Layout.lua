@@ -22,8 +22,9 @@ local Bar = NS.Bar
 local Layout = {}
 Bar.Layout = Layout
 
---- The narrowest the bar draws while it has a header: the title and two 18 px controls.
-Layout.MIN_WIDTH = 110
+--- The narrowest the bar draws while it has a header: the title and its three 18 px marks (lock,
+--- settings, close: 6 + 3 x 18 + 2 x 6 = 72 px from the right edge, AD-86-OR; 110 held two).
+Layout.MIN_WIDTH = 136
 
 local function count(v, low)
     v = tonumber(v) or low

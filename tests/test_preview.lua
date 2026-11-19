@@ -677,10 +677,46 @@ test("preview window: the strip shows under the title and pushes the list; off p
     assertEqual(height, NS.Window.HEIGHT + push)
     assertEqual(w.title:GetText(), TITLE, "one marker per mode: no title word while the strip shows")
     assertTrue(strip:GetFrameLevel() >= w:GetFrameLevel(), "the strip sits under the window's own level")
+    -- AD-88-OR (preview-mode, *Where the strip sits*): the library's docking puts it directly under
+    -- the title band (w.titleBar, whose bottom is the old -27 line), full width. red under: the
+    -- strip anchored by hand at the window's TOPLEFT (no Place, no BodyOffset, no titleBar point).
+    assertEqual(type(strip.Place), "function", "the window's strip is not docked")
+    assertEqual(type(strip.BodyOffset), "function", "the window's strip is not docked")
+    assertTrue(w.titleBar ~= nil, "the window has no title-bar frame to dock under")
+    local sp = lastPoint(strip)
+    assertTrue(sp[1] == "TOPRIGHT" and sp[2] == w.titleBar and sp[3] == "BOTTOMRIGHT",
+        "the strip's last anchor is not the title bar's bottom edge")
+    local tr
+    for _, p in ipairs(w.titleBar.__pts) do if p[1] == "TOPRIGHT" then tr = p end end
+    assertTrue(tr ~= nil and tr[2] == w and tr[4] == -1 and tr[5] == 0, "the title bar spans the window's top")
     NS.Preview.Stop()
     M.__world:openCharacter()
     NS.Dock.Open()
     assertFalse(strip:IsShown())
+    assertEqual(lastPoint(M.OutfitterRebornWindowList)[5], -30)
+    assertEqual(height, NS.Window.HEIGHT)
+end)
+
+test("preview window: the list's push follows the strip's own body offset, not the constant", function()
+    local NS, M = testScene()
+    local make = NS.MakeTestStrip
+    -- A strip that wraps to 30 px (the library answers BodyOffset from the strip's own height).
+    NS.MakeTestStrip = function(...)
+        local strip = make(...)
+        if strip then rawset(strip, "GetHeight", function() return 30 end) end
+        return strip
+    end
+    local w, height = NS.Window.Build(), nil
+    rawset(w, "SetHeight", function(_, h) height = h end)
+    NS.Preview.Start()
+    -- red under: a push read from NS.TEST_STRIP_HEIGHT (18 + 2), which the strip no longer matches
+    assertEqual(w.strip:BodyOffset(), 30)
+    assertEqual(lastPoint(M.OutfitterRebornWindowList)[5], -30 - 32, "the list was not pushed by the strip's offset")
+    assertEqual(height, NS.Window.HEIGHT + 32)
+    assertEqual(select(2, NS.Window.Size()), NS.Window.HEIGHT + 32)
+    NS.Preview.Stop()
+    M.__world:openCharacter()
+    NS.Dock.Open()
     assertEqual(lastPoint(M.OutfitterRebornWindowList)[5], -30)
     assertEqual(height, NS.Window.HEIGHT)
 end)

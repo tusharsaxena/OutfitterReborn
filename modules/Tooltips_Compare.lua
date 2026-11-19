@@ -15,8 +15,14 @@ local _, NS = ...
 -- and its "Used by outfits" line.
 --
 -- PLACEMENT. Beside the outermost stock shopping tooltip that shows (ShoppingTooltip2, else 1, else
--- GameTooltip itself), towards the side of the screen with more room; each next one beside the last.
--- A tooltip that shows hidden information has secret geometry: then it is left to right.
+-- GameTooltip itself); each next one beside the last. The side: when this addon placed GameTooltip
+-- itself (an outfit window item row, NS.PlaceBodyTip), the side that placement took, so ours open
+-- further out on the same side and never back over the item tooltip and the window (AD-92-OR,
+-- standalone-windows *Tooltip placement* body rule 5; NS.BodyTipSide). Otherwise (a bag, sheet or
+-- link hover, a tooltip the client placed) towards the side of the screen with more room. A tooltip
+-- that shows hidden information has secret geometry: then it is left to right. The client may run
+-- its compare before the item row has placed GameTooltip, so the row calls Compare.Reside after
+-- placing it, which draws ours again from the side just chosen.
 --
 -- HIDING. GameTooltip's OnHide (a HookScript that touches only our frames), the modifier released,
 -- Refresh (the `tooltip.compare` row) and the stand-down hide all five. The release is caught by an
@@ -29,7 +35,7 @@ local _, NS = ...
 -- IsModifiedClick and GetScreenWidth.
 --
 -- CALLS (at call time, no nil guard; design §12): NS.Outfits.Categories/Ids/Get/Items,
--- NS.Tooltips.Decorate/FontString.
+-- NS.Tooltips.Decorate/FontString, NS.BodyTipSide (core/CoreSetup.lua).
 
 local Compare = {}
 NS.Compare = Compare
@@ -142,6 +148,8 @@ function Compare.Placement()
     elseif ShoppingTooltip1 and ShoppingTooltip1:IsShown() then
         anchor = ShoppingTooltip1
     end
+    local placed = NS.BodyTipSide(GameTooltip)
+    if placed == "right" or placed == "left" then return anchor, placed == "right" end
     local screen = GetScreenWidth
     local left = Secrets.PlainNumber(GameTooltip:GetLeft())
     local right = Secrets.PlainNumber(GameTooltip:GetRight())
@@ -249,6 +257,14 @@ function Compare.OnShowCompare(tooltip)
     if tooltip ~= nil and tooltip ~= GameTooltip then return end
     if not compareWanted() then return Compare.HideAll() end
     Compare.Show()
+end
+
+--- Draw ours again after GameTooltip was placed (or placed again): an item row calls this once its
+--- tooltip is beside the window, so a compare the client ran before that takes the side just chosen.
+--- Only while ours show; the gates are OnShowCompare's.
+function Compare.Reside()
+    local first = frames[1]
+    if first and first:IsShown() then Compare.OnShowCompare(GameTooltip) end
 end
 
 --- The first compare tooltip's OnUpdate: a released modifier (or a client that stops wanting the

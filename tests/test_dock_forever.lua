@@ -144,8 +144,15 @@ test("dock (Forever): a strip down the sheet's edge widens the window and moves 
     local lp = list.__pts[#list.__pts]
     -- red under: the 2026-11-09 band (4 px margin plus the list's 8 px padding past the tabs, R2-2).
     assertEqual(lp[4], inset, "the rows start flush with the strip's edge")
-    local new = M.OutfitterRebornNewOutfitButton
-    assertEqual(new.__pts[#new.__pts][4], inset, "so does the footer")
+    -- AD-89-OR: the footer (W.Footer) moves right by the shift, its hairline flush with the title
+    -- divider, and New outfit keeps its 8 px padding inside it, so it still starts at the inset. This
+    -- pinned New outfit's own x against the window before; it now pins the footer's shift plus the pad.
+    local new, foot = M.OutfitterRebornNewOutfitButton, win.footer
+    local fp = foot.__pts[#foot.__pts]
+    assertTrue(fp[1] == "BOTTOMLEFT" and fp[2] == win, "the footer's left edge is not re-anchored")
+    assertEqual(fp[4] + new.__pts[#new.__pts][4], inset, "so does the footer")
+    local tb = win.titleBar.__pts[#win.titleBar.__pts]
+    assertTrue(tb[1] == "TOPLEFT" and tb[4] == 1 + inset - 8, "the title bar (the strip's dock) moves with the divider")
     -- The strip moves clear (a Chonky side panel opens): the follow narrows the window again.
     for i = 1, 6 do
         rawset(M["CharacterFrameModeTab" .. i], "GetLeft", function() return 900 end)

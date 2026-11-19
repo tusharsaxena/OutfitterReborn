@@ -10,6 +10,11 @@ local _, NS = ...
 -- description), shown only while the UberTooltips CVar is on, as the legacy AddNewbieTip did; with
 -- neither, nothing shows.
 --
+-- PLACEMENT (AD-92-OR, LibKa0s#92; standalone-windows, *Tooltip placement*). The tooltip is owned by
+-- the hovered element at ANCHOR_NONE and, once shown, placed beside the window group the caller names
+-- (the outfit window for a row, the whole bar for a bar button) by NS.PlaceBodyTip: right of the
+-- group, else left, top level with the element. Never the cursor, never a corner anchor.
+--
 -- CALLS (at call time, no nil guard; design §12): NS.Outfits.Get, NS.Inventory.Missing,
 -- NS.Triggers.Get.
 
@@ -49,33 +54,36 @@ local function addList(tip, label, token, items)
     tip:AddLine(itemList(label, token, items), r, g, b, true)
 end
 
-local function full(tip, rec, desc, missing, banked, owner, anchor)
-    tip:SetOwner(owner, anchor or "ANCHOR_LEFT")
+local function full(tip, rec, desc, missing, banked, owner, group)
+    tip:SetOwner(owner, "ANCHOR_NONE")
     tip:ClearLines()
     tip:AddLine(tostring(rec.name))
     if desc then tip:AddLine(desc, HIGHLIGHT[1], HIGHLIGHT[2], HIGHLIGHT[3], true) end
     addList(tip, L["Missing:"], "of.outfit.missing", missing)
     addList(tip, L["Banked:"], "of.outfit.banked", banked)
     tip:Show()
+    NS.PlaceBodyTip(tip, owner, group)
 end
 
-local function newbie(tip, rec, desc, owner, anchor)
+local function newbie(tip, rec, desc, owner, group)
     if Compat.GetCVar("UberTooltips") ~= "1" then return false end
-    tip:SetOwner(owner, anchor or "ANCHOR_RIGHT")
+    tip:SetOwner(owner, "ANCHOR_NONE")
     tip:ClearLines()
     tip:AddLine(tostring(rec.name), HIGHLIGHT[1], HIGHLIGHT[2], HIGHLIGHT[3])
     tip:AddLine(desc, NORMAL[1], NORMAL[2], NORMAL[3], true)
     tip:Show()
+    NS.PlaceBodyTip(tip, owner, group)
     return true
 end
 
---- Show outfit `id`'s tooltip on GameTooltip, owned by `owner` at `anchor`. True when it showed.
+--- Show outfit `id`'s tooltip on GameTooltip, owned by `owner` and placed beside `group`. True when
+--- it showed.
 --- @param id string
---- @param owner table
---- @param anchor string|nil
+--- @param owner table the hovered body element
+--- @param group table|nil the window group (nil: the library finds it from `owner`)
 --- @param always boolean|nil  draw the full tooltip even with nothing missing or banked (the bar)
 --- @return boolean
-function OT.Show(id, owner, anchor, always)
+function OT.Show(id, owner, group, always)
     local rec = NS.Outfits.Get(id)
     if not rec then return false end
     local desc = description(rec)
@@ -83,9 +91,9 @@ function OT.Show(id, owner, anchor, always)
     missing, banked = missing or {}, banked or {}
     local tip = GameTooltip
     if always or #missing > 0 or #banked > 0 then
-        full(tip, rec, desc, missing, banked, owner, anchor)
+        full(tip, rec, desc, missing, banked, owner, group)
         return true
     end
-    if desc then return newbie(tip, rec, desc, owner, anchor) end
+    if desc then return newbie(tip, rec, desc, owner, group) end
     return false
 end

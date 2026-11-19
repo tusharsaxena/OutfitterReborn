@@ -42,7 +42,7 @@ local _, NS = ...
 -- CALLS (at call time; design §12): NS.Window.MarkDirty/ToggleCollapsed, NS.Stack.Wear/Remove/IsWorn/
 -- Select/Selected, NS.Outfits.Get/IsEM, NS.EM.SetStored, NS.OutfitMenu.Open,
 -- NS.OutfitTooltip.Show, NS.OutfitIcon (the one icon resolver), NS.Compat (pickup, use, sell
--- cursor, item icon).
+-- cursor, item icon), NS.PlaceBodyTip, NS.Compare.Reside.
 
 local Rows = { rows = {}, built = false, COUNT = 14, ROW_H = 18, ROW_W = 228 }
 NS.WindowRows = Rows
@@ -191,17 +191,21 @@ local function emTooltip(mark, row)
     if e.placeholder then stored = e.rec.em == true else stored = NS.Outfits.IsEM(e.id) end
     local hint = stored and L["Click to remove from the Equipment Manager"] or L["Click to save in the Equipment Manager"]
     if e.placeholder then hint = L["Not available in test mode"] end
-    GameTooltip:SetOwner(mark, "ANCHOR_RIGHT")
+    GameTooltip:SetOwner(mark, "ANCHOR_NONE")
     GameTooltip:SetText(stored and L["Stored in the Equipment Manager"] or L["Not stored in the Equipment Manager"])
     GameTooltip:AddLine(hint, nil, nil, nil, true)
     GameTooltip:Show()
+    NS.PlaceBodyTip(GameTooltip, mark, NS.Window.Frame())
 end
 
 -- ── hover ─────────────────────────────────────────────────────────────────────────────────────
+--
+-- Every row tooltip is a body element's (AD-92-OR, LibKa0s#92): owned by the row at ANCHOR_NONE,
+-- filled, shown, then placed beside the outfit window by NS.PlaceBodyTip (core/CoreSetup.lua).
 
 local function itemTooltip(row, item)
     local loc = item.loc or {}
-    GameTooltip:SetOwner(row, "ANCHOR_RIGHT")
+    GameTooltip:SetOwner(row, "ANCHOR_NONE")
     if loc.bag then
         GameTooltip:SetBagItem(loc.bag, loc.slot)
         if MerchantFrame and MerchantFrame:IsShown() then NS.Compat.ShowContainerSellCursor(loc.bag, loc.slot) end
@@ -209,25 +213,31 @@ local function itemTooltip(row, item)
         GameTooltip:SetInventoryItem("player", loc.slotID)
     end
     GameTooltip:Show()
+    NS.PlaceBodyTip(GameTooltip, row, NS.Window.Frame())
+    -- ours chain off it on the side just chosen (body rule 5); a late-growing item is placed again
+    -- by the item post-call (NS.Tooltips.OnItem → NS.ReplaceBodyTip).
+    NS.Compare.Reside()
 end
 
 local HOVER = {}
 function HOVER.category(row, e)
     if not e.desc then return end
-    GameTooltip:SetOwner(row, "ANCHOR_RIGHT")
+    GameTooltip:SetOwner(row, "ANCHOR_NONE")
     GameTooltip:SetText(e.label)
     GameTooltip:AddLine(e.desc, nil, nil, nil, true)
     GameTooltip:Show()
+    NS.PlaceBodyTip(GameTooltip, row, NS.Window.Frame())
 end
 function HOVER.outfit(row, e)
     if e.placeholder then
-        GameTooltip:SetOwner(row, "ANCHOR_RIGHT")
+        GameTooltip:SetOwner(row, "ANCHOR_NONE")
         GameTooltip:SetText(tostring(e.rec.name))
         GameTooltip:AddLine(L["Sample outfit (test mode). Nothing is equipped."], nil, nil, nil, true)
         GameTooltip:Show()
+        NS.PlaceBodyTip(GameTooltip, row, NS.Window.Frame())
         return
     end
-    if not NS.OutfitTooltip.Show(e.id, row, "ANCHOR_RIGHT") then GameTooltip:Hide() end
+    if not NS.OutfitTooltip.Show(e.id, row, NS.Window.Frame()) then GameTooltip:Hide() end
 end
 function HOVER.item(row, e) itemTooltip(row, e.item) end
 

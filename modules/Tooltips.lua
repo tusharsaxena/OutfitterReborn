@@ -19,7 +19,8 @@ local _, NS = ...
 -- With no match the line is appended. The search pattern conversion is the legacy addon's own
 -- (Outfitter.lua:5808-5825): the client has no such function.
 --
--- CALLS (at call time, no nil guard; design §12): NS.Outfits.UsingItem/Get/Status.
+-- CALLS (at call time, no nil guard; design §12): NS.Outfits.UsingItem/Get/Status, NS.BodyTipSide,
+-- NS.ReplaceBodyTip, NS.Compare.Reside.
 
 local Tooltips = {}
 NS.Tooltips = Tooltips
@@ -171,14 +172,25 @@ local function wanted(tooltip)
     return unit == nil or unit == "player"
 end
 
---- The item post-call: the gates, then the line (perf bucket `tooltipUsedBy`).
-function Tooltips.OnItem(tooltip)
+-- The line, behind its gates (perf bucket `tooltipUsedBy`).
+local function decorateItem(tooltip)
     if not wanted(tooltip) then return end
     local link = displayedLink(tooltip)
     if not link then return end
     local t0 = Perf.on and debugprofilestop()
     Tooltips.Decorate(tooltip, link)
     if t0 then Perf.Note("tooltipUsedBy", debugprofilestop() - t0) end
+end
+
+--- The item post-call: the line, then, for an item tooltip this addon placed itself (an outfit
+--- window item row), a fresh placement: late item data and the line grow it after Show (AD-92-OR,
+--- LibKa0s-Tooltip-1.0 Replace), and ours chain again when its side changed.
+function Tooltips.OnItem(tooltip)
+    decorateItem(tooltip)
+    if NS.IsStoodDown() or tooltip ~= GameTooltip then return end
+    local before = NS.BodyTipSide(tooltip)
+    if not before then return end
+    if NS.ReplaceBodyTip(tooltip) ~= before then NS.Compare.Reside() end
 end
 
 -- ── the lifecycle ─────────────────────────────────────────────────────────────────────────────

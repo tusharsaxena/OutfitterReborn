@@ -153,7 +153,9 @@ The outfit verbs (`show`, `hide`, `wear`, `unwear`, `toggle`, `update`, the bank
 `zone`, `iteminfo`, `test`, `bar`, `lock`, `unlock`, `deleteall` and the rest) follow `version`, with
 their handlers in `modules/Commands.lua` (`bar show|hide|toggle` writes `bar.shown` in
 `settings/Slash.lua`, or in test mode only dismisses the bar for that test session; the *Toggle outfit bar* key runs it). The live-while-disabled rules, the macro-conditional routing and
-the full verb set are in [`slash-dispatch.md`](slash-dispatch.md).
+the full verb set are in [`slash-dispatch.md`](slash-dispatch.md). The three report verbs (`missing`,
+`zone`, `iteminfo`) write to the debug console through `NS.DebugLog:Report` with one chat pointer,
+and their refusals stay in chat (debug-logging-§15; [`debug.md`](debug.md#reports)).
 
 ## Public API
 
@@ -231,6 +233,81 @@ would poke it through a window that covers the sheet (the fork's lesson, kept). 
 the dialogs and the icon browser `MODAL` (the browser in a band over the dialogs), the menus `POPUP`
 (each cascading level of a menu in the same strata) and the compare tooltips `CURSOR`. The full stack
 is in the design's §7.1 and the limitations it leaves are in [`known-limitations.md`](known-limitations.md).
+
+**Window chrome** (standalone-windows' *Window chrome geometry* and *The footer*, preview-mode's *Where
+the strip sits*; AD-88-OR and AD-89-OR, 2026-11-17). Both test strips are the library's `TestStrip`,
+placed by its own docking (`dock = "title"`), never anchored by the addon: the window's under
+`frame.titleBar`, a mouse-transparent frame over the title band down to 1 px under the divider, which
+`Win.SetLeftInset` moves with the divider; the bar's under its header band (`Bar.Band`). Each body moves
+down by `TEST_STRIP.HEIGHT` (plus the window's 2 px gap) while its strip shows, laid from config. The
+window's bottom row is the library's `Footer` (`NS.MakeFooter`, `FOOTER.HEIGHT` 24 px, no fill, a
+hairline in the skin's `divider`), with *New outfit* on its left and *Slots: All None* on its right;
+the list ends above it. The bar has no footer. The dialogs' Done / Cancel rows are a modal's button
+row, which the footer rule does not cover.
+
+**Title-bar marks** (standalone-windows' *Title-bar controls*; AD-86-OR, LibKa0s#86, 2026-11-17). Every
+window this addon draws builds its marks with the library's `W.HeaderButtons` through one seam,
+`NS.HeaderButtons` (`core/WidgetsSetup.lua`): right-aligned, left to right extras · settings · close,
+18 px marks with 12 px art, 6 px from the corner and 6 apart, `icon.tint` at rest and `text.link` under
+the pointer (the close `close.hot`), each with its tooltip above it; the owner is always the addon's
+folder, the launcher's `name`, and the close is built through `NS.MakeCloseButton`. Without the
+library the seam builds the same strip by hand. The **outfit window** reads settings · close at the
+top right (y -5); its settings mark opens the settings panel, refused while the addon stands down, and
+leaves the window shown (it sits beside the character sheet, not over the panel). The **outfit bar**
+reads lock · settings · close, laid on its title band by `S.Header` from the strip's offsets: the lock
+keeps its state art and its two-line tooltip, the settings mark opens the bar's own settings page
+(as the header's right click does), and the drag strip stops 2 px short of the lock; the bar's narrowest
+width (`Bar.Layout.MIN_WIDTH`) is 136 to hold the title beside three marks. The **dialogs** (outfit,
+trigger, rebuild, progress) carry the close alone, their settings mark **opted out** with the reason
+the strip records (`settingsOptOut`): a dialog is `MODAL`-tier, so the settings panel would open
+under it, and hiding it first would discard or cancel what it holds (the outfit and trigger dialogs'
+draft, the rebuild's unapplied stat choice, the progress dialog's running optimize), since every
+Hide does. The addon builds no LibKa0s `DragHandle`, so the drag strip's settings mark does not arise.
+
+**Tooltip placement** (standalone-windows' *Tooltip placement*, frame-layering-§4; AD-92-OR,
+LibKa0s#92, 2026-11-18). Every tooltip the addon places itself is classified and placed through
+LibKa0s-Tooltip-1.0, never at the cursor and never by a corner anchor:
+
+| Element | Kind | Placed by | Group |
+|---|---|---|---|
+| An outfit window row (category, outfit, sample outfit, item) and a row's EM mark | body | `NS.PlaceBodyTip` (`core/CoreSetup.lua`) → `PlaceBeside` | the outfit window |
+| An outfit bar button (an outfit, a sample) | body | `NS.PlaceBodyTip` → `PlaceBeside` | the whole bar |
+| The outfit tooltip (`NS.OutfitTooltip.Show(id, owner, group, always)`) | body | `NS.PlaceBodyTip` → `PlaceBeside` | the group its caller passes |
+| Title-bar controls: the window's and bar's marks, the bar's lock, every dialog's close | chrome | `NS.ShowTitleTip` / the library's `AttachTitleTip` → `PlaceAttached` | — |
+
+`NS.PlaceBodyTip(tip, el, group)` runs after the tooltip is owned at `ANCHOR_NONE`, filled and shown:
+right of the group, else left, top level with the element (the comparison side set to match). With
+unreadable geometry it falls back to `PlaceAttached` above the element, then a plain `BOTTOM`-on-`TOP`
+attach (0, 2). The outfit window is the whole group: it has no companion panel.
+
+The side each body tooltip took is remembered with the element it was placed against
+(`NS.BodyTipSide`, while the tooltip is still owned by that element). On an outfit window item row it
+drives the addon's own compare tooltips (`OutfitterRebornCompareTooltip1..5`, body rule 5):
+`Compare.Placement` chains them further out on that same side, off `ShoppingTooltip2`, else
+`ShoppingTooltip1`, else `GameTooltip`, so they never open back over the item tooltip and the window.
+The client may run its compare before the row places its tooltip, so the row calls `Compare.Reside`
+after placing, which draws ours again from the side just chosen. An item tooltip that grows after it
+is placed (item data arriving late, the outfit line added) is placed again from the item post-call
+(`NS.Tooltips.OnItem` → `NS.ReplaceBodyTip`, the library's `Replace`); ours are drawn again when that
+changes the side. A window docked on the
+character sheet's right may, with no room right of it, open a row's tooltip on its left, over the
+sheet; the sheet is Blizzard's, not part of the group.
+
+Left where they are, out of scope (the rule's *What it does not bind*), each held by
+`tests/test_tooltip_place.lua`'s guard:
+
+- **The outfit tab on the character frame** (`modules/Dock.lua`, `SetOwner(self, "ANCHOR_RIGHT")`): a
+  button parented to and drawn as part of Blizzard's `CharacterFrame`, in the host's look
+  (DEV-SKIN-SHEET-BUTTON); tooltips over Blizzard's frames are not bound.
+- **The compare tooltips on a client-placed item tooltip** (`modules/Tooltips_Compare.lua`, owned at
+  `ANCHOR_NONE` and chained `TOPLEFT`/`TOPRIGHT` off the item tooltip) for an item hovered in a bag,
+  on the sheet or in a link: they extend a tooltip the client placed, so with no side of this addon's
+  to follow they take the screen half with more room. On an outfit window item row they are in scope
+  and follow the row's side (above).
+- **Item tooltips decorated in place** (`modules/Tooltips.lua`, the outfit lines added to the client's
+  own item tooltips): client-placed.
+- **The settings canvas pages** and **LibDataBroker displays** (the broker object's tooltip is drawn
+  by the display) and the **minimap button** (the library's Launcher, `PlaceLauncher`, launcher-§7).
 
 ## Taint Notes
 

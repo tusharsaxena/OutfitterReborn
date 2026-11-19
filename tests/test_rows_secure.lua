@@ -551,7 +551,7 @@ test("rows: the worn box and the EM mark wash in the skin's accent; the gear is 
         assertEqual(p.layer, "HIGHLIGHT")
     end
     -- red under: NS.Skin.Button's noBg pass (no tint on the gear's art, so no hover color either).
-    local title = M.__paint(M.OutfitterRebornWindowSettings.icon)
+    local title = M.__paint(M.OutfitterRebornWindow.settingsButton.icon)
     local gear = M.__paint(row.menu.icon)
     assertTrue(gear.vertex ~= nil, "the row gear's art is tinted")
     assertEqual(table.concat(gear.vertex, ","), table.concat(title.vertex or {}, ","), "as the title gear's is")
@@ -570,4 +570,69 @@ test("window: the footer's three buttons share the plain look; All and None dim 
         assertEqual(o.tokens and o.tokens.text, "text.muted", "a dimmer label")
         assertTrue(o.primary ~= true)
     end
+end)
+
+test("window: the footer is the library's W.Footer, its buttons on it and the list above it (AD-89-OR)", function()
+    local NS, M = opened()
+    local w = M.OutfitterRebornWindow
+    local foot = w.footer
+    -- red under: the hand-built row of buttons on the window's bottom edge (no footer frame, no
+    -- hairline: standalone-windows, *The footer*; anti-pattern #118).
+    assertTrue(foot ~= nil, "the window has no footer")
+    assertTrue(foot.line ~= nil and type(foot.SetLeft) == "function", "the footer is not W.Footer")
+    assertTrue(foot:IsShown(), "the footer is hidden")
+    local function anchoredTo(f, point)
+        for _, p in ipairs(f.__pts) do if p[1] == point and p[2] == foot then return true end end
+        return false
+    end
+    assertTrue(anchoredTo(M.OutfitterRebornNewOutfitButton, "LEFT"), "New outfit is not on the footer")
+    assertTrue(anchoredTo(M.OutfitterRebornSlotsNone, "RIGHT"), "the Slots trio is not on the footer")
+    -- The body ends FOOTER.HEIGHT above the window's bottom edge (Window chrome geometry), laid from config.
+    local Rows = NS.WindowRows
+    assertEqual(NS.FOOTER_HEIGHT, 24)
+    assertTrue(30 + Rows.COUNT * Rows.ROW_H <= NS.Window.HEIGHT - NS.FOOTER_HEIGHT,
+        "the list passes under the footer's divider")
+end)
+
+test("window: with no library footer, New outfit and the Slots trio sit on a bare 24 px frame on the bottom edge", function()
+    -- The mock records no height: every frame's SetHeight is recorded as it is made.
+    local NS, M = scene({ mutate = function(M)
+        local prev = M.CreateFrame
+        M.CreateFrame = function(...)
+            local f = prev(...)
+            if type(f) == "table" then
+                rawset(f, "SetHeight", function(self, h) rawset(self, "__height", h) end)
+            end
+            return f
+        end
+    end })
+    -- The library degraded for the footer alone: NS.MakeFooter answers nil, so Window.lua's bareFooter.
+    NS.MakeFooter = function() return nil end
+    M.__world:openCharacter()
+    NS.Dock.Open()
+    local w = M.OutfitterRebornWindow
+    local foot = w.footer
+    -- red under: a footerRow that indexes the library's footer unguarded (no frame, or a nil error)
+    assertTrue(foot ~= nil, "the window has no footer frame")
+    assertNil(rawget(foot, "line"), "the bare frame draws no hairline")
+    assertEqual(rawget(foot, "__height"), NS.FOOTER_HEIGHT, "the bare footer is not FOOTER_HEIGHT tall")
+    local function has(f, point, rel, relPoint)
+        for _, p in ipairs(f.__pts) do
+            if p[1] == point and p[2] == rel and (relPoint == nil or p[3] == relPoint) then return true end
+        end
+        return false
+    end
+    assertTrue(has(foot, "BOTTOMLEFT", w, "BOTTOMLEFT") and has(foot, "BOTTOMRIGHT", w, "BOTTOMRIGHT"),
+        "the bare footer does not span the window's bottom edge")
+    assertTrue(has(M.OutfitterRebornNewOutfitButton, "LEFT", foot), "New outfit is not on the bare footer")
+    assertTrue(has(M.OutfitterRebornSlotsNone, "RIGHT", foot), "None is not on the bare footer")
+    assertTrue(has(M.OutfitterRebornSlotsAll, "RIGHT", M.OutfitterRebornSlotsNone), "All is not beside None")
+    assertEqual(M.OutfitterRebornNewOutfitButton.text:GetText(), NS.L["New outfit"])
+    -- Win.SetLeftInset re-anchors the bare frame as it does the library's (S5).
+    NS.Window.SetLeftInset(53)
+    local fp = foot.__pts[#foot.__pts]
+    -- red under: a SetLeftInset that moves only a library footer
+    assertTrue(fp[1] == "BOTTOMLEFT" and fp[2] == w and fp[4] == 53 - 8, "the bare footer's left edge is not re-anchored")
+    NS.Window.SetLeftInset(0)
+    assertEqual(foot.__pts[#foot.__pts][4], 0)
 end)
