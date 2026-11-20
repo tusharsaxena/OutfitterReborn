@@ -72,5 +72,5 @@ for i, s in ipairs(C.LAYERS.STRATA_ORDER) do C.LAYERS.STRATA_RANK[s] = i end
 -- does not take it away.
 C.DEFAULT_OUTFIT_ICON = 132724
 
--- The hotkey "equipped / unequipped" line's color on UIErrorsFrame (INV §14): today's value.
-C.OUTFIT_MESSAGE_COLOR = { r = 0.2, g = 0.75, b = 0.3 }
+-- The hotkey "equipped / unequipped" line's color on UIErrorsFrame (INV §14) is the owner token
+-- `of.message.equip` (core/SkinSetup.lua), read at each message (SD-SK-OR.9).

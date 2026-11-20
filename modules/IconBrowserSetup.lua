@@ -8,7 +8,9 @@ local addonName, NS = ...
 --                   (LibKa0s docs/api/IconBrowser/version-1.1.1-docs.md)
 --
 -- A GLYPH is a LibKa0s catalog icon's texture path (white on transparent, so it takes a tint), and its
--- color six lowercase hex digits, or none for white. A game icon is a fileID number and takes no color.
+-- color six lowercase hex digits, or none. A glyph with no color draws the skin's `icon.tint`, read at
+-- each draw; a picked color is the player's and draws as picked (owner U-22, 2026-11-20; skinning-§9:
+-- only an icon's tint follows the skin). A game icon is a fileID number and takes no color.
 --
 -- THE BROWSER. What is this addon's is the spec handed to the library:
 --
@@ -30,8 +32,8 @@ local addonName, NS = ...
 -- X and Cancel, the outfit window hiding (modules/Dock.lua, Close("opener"), the sheet's close among
 -- them) and the stand-down (Suspend: the library's StandDown, which also refuses an Open until Resume).
 --
--- DEGRADED (the library absent): no path is a glyph, only "none" is a color and every tint is white,
--- so a stored glyph falls through to the next rung of the icon ladder and nothing draws tinted. The
+-- DEGRADED (the library absent): no path is a glyph and only "none" is a color, so a stored glyph
+-- falls through to the next rung of the icon ladder and nothing draws tinted. The
 -- browser never opens: Open answers false and Browser() nil.
 
 local IB = LibStub and LibStub("LibKa0s-IconBrowser-1.0", true)
@@ -57,12 +59,22 @@ function Glyph.ValidColor(v)
     return IB.ValidColor(v) == true
 end
 
---- A stored color as r, g, b (0..1): white for none or a malformed one.
+--- A stored color as r, g, b (0..1); for none or a malformed one, the skin's `icon.tint` now (U-22).
 --- @param hex string|nil
 --- @return number, number, number
 function Glyph.Tint(hex)
-    if not IB then return 1, 1, 1 end
-    return IB.Tint(hex)
+    if hex ~= nil and IB and IB.ValidColor(hex) == true then return IB.Tint(hex) end
+    local r, g, b = NS.SkinColor("icon.tint")   -- never nil: NS.SKIN_FALLBACK holds it degraded
+    return r, g, b
+end
+
+--- Inline `|T...|t` markup for glyph `path` in r, g, b, drawn whole (a catalog mark is not cropped, as
+--- an item icon's markup is) at the line's height. Markup cannot be repainted: the caller writes it
+--- again after a skin switch (the broker builds its menu at each open).
+--- @return string
+function Glyph.Markup(path, r, g, b)
+    local function byte(x) return math.floor((tonumber(x) or 1) * 255 + 0.5) end
+    return ("|T%s:0:0:0:0:64:64:0:64:0:64:%d:%d:%d|t"):format(tostring(path), byte(r), byte(g), byte(b))
 end
 
 -- ── the browser ───────────────────────────────────────────────────────────────────────────────

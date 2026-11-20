@@ -24,9 +24,19 @@ NS.OutfitTooltip = OT
 local Compat, Secrets = NS.Compat, NS.Secrets
 local L = NS.L
 
--- NORMAL_FONT_COLOR and HIGHLIGHT_FONT_COLOR, as the legacy tooltip drew the description in them.
-local NORMAL = { 1, 0.82, 0 }
-local HIGHLIGHT = { 1, 1, 1 }
+-- The title and the description are lines this addon writes on GameTooltip, so they take the
+-- skin's tooltip colors (skinning-§7, owner U-7, 2026-11-20): `gtip.title` and `gtip.body`, read at
+-- each show so a skin switch reaches the next tooltip (SD-SK-OR.5; the legacy drew them in
+-- HIGHLIGHT_FONT_COLOR and NORMAL_FONT_COLOR).
+local function addTitle(tip, rec)
+    local r, g, b = NS.SkinColor("gtip.title")
+    tip:AddLine(tostring(rec.name), r, g, b)
+end
+
+local function addBody(tip, text)
+    local r, g, b = NS.SkinColor("gtip.body")
+    tip:AddLine(text, r, g, b, true)
+end
 
 -- The trigger's description, or nil.
 local function description(rec)
@@ -57,8 +67,8 @@ end
 local function full(tip, rec, desc, missing, banked, owner, group)
     tip:SetOwner(owner, "ANCHOR_NONE")
     tip:ClearLines()
-    tip:AddLine(tostring(rec.name))
-    if desc then tip:AddLine(desc, HIGHLIGHT[1], HIGHLIGHT[2], HIGHLIGHT[3], true) end
+    addTitle(tip, rec)
+    if desc then addBody(tip, desc) end
     addList(tip, L["Missing:"], "of.outfit.missing", missing)
     addList(tip, L["Banked:"], "of.outfit.banked", banked)
     tip:Show()
@@ -69,8 +79,8 @@ local function newbie(tip, rec, desc, owner, group)
     if Compat.GetCVar("UberTooltips") ~= "1" then return false end
     tip:SetOwner(owner, "ANCHOR_NONE")
     tip:ClearLines()
-    tip:AddLine(tostring(rec.name), HIGHLIGHT[1], HIGHLIGHT[2], HIGHLIGHT[3])
-    tip:AddLine(desc, NORMAL[1], NORMAL[2], NORMAL[3], true)
+    addTitle(tip, rec)
+    addBody(tip, desc)
     tip:Show()
     NS.PlaceBodyTip(tip, owner, group)
     return true

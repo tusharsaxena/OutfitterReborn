@@ -286,17 +286,6 @@ Kit.skinValues = { root = root, rows = {
       why = "EllesmereUI's own fallback for a missing accent, matched to its neighbors", cause = HOST_LOOK },
     { file = "modules/Triggers_Families.lua", substring = "return 0, 0, 1 end",
       why = "the legacy RGBToHSV's hue, saturation and value for no color, not a color", category = "not a color" },
-    -- Moved to the skin by SD-SK-OR (each row goes with its fix).
-    { file = "core/Constants.lua", substring = "C.OUTFIT_MESSAGE_COLOR =",
-      why = "the hotkey message color, an owner token after SD-SK-OR.9", cause = "SD-SK-OR" },
-    { file = "modules/OutfitTooltip.lua", substring = "local NORMAL = {",
-      why = "the outfit tooltip's description color, gtip.body after SD-SK-OR.5", cause = "SD-SK-OR" },
-    { file = "modules/OutfitTooltip.lua", substring = "local HIGHLIGHT = {",
-      why = "the outfit tooltip's title color, gtip.title after SD-SK-OR.5", cause = "SD-SK-OR" },
-    { file = "modules/Tooltips.lua", substring = "local LINE_R, LINE_G, LINE_B =",
-      why = "the item tooltip's Equipment Sets line, a token after SD-SK-OR.6", cause = "SD-SK-OR" },
-    { file = "modules/IconBrowserSetup.lua", substring = "if not IB then return 1, 1, 1 end",
-      why = "an uncolored glyph's tint, icon.tint after U-22", cause = "SD-SK-OR" },
 } }
 
 -- The skin-switch test's painted surfaces (skinning-§1): the design §9.5 builders (P4.30).

@@ -142,12 +142,15 @@ test("icons: a glyph with a color tints", function()
     assertEqual(tex, glyph(NS))
     assertTrue(near(r, 1) and near(g, 128 / 255) and near(b, 0), "tinted " .. r .. "," .. g .. "," .. b)
     assertTrue(#edited >= 1 and edited[#edited][1] == id and edited[#edited][2] == "icon", "OUTFIT_EDITED icon")
-    -- White is no color (the browser hands nil, ColorFrom answers false): drawn untinted.
+    -- White is no color (the browser hands nil, ColorFrom answers false): drawn in the skin's
+    -- icon.tint (owner U-22, 2026-11-20). red under: a Glyph.Tint that answers white for none.
     assertTrue(O.SetIcon(id, glyph(NS), false))
     assertNil(O.Get(id).iconColor)
     tex, r, g, b = NS.OutfitIcon(O.Get(id))
     assertEqual(tex, glyph(NS))
-    assertTrue(r == 1 and g == 1 and b == 1, "an uncolored glyph is white")
+    local tr, tg, tb = NS.SkinColor("icon.tint")
+    assertTrue(r == tr and g == tg and b == tb, "an uncolored glyph draws icon.tint")
+    assertFalse(r == 1 and g == 1 and b == 1, "Ka0s Default's icon.tint is no white")
     -- red under: a fileID pick that keeps the glyph's color.
     assertTrue(O.SetIcon(id, glyph(NS), "00ff00"))
     assertTrue(O.SetIcon(id, 135349, "00ff00"))

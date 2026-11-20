@@ -105,16 +105,18 @@ end
 
 -- ── the menu ────────────────────────────────────────────────────────────────────────────────
 
---- An outfit row's label: its icon, then its name in the window's status color. The icon is the
---- library's cropped inline markup (NS.IconText), which takes no tint: a glyph shows in white here,
---- and in its color on the object's own icon.
+--- An outfit row's label: its icon, then its name in the window's status color. A game icon is the
+--- library's cropped inline markup (NS.IconText); a glyph is drawn whole in its tint, the picked color
+--- or the skin's `icon.tint` (NS.Glyph.Markup; owner U-22, 2026-11-20), as on the object's own icon.
 local function outfitLabel(id, statusCache)
     local rec = NS.Outfits.Get(id)
     local name = rec and type(rec.name) == "string" and rec.name or "?"
     local token = NS.WindowRows.STATUS_TOKEN[NS.WindowListModel.Status(id, statusCache)]
     local esc = token and NS.SkinEscape(token)
     if esc then name = esc .. name .. "|r" end
-    local icon = NS.IconText((NS.OutfitIcon(rec)), 0)
+    local tex, r, g, b = NS.OutfitIcon(rec)
+    local icon
+    if NS.Glyph.IsGlyph(tex) then icon = NS.Glyph.Markup(tex, r, g, b) else icon = NS.IconText(tex, 0) end
     return icon ~= "" and (icon .. " " .. name) or name
 end
 

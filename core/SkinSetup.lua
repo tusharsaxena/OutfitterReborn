@@ -112,6 +112,7 @@ NS.SKIN_FALLBACK = {
     ["text.highlight"] = { 1, 1, 1, 1 },
     ["gtip.title"]     = { 1, 0.82, 0, 1 },
     ["gtip.body"]      = { 0.9, 0.9, 0.9, 1 },
+    ["gtip.line"]      = { 1, 0.82, 0, 1 },
     ["icon.tint"]      = { 0.7, 0.7, 0.72, 1 },
     -- The list's control hover wash (modules/Window_Rows.lua, Forever smoke feedback S6): Ka0s
     -- Default's gold accent.
@@ -140,6 +141,9 @@ NS.SKIN_TOKENS = {
     ["of.bar.worn"]        = { default = { 1, 0.82, 0, 1 }, follow = "text.accent" },
     -- A dialog's error line (a duplicate name, an invalid trigger parameter).
     ["of.dialog.error"]    = { default = { 1, 0.33, 0.33, 1 }, follow = "sem.bad" },
+    -- The hotkey's "equipped / unequipped" line on UIErrorsFrame (INV §14): the old addon's
+    -- OUTFIT_MESSAGE_COLOR green (SD-SK-OR.9).
+    ["of.message.equip"]   = { default = { 0.2, 0.75, 0.3, 1 }, follow = "sem.good" },
 }
 
 --- A color token's components AS A CALL SITE WRITES THEM: r, g, b for an opaque color and r, g, b,

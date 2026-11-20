@@ -278,7 +278,13 @@ LibKa0s-Tooltip-1.0, never at the cursor and never by a corner anchor:
 `NS.PlaceBodyTip(tip, el, group)` runs after the tooltip is owned at `ANCHOR_NONE`, filled and shown:
 right of the group, else left, top level with the element (the comparison side set to match). With
 unreadable geometry it falls back to `PlaceAttached` above the element, then a plain `BOTTOM`-on-`TOP`
-attach (0, 2). The outfit window is the whole group: it has no companion panel.
+attach (0, 2). The outfit window is the whole group: it has no companion panel. A plain body
+tooltip (a sample outfit, a category's description, the EM mark) is filled by `NS.ShowBodyTip`: line 1
+in the skin's `gtip.title`, the rest in `gtip.body`, read at each show (skinning-§7). Every other line
+this addon writes on a client tooltip or frame reads a token too: the outfit tooltip, the appended
+*Equipment Sets:* line (`gtip.title`), the launcher's host line (`gtip.line`), the sheet button's
+tooltip (`gtip.title`, owner U-7) and the hotkey message on `UIErrorsFrame` (the owner token
+`of.message.equip`, following `sem.good`).
 
 The side each body tooltip took is remembered with the element it was placed against
 (`NS.BodyTipSide`, while the tooltip is still owned by that element). On an outfit window item row it

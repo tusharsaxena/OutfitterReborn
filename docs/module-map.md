@@ -54,10 +54,10 @@ The libraries load first, each in its own folder under `libs/`, and are vendored
 |---|---|
 | `core/Namespace.lua` | `NS.PREFIX` (`[OR]`), `NS.name`, `NS.BRAND`, `NS.SLASH`/`NS.SLASH_LONG`, the version fallback |
 | `core/MediaSetup.lua` | `NS.Icon`, `NS.MediaFont` and the LibSharedMedia registration (LibKa0s-Media) |
-| `core/Constants.lua` | `FONT_MONO`, `LOGO`/`LOGO_128`, `LAYERS` (with `STRATA_ORDER`/`STRATA_RANK` for the host strata and the `LEVEL.MAX` cap), `DEFAULT_OUTFIT_ICON` (fileID 132724), `OUTFIT_MESSAGE_COLOR` |
+| `core/Constants.lua` | `FONT_MONO`, `LOGO`/`LOGO_128`, `LAYERS` (with `STRATA_ORDER`/`STRATA_RANK` for the host strata and the `LEVEL.MAX` cap), `DEFAULT_OUTFIT_ICON` (fileID 132724) |
 | `core/State.lua` | `NS.State`: session-only flags (`debug`, `testMode`, `legacyLoaded`) |
 | `core/EnvSetup.lua` | `NS.Meta`, `NS.Version` (LibKa0s-Env) |
-| `core/CoreSetup.lua` | `NS.Print`, `NS.SafeToString`, the `SafeRegister*` family, the window chrome, `NS.ResolveColor` (a swatch through its class-color companion) (LibKa0s-Core) |
+| `core/CoreSetup.lua` | `NS.Print`, `NS.SafeToString`, the `SafeRegister*` family, the window chrome, `NS.ResolveColor` (a swatch through its class-color companion), `NS.ShowTitleTip`, `NS.PlaceBodyTip` and `NS.ShowBodyTip` (a body element's plain tooltip in `gtip.title` and `gtip.body`) (LibKa0s-Core) |
 | `core/SkinSetup.lua` | `NS.Skin`, the owner registration and its `of.*` tokens, the skin choice and picker seams, `NS.SkinBandGeometry` (where the title band lies, for the bar's header) (LibKa0s-Skin) |
 | `core/Compat.lua` | `NS.Compat`: every version-variant client call and every LibKa0s-Compat member the addon consumes ([compat-layer.md](compat-layer.md)) |
 | `core/ClientSetup.lua` | The per-client picks (clients-§5): `NS.CLIENT`, read once from `Compat.ClientKey`, and `NS.PerClient` / `NS.ForClientRows` over it |
@@ -98,7 +98,7 @@ the diagnostics sections.
 | `modules/ItemInfo.lua` | `NS.ItemInfo`: link parse, item identity and comparison |
 | `modules/Inventory.lua` | `NS.Inventory`: the bag and equipment scan, its cache and the bank-open rules |
 | `modules/Inventory_Lists.lua` | The missing, unused, BoE, warbound, in-use and cooldown lists and their sections (extends `NS.Inventory`) |
-| `modules/IconBrowserSetup.lua` | `NS.Glyph`: the glyph helpers (`IsGlyph`, `ValidColor`, `Tint`) from LibKa0s-IconBrowser, with a library-absent stub; `NS.IconBrowser` (`Open(id)`, `Close`, `IsOpen`, `Browser`): Change icon...'s library browser, tabs Recommended and Equipped and bags ahead of Game icons and Glyphs, no Markers |
+| `modules/IconBrowserSetup.lua` | `NS.Glyph`: the glyph helpers (`IsGlyph`, `ValidColor`, `Tint`, which answers the skin's `icon.tint` for no color, and `Markup`, a glyph's whole inline markup in its tint) from LibKa0s-IconBrowser, with a library-absent stub; `NS.IconBrowser` (`Open(id)`, `Close`, `IsOpen`, `Browser`): Change icon...'s library browser, tabs Recommended and Equipped and bags ahead of Game icons and Glyphs, no Markers |
 | `modules/Outfits.lua` | `NS.Outfits`: the outfit store and its one writer API; `NS.OutfitIcon`, the one outfit icon resolver (own icon, a seeded spec outfit's spec icon, the trigger's, the item rungs, then the default 132724), and `NS.Outfits.SetIcon` |
 | `modules/Outfits_Seed.lua` | The LoadPass: store repair, the built-in outfits' seed and the 1 s timer that runs the first one (extends `NS.Outfits`) |
 | `modules/Outfits_Schema.lua` | `NS.OutfitSchema`: the per-outfit instance rows, `outfit.*` and `trigger.<TID>.*` |

@@ -785,7 +785,10 @@ local function buildSheet()
         self.hovered = true
         paintButton()
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-        GameTooltip:SetText(L["Toggle the Outfitter window"])
+        -- The button wears the host's look; the line this addon writes on the client tooltip takes
+        -- the skin's title color (skinning-§7, owner U-7, 2026-11-20).
+        local r, g, b = NS.SkinColor("gtip.title")
+        GameTooltip:SetText(L["Toggle the Outfitter window"], r, g, b)
         GameTooltip:Show()
     end)
     button:SetScript("OnLeave", function(self)

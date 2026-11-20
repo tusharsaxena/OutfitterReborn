@@ -39,6 +39,12 @@ local function build()
     f.bar:SetPoint("TOPLEFT", f, "TOPLEFT", 14, -38)
     f.bar:SetMinMaxValues(0, 1)
     f.bar:SetValue(0)
+    -- The fill: the accent over the skin's statusbar texture (S.ApplyBarFill, LibKa0s v1.108.0). The
+    -- empty track: a BACKGROUND texture in the skin's `bar.bg`, colored in place by S.Divider's token
+    -- form, recorded, so a switch recolors it (SD-SK-OR.1).
+    f.bar.bg = f.bar:CreateTexture(nil, "BACKGROUND")
+    f.bar.bg:SetAllPoints(f.bar)
+    NS.Skin.Divider(f.bar.bg, { token = "bar.bg" })
     NS.Skin.ApplyBarFill(f.bar)
     f.best = D.Label(f, "", "muted")
     f.best:SetPoint("TOPLEFT", f.bar, "BOTTOMLEFT", 0, -8)
