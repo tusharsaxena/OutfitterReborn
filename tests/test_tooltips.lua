@@ -58,6 +58,24 @@ local function texts(tip)
     return out
 end
 
+-- Switch the instance onto the kit's probe skin, which gives every token a value of its own
+-- (tests/_kit/skin_switch.lua), so gtip.title is told apart from the client tooltip's own gold.
+local function probe(NS, M)
+    local Skin = M.LibStub("LibKa0s-Skin-1.0")
+    local W = dofile(T.root .. "/tests/_kit/skin_switch.lua")
+    if not Skin:GetSkin(W.PROBE_KEY) then
+        Skin:RegisterSkin({ key = W.PROBE_KEY, label = "Probe", tokens = W.probeTokens(Skin) })
+    end
+    NS.ApplySkinChoice("ka0s", W.PROBE_KEY)
+end
+
+local function rgb(r, g, b) return ("%.3f %.3f %.3f"):format(r or -1, g or -1, b or -1) end
+
+-- Line `i` of `tip` is in color token `token`.
+local function lineIn(NS, tip, i, token, what)
+    assertEqual(rgb(tip["TextLeft" .. i]:GetTextColor()), rgb(NS.SkinColor(token)), what .. ": not " .. token)
+end
+
 -- The "Equipment Sets:" line and how many there are.
 local function usedLine(tip)
     local found, n = nil, 0
@@ -163,6 +181,27 @@ test("tooltips: the client's Equipment Sets line is replaced, otherwise one line
     tip:SetInventoryItem("player", 1)
     postCall(M)
     assertEqual(tip:NumLines(), n + 1, "no client line: appended once")
+end)
+
+test("tooltips: an appended line is in gtip.title, and a skin switch wipes the cached names", function()
+    -- red under: the NORMAL_FONT_COLOR literal on the appended line, or no OnLooksChanged wipe (the
+    -- names keep the old skin's escapes; SD-SK-OR.6).
+    local NS, M = scene()
+    probe(NS, M)
+    outfit(NS, "Tank", { HeadSlot = "head_plate" })
+    local tip = M.GameTooltip
+    tip:SetInventoryItem("player", 1)
+    postCall(M)
+    assertTrue(usedLine(tip) ~= nil, "no line")
+    lineIn(NS, tip, tip:NumLines(), "gtip.title", "the appended line")
+    local O, calls = NS.Outfits, 0
+    local using = O.UsingItem
+    O.UsingItem = function(...) calls = calls + 1; return using(...) end
+    NS.Tooltips.LineFor(DB.head_plate.link)
+    assertEqual(calls, 0, "the post-call's line is cached")
+    NS.ApplySkinChoice("ka0s", "ka0s")
+    NS.Tooltips.LineFor(DB.head_plate.link)
+    assertEqual(calls, 1, "a skin switch wipes the cache")
 end)
 
 test("tooltips: a secret line text is skipped, never searched", function()
@@ -538,6 +577,25 @@ test("outfit tooltip: nothing missing falls back to the newbie tip, which follow
     M.__cvars.UberTooltips = "1"
     -- red under: drawing the full tooltip whatever is missing (the `#missing > 0 or #banked > 0` test gone).
     assertFalse(NS.OutfitTooltip.Show(plain, owner), "nothing to say")
+end)
+
+test("outfit tooltip: the name is in gtip.title and the trigger description in gtip.body", function()
+    -- red under: the legacy HIGHLIGHT_FONT_COLOR and NORMAL_FONT_COLOR literals (SD-SK-OR.5).
+    local NS, M = scene()
+    probe(NS, M)
+    triggers(NS, "Worn while you are swimming")
+    local id = outfit(NS, "Dive", { HeadSlot = "head_plate" })
+    NS.Outfits.Get(id).trigger = { id = "SWIMMING" }
+    local owner = M.CreateFrame("Button", nil, M.UIParent)
+    local tip = M.GameTooltip
+    assertTrue(NS.OutfitTooltip.Show(id, owner, owner, true))
+    lineIn(NS, tip, 1, "gtip.title", "the full tooltip's name")
+    lineIn(NS, tip, 2, "gtip.body", "the full tooltip's description")
+    M.__cvars.UberTooltips = "1"
+    tip:ClearLines()
+    assertTrue(NS.OutfitTooltip.Show(id, owner))
+    lineIn(NS, tip, 1, "gtip.title", "the newbie tip's name")
+    lineIn(NS, tip, 2, "gtip.body", "the newbie tip's description")
 end)
 
 test("outfit tooltip: `always` (the bar) draws the full tooltip with nothing missing, UberTooltips off", function()

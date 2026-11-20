@@ -103,6 +103,29 @@ function NS.PlaceBodyTip(tip, el, group)
     return side
 end
 
+--- A body element's plain tooltip on GameTooltip (SD-SK-OR.7): owned by `el` at ANCHOR_NONE, `title`
+--- in `gtip.title`, then each further argument a wrapped line in `gtip.body` (skinning-§7: lines this
+--- addon writes on a client tooltip take the skin's colors), shown, then placed beside `group` by
+--- NS.PlaceBodyTip. Colors are read now, so the next tooltip after a skin switch has the new ones.
+--- @param el table the row, mark or button under the pointer
+--- @param group table|function|nil the window group PlaceBodyTip places beside
+--- @param title string
+function NS.ShowBodyTip(el, group, title, ...)
+    local tip = GameTooltip
+    if not (tip and tip.SetOwner and el) then return end
+    local color = NS.Skin and NS.Skin.Color or function() end
+    tip:SetOwner(el, "ANCHOR_NONE")
+    local r, g, b = color("gtip.title")
+    tip:SetText(tostring(title or ""), r, g, b, 1, true)
+    local br, bg, bb = color("gtip.body")
+    for i = 1, select("#", ...) do
+        local line = select(i, ...)
+        if line ~= nil then tip:AddLine(line, br, bg, bb, true) end
+    end
+    tip:Show()
+    NS.PlaceBodyTip(tip, el, group)
+end
+
 --- The side body tooltip `tip` took at its last NS.PlaceBodyTip, while it is still owned by the
 --- element it was placed against; nil for a tooltip this addon did not place (or no longer owns).
 --- @param tip table

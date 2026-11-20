@@ -46,7 +46,8 @@ local SETTINGS_OPT_OUT = "a modal dialog: settings would open under it, and hidi
 
 -- ── the controls ──────────────────────────────────────────────────────────────────────────────
 
---- A push button with a centered label.
+--- A push button with a centered label. The label is also `b.text`, where S.Button finds a hand-made
+--- label, so the skin paints its face and color (`btn.text`, `btnPrimary.text`; SD-SK-OR.2).
 --- @param opts table|nil { primary = true } for the dialog's OK
 function D.Button(parent, width, height, text, opts)
     local b = CreateFrame("Button", nil, parent)
@@ -54,11 +55,13 @@ function D.Button(parent, width, height, text, opts)
     b.label = b:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     b.label:SetPoint("CENTER", b, "CENTER", 0, 0)
     b.label:SetText(text)
+    b.text = b.label
     NS.Skin.Button(b, opts)
     return b
 end
 
---- A check button with its label to the right.
+--- A check button with its label to the right. S.Checkbox paints the box only, so the label takes
+--- the body role through S.Text, face and color, recorded (SD-SK-OR.3).
 function D.Check(parent, text)
     local cb = CreateFrame("CheckButton", nil, parent)
     cb:SetSize(20, 20)
@@ -66,6 +69,7 @@ function D.Check(parent, text)
     cb.label:SetPoint("LEFT", cb, "RIGHT", 4, 0)
     cb.label:SetText(text)
     NS.Skin.Checkbox(cb)
+    NS.Skin.Text(cb.label, "body")
     return cb
 end
 

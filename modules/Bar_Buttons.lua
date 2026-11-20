@@ -165,11 +165,7 @@ local function onEnter(btn)
     local rec = btn.outfit
     if not rec then return end
     if rec.placeholder then
-        GameTooltip:SetOwner(btn, "ANCHOR_NONE")
-        GameTooltip:SetText(tostring(rec.name))
-        GameTooltip:AddLine(L["Sample outfit (test mode). Nothing is equipped."], nil, nil, nil, true)
-        GameTooltip:Show()
-        NS.PlaceBodyTip(GameTooltip, btn, Bar.Frame())
+        NS.ShowBodyTip(btn, Bar.Frame(), tostring(rec.name), L["Sample outfit (test mode). Nothing is equipped."])
         return
     end
     -- A body element: the tooltip opens beside the whole bar (AD-92-OR).

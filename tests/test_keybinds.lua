@@ -346,9 +346,13 @@ test("keybinds: the key announces on UIErrorsFrame in the outfit color, unless a
     M.__now = 102
     press(M, wearKey(3))
     assertEqual(messages(M), "Hat equipped|Hat unequipped")
-    local c, m = NS.Constants.OUTFIT_MESSAGE_COLOR, M.UIErrorsFrame.__messages[1]
-    assertEqual(m.r, c.r); assertEqual(m.g, c.g); assertEqual(m.b, c.b)
-    assertEqual(c.r .. "," .. c.g .. "," .. c.b, "0.2,0.75,0.3")
+    -- red under: a literal message color (SD-SK-OR.9): the line reads the owner token now
+    local m = M.UIErrorsFrame.__messages[1]
+    local r, g, b = NS.SkinColor("of.message.equip")
+    assertEqual(m.r, r); assertEqual(m.g, g); assertEqual(m.b, b)
+    NS.ApplySkinChoice("ka0s", "ka0s")   -- Ka0s Default's pixels; Forever's new profile wears WoW Forever
+    r, g, b = NS.SkinColor("of.message.equip")
+    assertEqual(r .. "," .. g .. "," .. b, "0.2,0.75,0.3", "Ka0s Default draws the old addon's green")
     assertTrue(NS.SetByPath("equip.announceKeys", false))
     M.__now = 104
     press(M, wearKey(3))

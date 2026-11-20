@@ -571,8 +571,8 @@ local function plainIcon(v)
     return nil
 end
 
--- A stored icon as texture, r, g, b, or nil: a fileID drawn white, a glyph in its color (white for
--- none). A string that is not a glyph (or any glyph while the library is absent) draws nothing.
+-- A stored icon as texture, r, g, b, or nil: a fileID drawn white, a glyph in its color (the skin's
+-- `icon.tint` for none, U-22). A string that is not a glyph (or any glyph while the library is absent) draws nothing.
 local function drawn(icon, color)
     if type(icon) == "string" then
         if NS.Glyph.IsGlyph(icon) then return icon, NS.Glyph.Tint(color) end

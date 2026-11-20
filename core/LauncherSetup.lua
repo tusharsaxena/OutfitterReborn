@@ -29,7 +29,9 @@ end
 --- THE wear keys' handler (design §4.4). NS.Stack.WearBound owns the anti-panic rule and the wear: a
 --- Complete outfit is worn now, anything else toggles now, and the press clears the trigger's
 --- Disabled and is a hardware event. An ignored repeat says nothing; an unbound key says so. With
---- `equip.announceKeys` on, the result goes to the error frame in the outfit color (INV §5).
+--- `equip.announceKeys` on, the result goes to the error frame in the outfit color (INV §5), the
+--- owner token `of.message.equip` read now, so the line follows the skin (skinning-§9: a line written
+--- into a client frame takes its colors from the skin; SD-SK-OR.9).
 --- @param n number  the key, 1..10
 function NS.WearBoundOutfit(n)
     local line = NS.StoodDownRefusal()        -- the button asked already; a direct caller has not
@@ -38,9 +40,9 @@ function NS.WearBoundOutfit(n)
     if ignored then return end
     if not rec then return NS.Print(L["No outfit is bound to key %d."]:format(n)) end
     if NS.GetSetting("equip.announceKeys") == false then return end
-    local c = NS.Constants.OUTFIT_MESSAGE_COLOR
+    local r, g, b = NS.SkinColor("of.message.equip")
     local text = (worn and L["%s equipped"] or L["%s unequipped"]):format(tostring(rec.name))
-    UIErrorsFrame:AddMessage(text, c.r, c.g, c.b)
+    UIErrorsFrame:AddMessage(text, r, g, b)
 end
 
 -- ── The key bindings (launcher-§6, design §4.4) ─────────────────────────────────────────────────
@@ -165,7 +167,11 @@ NS.Launcher = Launcher:New({
     -- The one host line: the outfit on top of the stack (NS.Stack.CurrentLabel); without NS.Stack the
     -- tooltip carries the library's status block only.
     onTooltipShow  = function(tt)
-        if NS.Stack then tt:AddLine(L["Current outfit: %s"]:format(NS.Stack.CurrentLabel())) end
+        -- In the skin's tooltip line color, as the library's own status lines are (SD-SK-OR.8).
+        if NS.Stack then
+            local r, g, b = NS.SkinColor("gtip.line")
+            tt:AddLine(L["Current outfit: %s"]:format(NS.Stack.CurrentLabel()), r, g, b)
+        end
     end,
     version        = function() return NS.Version() end,
     print          = function(line) NS.Print(line) end,

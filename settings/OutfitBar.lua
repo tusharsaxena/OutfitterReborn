@@ -234,6 +234,10 @@ end
 registerComposed(H.ColorPair({
     prefix = "bar.", page = PAGE, group = FRAME, subgroup = L["Background"], order = 100,
     key = "bgColor", companionKey = "useClassColorBg", label = L["Background color"], classColor = PLAYER_CLASS,
+    -- The swatch's skin companion (OptionsCompose minor 20 emits `<key>FromSkin`) is this addon's own
+    -- *Use the skin's background*, `bar.bgFromSkin` in `extra` below, so the composer adds no second
+    -- `bar.bgColorFromSkin` row that nothing reads.
+    keys = { bgColorFromSkin = "bgFromSkin" },
     defaults = { bgColor = DB.bgColor, useClassColorBg = DB.useClassColorBg },
     extra = { {
         path = "bar.bgFromSkin", type = "bool", startsLine = true, label = L["Use the skin's background"],

@@ -136,6 +136,25 @@ end)
 
 -- The legacy menu listed only visible outfits (Outfitter.lua:2452 OutfitIsVisible at d396f11): not
 -- Disabled and not hidden from the bar, the rule modules/Bar.lua's LiveSource keeps.
+test("broker: a menu row's glyph is drawn whole in its tint: the picked color, or the skin's icon.tint", function()
+    -- red under: the row's icon through NS.IconText (cropped, white) for a glyph (owner U-22, 2026-11-20).
+    local NS, M, ctl = scene()
+    local ids = outfits(NS)
+    local glyph = assert(NS.Icon("ph:sword"))
+    assertTrue(NS.Outfits.SetIcon(ids.ride, glyph, "ff8000"))
+    assertTrue(NS.Outfits.SetIcon(ids.cloak, glyph, nil))
+    local rows = open(M, ctl)
+    local function markup(r, g, b)
+        local function byte(x) return math.floor(x * 255 + 0.5) end
+        return ("|T%s:0:0:0:0:64:64:0:64:0:64:%d:%d:%d|t"):format(glyph, byte(r), byte(g), byte(b))
+    end
+    local ride, cloak = find(rows, "Ride").label, find(rows, "Cloak").label
+    assertTrue(ride:find(markup(1, 128 / 255, 0), 1, true) ~= nil, "the picked color: " .. ride)
+    local tr, tg, tb = NS.SkinColor("icon.tint")
+    assertTrue(cloak:find(markup(tr, tg, tb), 1, true) ~= nil, "no color, icon.tint: " .. cloak)
+    assertTrue(find(rows, "Bare").label:find(":64:64:5:59:5:59|t", 1, true) ~= nil, "a game icon stays cropped")
+end)
+
 test("broker: the menu leaves out an outfit whose trigger is off or that is hidden from the bar", function()
     local NS, M, ctl = scene()
     local ids = outfits(NS)

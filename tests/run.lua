@@ -271,6 +271,21 @@ Kit.skinValues = { root = root, rows = {
       why = "EllesmereUI's tab label idle color, matched to its neighbors", cause = HOST_LOOK },
     { file = "modules/Dock.lua", substring = "ccsGlow:SetVertexColor(1, 1, 0, 1)",
       why = "ChonkyCharacterSheet's tab glow, its own fixed yellow, matched to its neighbors", cause = HOST_LOOK },
+    { file = "modules/Dock.lua", substring = "local TAB_BG = {",
+      why = "texture coordinates of the host sheet's sidebar tab art, not a color", category = "not a color" },
+    { file = "modules/Dock.lua", substring = "local TAB_BG_SELECTED = {",
+      why = "texture coordinates of the host sheet's sidebar tab art, not a color", category = "not a color" },
+    { file = "modules/Dock.lua", substring = "local TAB_HIDER = {",
+      why = "texture coordinates of the host sheet's sidebar tab art, not a color", category = "not a color" },
+    { file = "modules/Dock.lua", substring = "local TAB_HIGHLIGHT = {",
+      why = "texture coordinates of the host sheet's sidebar tab art, not a color", category = "not a color" },
+    { file = "modules/Sheet.lua", substring = "local CHONKY_IDLE, CHONKY_ACTIVE =",
+      why = "ChonkyCharacterSheet's own tab colors when its live ones cannot be read, matched to its neighbors",
+      cause = HOST_LOOK },
+    { file = "modules/Sheet.lua", substring = "local EUI_ACCENT_FALLBACK =",
+      why = "EllesmereUI's own fallback for a missing accent, matched to its neighbors", cause = HOST_LOOK },
+    { file = "modules/Triggers_Families.lua", substring = "return 0, 0, 1 end",
+      why = "the legacy RGBToHSV's hue, saturation and value for no color, not a color", category = "not a color" },
 } }
 
 -- The skin-switch test's painted surfaces (skinning-§1): the design §9.5 builders (P4.30).

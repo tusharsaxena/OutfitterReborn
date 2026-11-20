@@ -156,6 +156,21 @@ test("launcher: the tooltip's host line is the stack's label, absent without a s
     assertTrue(hasLine(lines, "Current outfit: None"), "the real stack's label for an empty stack (P4.9)")
 end)
 
+test("launcher: the host line is drawn in the skin's gtip.line, as the library's own lines are", function()
+    -- red under: core/LauncherSetup.lua's onTooltipShow adding the line with no color (SD-SK-OR.8).
+    local inst = T.load()
+    inst.NS.Stack = { CurrentLabel = function() return "Fishing" end }
+    local color
+    broker(inst).OnTooltipShow({ AddLine = function(_, text, r, g, b)
+        if text:find("Current outfit:", 1, true) then color = { r, g, b } end
+    end })
+    assertTrue(color ~= nil, "no host line")
+    local r, g, b = inst.NS.SkinColor("gtip.line")
+    assertTrue(r ~= nil, "gtip.line answers nothing")
+    assertEqual(("%.3f %.3f %.3f"):format(color[1] or -1, color[2] or -1, color[3] or -1),
+        ("%.3f %.3f %.3f"):format(r, g, b), "the host line is not gtip.line")
+end)
+
 test("launcher: the Minimap button row hides and shows the real button", function()
     local inst = T.load()
     local NS, icon = inst.NS, inst.mocks.LibStub("LibDBIcon-1.0")

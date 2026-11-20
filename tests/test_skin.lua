@@ -270,12 +270,17 @@ test("window: the header gear has no border", function()
     assertTrue(not (type(newOpts) == "table" and newOpts.noBorder), "the New outfit text button lost its border")
 end)
 
---- The lines of `srcs` that write inline texture markup by hand (a "|T" in a string).
+--- The lines of `srcs` that write inline texture markup by hand (a "|T" in a string). One builder is
+--- exempt: NS.Glyph.Markup (modules/IconBrowserSetup.lua), a catalog glyph drawn whole in its tint,
+--- which W.IconText is not for (it crops icon art, LibKa0s Widgets.lua's IconText note) and S.MarkText
+--- cannot draw in a picked color (it takes a token only); owner U-22, 2026-11-20.
+local GLYPH_MARKUP = "|T%s:0:0:0:0:64:64:0:64:0:64:%d:%d:%d|t"
 local function handMarkup(srcs)
     local out = {}
     for rel, src in pairs(srcs) do
         for _, l in ipairs(codeLines(src)) do
-            if l.text:find("|T", 1, true) then out[#out + 1] = rel .. ":" .. l.n end
+            local glyph = rel == "modules/IconBrowserSetup.lua" and l.text:find(GLYPH_MARKUP, 1, true)
+            if l.text:find("|T", 1, true) and not glyph then out[#out + 1] = rel .. ":" .. l.n end
         end
     end
     table.sort(out)
@@ -376,4 +381,83 @@ test("skin: a switch marks the window, and its next tick recolors an item row's 
         if not (near(nr, br) and near(ng, bg) and near(nb, bb)) then moved = true end
     end
     assertTrue(moved, "no shipped skin moved the item's quality color, so the walk proved nothing")
+end)
+
+-- ── the skin-defaults audit (SD-SK-OR, LibKa0s#97) ──────────────────────────────────────────────
+
+--- Switch the owner onto the kit's probe skin, which gives every token a value of its own.
+local function probe(Skin)
+    local W = dofile(T.root .. "/tests/_kit/skin_switch.lua")
+    if not Skin:GetSkin(W.PROBE_KEY) then
+        Skin:RegisterSkin({ key = W.PROBE_KEY, label = "Probe", tokens = W.probeTokens(Skin) })
+    end
+    Skin:SetChoice(OWNER, "ka0s", W.PROBE_KEY)
+end
+
+local function rgb(r, g, b) return ("%.3f %.3f %.3f"):format(r or -1, g or -1, b or -1) end
+
+test("skin: a dialog's push-button and check labels, the progress track and an item row's face wear the skin", function()
+    -- red under: D.Button's label only in `b.label` (S.Button finds none, SD-SK-OR.2), D.Check without
+    -- S.Text on its label (OR.3), no BACKGROUND track under the progress bar (OR.1), an item row's name
+    -- given only SetTextColor (no skin face, OR.4).
+    local NS, M, Skin = buildAll()
+    probe(Skin)
+    local f = NS.ProgressDialog.Frame()
+    local function is(fs, token, what) assertEqual(rgb(textColor(M, fs)), rgb(NS.Skin.Color(token)), what) end
+    is(f.cancel.label, "btn.text", "the Cancel label is not btn.text")
+    is(f.highSpeed.label, "text.body", "the High speed label is not text.body")
+    local track = f.bar.bg
+    assertTrue(track ~= nil and M.__paint(track).layer == "BACKGROUND", "the progress bar has no BACKGROUND track")
+    local c = M.__paint(track).color
+    assertEqual(rgb(c and c[1], c and c[2], c and c[3]), rgb(NS.Skin.Color("bar.bg")), "the track is not bar.bg")
+    assertTrue(M.__paint(f.bar).statusBarTexture ~= nil, "the progress fill draws no texture")
+    NS.Preview.Stop()
+    NS.Window.Render()
+    for _, r in ipairs(NS.WindowRows.rows) do
+        if r.entry and r.entry.kind == "item" then
+            local font = M.__paint(r.itemName).font
+            assertEqual(font and font[1], NS.Skin.GetFont(), "an item row's name is not in the skin's face")
+            break
+        end
+    end
+    Skin:SetChoice(OWNER, "ka0s", "ka0s")
+end)
+
+test("skin: the lines this addon writes on a client tooltip read gtip.title and gtip.body", function()
+    -- red under: the uncolored SetText and AddLine of a test-mode sample's tooltip (a window row and a
+    -- bar button, SD-SK-OR.7), the EM mark's (OR.7) and the sheet button's (owner U-7, 2026-11-20).
+    local NS, M, Skin = buildAll()
+    probe(Skin)
+    local tip = M.GameTooltip
+    local function lineIs(i, token, what)
+        local l = tip["TextLeft" .. i]
+        assertEqual(rgb(l.__r, l.__g, l.__b), rgb(NS.Skin.Color(token)), what .. ": line " .. i .. " is not " .. token)
+    end
+    assertTrue(NS.Preview.IsActive(), "the surfaces left test mode off")
+    local btn = NS.Bar.Buttons()[1]
+    assertTrue(btn and btn.outfit and btn.outfit.placeholder, "the bar shows no sample outfit")
+    btn:__fire("OnEnter")
+    lineIs(1, "gtip.title", "a bar sample")
+    lineIs(2, "gtip.body", "a bar sample")
+    btn:__fire("OnLeave")
+    NS.Window.Render()
+    local row
+    for _, r in ipairs(NS.WindowRows.rows) do
+        if row == nil and r.entry and r.entry.kind == "outfit" and r.entry.placeholder then row = r end
+    end
+    assertTrue(row ~= nil, "the window shows no sample outfit")
+    row:__fire("OnEnter")
+    lineIs(1, "gtip.title", "a row sample")
+    lineIs(2, "gtip.body", "a row sample")
+    row:__fire("OnLeave")
+    row.em:__fire("OnEnter")
+    lineIs(1, "gtip.title", "the EM mark")
+    lineIs(2, "gtip.body", "the EM mark")
+    row.em:__fire("OnLeave")
+    local sheet = M.OutfitterRebornSheetButton
+    assertTrue(sheet ~= nil, "no sheet button")
+    sheet:__fire("OnEnter")
+    lineIs(1, "gtip.title", "the sheet button")
+    sheet:__fire("OnLeave")
+    Skin:SetChoice(OWNER, "ka0s", "ka0s")
 end)

@@ -191,11 +191,8 @@ local function emTooltip(mark, row)
     if e.placeholder then stored = e.rec.em == true else stored = NS.Outfits.IsEM(e.id) end
     local hint = stored and L["Click to remove from the Equipment Manager"] or L["Click to save in the Equipment Manager"]
     if e.placeholder then hint = L["Not available in test mode"] end
-    GameTooltip:SetOwner(mark, "ANCHOR_NONE")
-    GameTooltip:SetText(stored and L["Stored in the Equipment Manager"] or L["Not stored in the Equipment Manager"])
-    GameTooltip:AddLine(hint, nil, nil, nil, true)
-    GameTooltip:Show()
-    NS.PlaceBodyTip(GameTooltip, mark, NS.Window.Frame())
+    NS.ShowBodyTip(mark, NS.Window.Frame(),
+        stored and L["Stored in the Equipment Manager"] or L["Not stored in the Equipment Manager"], hint)
 end
 
 -- ── hover ─────────────────────────────────────────────────────────────────────────────────────
@@ -222,19 +219,12 @@ end
 local HOVER = {}
 function HOVER.category(row, e)
     if not e.desc then return end
-    GameTooltip:SetOwner(row, "ANCHOR_NONE")
-    GameTooltip:SetText(e.label)
-    GameTooltip:AddLine(e.desc, nil, nil, nil, true)
-    GameTooltip:Show()
-    NS.PlaceBodyTip(GameTooltip, row, NS.Window.Frame())
+    NS.ShowBodyTip(row, NS.Window.Frame(), e.label, e.desc)
 end
 function HOVER.outfit(row, e)
     if e.placeholder then
-        GameTooltip:SetOwner(row, "ANCHOR_NONE")
-        GameTooltip:SetText(tostring(e.rec.name))
-        GameTooltip:AddLine(L["Sample outfit (test mode). Nothing is equipped."], nil, nil, nil, true)
-        GameTooltip:Show()
-        NS.PlaceBodyTip(GameTooltip, row, NS.Window.Frame())
+        NS.ShowBodyTip(row, NS.Window.Frame(), tostring(e.rec.name),
+            L["Sample outfit (test mode). Nothing is equipped."])
         return
     end
     if not NS.OutfitTooltip.Show(e.id, row, NS.Window.Frame()) then GameTooltip:Hide() end
@@ -336,11 +326,17 @@ function RENDER.item(row, e)
     row.icon:SetTexture(NS.Compat.ItemIcon(item.id))
     row.icon:Show()
     row.itemName:SetText(item.name or "")
-    -- No quality color (an item the client has not cached yet): the muted text color, always set, so
-    -- a reused row never keeps the last item's color (the legacy drew it GRAY_FONT_COLOR).
+    -- The skin's body face with the item's quality color (S.Font, recorded with the color, so a skin
+    -- switch keeps both on the string until the next render reads the new skin's q.* tokens;
+    -- SD-SK-OR.4). No quality color (an item the client has not cached yet): the muted text role,
+    -- always set, so a reused row never keeps the last item's color (the legacy drew it
+    -- GRAY_FONT_COLOR).
     local r, g, b = NS.QualityColor(item.quality)
-    if r == nil then r, g, b = NS.SkinColor("text.muted") end
-    row.itemName:SetTextColor(r, g, b)
+    if r == nil then
+        NS.Skin.Text(row.itemName, "muted")
+    else
+        NS.Skin.Font(row.itemName, r, g, b)
+    end
     row.itemName:Show()
 end
 

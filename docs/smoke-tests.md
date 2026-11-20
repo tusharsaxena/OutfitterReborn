@@ -12,7 +12,8 @@ Forever client unless a row says Retail, and a row tagged with a probe settles a
 from the inventory's best evidence (`-- PROBE Pn` at the code site). Section 22 is the window chrome
 of the LibKa0s v1.105.0 adoption (2026-11-17): the docked test strips and the window's footer.
 Section 24 is that adoption's report verbs (2026-11-18): `missing`, `zone` and `iteminfo` in the
-debug console.
+debug console. Section 25 is the skin-defaults run (LibKa0s v1.108.0, 2026-11-20): the looks and the
+tooltip lines that now follow the skin.
 
 ## Sign-off
 
@@ -607,3 +608,25 @@ in chat.
 | RP2 (AD-79-OR) | Close the bank, `/or missing`; open it with nothing missing, `/or missing` | Bank closed: *You must have your bank open ...* in chat, the console stays closed and gains nothing. Nothing missing: *No items are missing* in chat, nothing in the console |
 | RP3 (AD-79-OR) | Close the console; `/or zone` (in the open world, then in a battleground or arena) | The console opens with the instance line, the zone outfits line and the equipment lines; one pointer line in chat. Copy pastes plain text |
 | RP4 (AD-79-OR) | Close the console; `/or iteminfo ` then shift-click an item into the line; then `/or iteminfo nonsense` | The link line reads `[Item name]` in Copy, then `id`, `bonus`, `mods` and the other fields; one pointer in chat. `nonsense`: *Not a readable item link.* in chat, the console stays closed |
+
+## 25. Skin defaults (LibKa0s v1.108.0, SD-SK-OR, LibKa0s#97, 2026-11-20)
+
+Retail and Forever. Skinning-§6, §7 and §9 (standard v2.116.0): every look this addon draws follows the
+skin unless the owner ruled it fixed, and the lines it writes on a client tooltip or frame take the
+skin's colors. Run each check under Ka0s Default first, then under one light-window skin and one other
+(WoW Midnight, High Contrast).
+
+| # | Do | See |
+|---|---|---|
+| SD1 (SD-SK-OR.1, SD-LK-97.17) | Pick an outfit, Optimize it for a stat with the genetic search; watch the progress window | The bar's empty track is a dark band, and the fill grows over it in the accent color in the skin's bar texture (a flat bar under Ka0s Default, the skin's own texture elsewhere). Switch the skin while it runs: both move |
+| SD2 (SD-SK-OR.2) | Open New outfit, a trigger dialog, Rebuild and the progress window; read the push buttons (Done, Cancel, Rebuild, Add a stat, the capture buttons, Use summoned pet) | Each label is in the skin's button text color and face (Done, the primary, in the primary button's), not the client's small white; a skin switch with a dialog open moves them |
+| SD3 (SD-SK-OR.3) | Same dialogs: read the checkbox labels (High speed, Disable in combat, Turn this trigger off, Complex, the build-from checks, a bool trigger field) | Each label is in the skin's body text color and face, matching the dialog's other labels |
+| SD4 (SD-SK-OR.4) | Select an outfit and read its item rows under each skin | Each item name is in the skin's body face (not the client's small font) and still in its quality color; an uncached item reads muted |
+| SD5 (SD-SK-OR.5) | Hover an outfit with a trigger and a missing item; with UberTooltips on, one with a trigger and nothing missing | The outfit's name is in the skin's tooltip title color (gold under Ka0s Default) and the trigger's description in its tooltip body color (light gray under Ka0s Default, was white); Missing and Banked unchanged |
+| SD6 (SD-SK-OR.6) | Hover a bag item an outfit holds, one that is in no Blizzard equipment set (so the line is appended) | The *Equipment Sets:* line is in the skin's tooltip title color, the outfit names in their status colors. Switch the skin and hover again: the names take the new skin's colors at once |
+| SD7 (SD-SK-OR.7) | Hover a category with a description, an outfit's EM mark; `/or test` and hover a sample row and a sample bar button | Line 1 is in the skin's tooltip title color and the rest in its body color (no more gold body lines); placement as TP1 and TP5 |
+| SD8 (SD-SK-OR.8) | Hover the minimap button | *Current outfit: ...* is in the same color as the library's own status lines above it |
+| SD9 (SD-SK-OR.9) | Bind an outfit to a key; press it twice | *<outfit> equipped* / *unequipped* shows on the error frame in green under Ka0s Default, and in the skin's "good" color under another skin |
+| SD10 (owner U-7) | Hover the outfit tab on the character frame | *Toggle the Outfitter window* is in the skin's tooltip title color; the tab itself keeps the host sheet's look |
+| SD11 (owner U-22) | Give one outfit a glyph with no color (pick white in the icon browser) and another a glyph with a color; look at the window rows, the outfit bar and the Outfits broker's hover menu | The uncolored glyph draws in the skin's icon tint (soft gray under Ka0s Default, no longer pure white) and moves with a skin switch; the colored one keeps its color. In the broker menu both glyphs show whole (uncropped) in those tints; item icons there stay cropped |
+| SD12 (SD-RV-OR) | Settings, Outfit Bar, Frame tab | The Background block shows *Background color*, *Use class color* and *Use the skin's background*, and nothing else: no second *Use the skin's color* row |

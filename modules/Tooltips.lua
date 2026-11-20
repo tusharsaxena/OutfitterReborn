@@ -11,7 +11,10 @@ local _, NS = ...
 -- THE LINE is EQUIPMENT_SETS formatted with the outfits that use the item, each name colored by its
 -- status (disabled, missing, banked, normal); banked is `of.outfit.banked`, blue, where the legacy
 -- line drew it red. It is cached per plain link and the cache is wiped on every outfit-record message
--- and INVENTORY_CHANGED, and by Refresh (the `tooltip.usedBy` row's reaction).
+-- and INVENTORY_CHANGED, on a skin switch (OnLooksChanged: the cached names carry the old skin's
+-- escapes), and by Refresh (the `tooltip.usedBy` row's reaction). An appended line is drawn in
+-- `gtip.title`, read at draw time: the gold the client draws its own Equipment Sets line in under
+-- Ka0s Default, and the skin's tooltip title color under every other (skinning-§7, SD-SK-OR.6).
 --
 -- REPLACING THE CLIENT'S LINE (O34). The client draws its own "Equipment Sets:" line for an item in a
 -- Blizzard set; ours replaces it through SetText on the matched left fontstring, found with a search
@@ -34,8 +37,6 @@ local STATUS_TOKEN = {
     disabled = "of.outfit.disabled", missing = "of.outfit.missing", banked = "of.outfit.banked",
     normal = "text.highlight",
 }
--- NORMAL_FONT_COLOR, the color the legacy appended line was drawn in (Outfitter.lua:7246).
-local LINE_R, LINE_G, LINE_B = 1, 0.82, 0
 
 local installed = false
 local cache = {}             -- [plain link] = the line, or false for "no outfit uses it"
@@ -141,7 +142,8 @@ function Tooltips.Decorate(tooltip, link)
     if fs then
         fs:SetText(line)
     else
-        tooltip:AddLine(line, LINE_R, LINE_G, LINE_B, true)
+        local r, g, b = NS.SkinColor("gtip.title")
+        tooltip:AddLine(line, r, g, b, true)
         tooltip:Show()
     end
     return true
@@ -206,6 +208,7 @@ function Tooltips.Install()
     if proc and proc.AddTooltipPostCall and kinds and kinds.Item then
         proc.AddTooltipPostCall(kinds.Item, Tooltips.OnItem)
     end
+    NS.Skin.OnLooksChanged(Tooltips.Refresh)
     bus = NS.NewBusTarget()
     if not bus then return end
     for _, key in ipairs(WIPE_ON) do

@@ -27,6 +27,13 @@
 -- the window re-renders on the dock's follow tick once NS.Skin.OnLooksChanged has marked it dirty.
 -- Their `paint` is that tick (NS.Window.RenderIfDirty).
 --
+-- KIT REVISION 58 (SD-SK-OR, LibKa0s#97). Every family a surface draws must move on its own, and
+-- every StatusBar must draw and move its fill. The progress fill is a data fill, so it names
+-- `expect = "texture"`. No surface needs `hold`: an item row's quality color reads the skin's q.*
+-- tokens, and the one host-look surface, the sheet button (DEV-SKIN-SHEET-BUTTON), is not declared.
+-- No StatusBar is drawn clear, so none takes `clear = true`. The audit's rows added three (the
+-- progress track, a dialog button's label and a checkbox label; SD-SK-OR.1 to .3).
+--
 -- COMPANIONS. The window and the dialogs store no colors. The bar's do, each with a FromSkin row
 -- (skinning-§6, smoke round 2 design G6), but its window chrome is the skin's Shell whatever they
 -- say: `bar.bgFromSkin` off swaps it for the player's plate, which no skin paints, so the chrome
@@ -137,7 +144,14 @@ return function(T)
             { name = "the trigger dialog's shell", build = function() live(); return NS.TriggerDialog.Frame() end },
             { name = "the rebuild dialog's shell", build = function() live(); return NS.RebuildDialog.Frame() end },
             { name = "the progress dialog's shell", build = function() live(); return NS.ProgressDialog.Frame() end },
-            { name = "the progress dialog's fill", build = function() live(); return NS.ProgressDialog.Frame().bar end },
+            -- A data fill: its statusbar texture must move on its own (kit revision 58's `expect`).
+            { name = "the progress dialog's fill", expect = "texture",
+              build = function() live(); return NS.ProgressDialog.Frame().bar end },
+            { name = "the progress dialog's track", build = function() live(); return NS.ProgressDialog.Frame().bar.bg end },
+            { name = "the progress dialog's Cancel button's label",
+              build = function() live(); return NS.ProgressDialog.Frame().cancel.label end },
+            { name = "a dialog checkbox's label",
+              build = function() live(); return NS.ProgressDialog.Frame().highSpeed.label end },
         }
     end
 

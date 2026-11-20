@@ -177,12 +177,15 @@ test("parity: the IconBrowser seam's glyph helpers answer on both arms, the stub
         assertTrue(NS.Glyph.ValidColor(nil), arm .. ": none is a color")
         assertFalse(NS.Glyph.ValidColor(false), arm .. ": false is not stored")
         assertFalse(NS.Glyph.ValidColor("red"), arm)
+        -- red under: a Tint that answers white for none (U-22: no color is the skin's icon.tint).
         local r, g, b = NS.Glyph.Tint(nil)
-        assertTrue(r == 1 and g == 1 and b == 1, arm .. ": no color is white")
+        local tr, tg, tb = NS.SkinColor("icon.tint")
+        assertTrue(r == tr and g == tg and b == tb, arm .. ": no color is the skin's icon.tint")
     end
     assertTrue(l.NS.Glyph.ValidColor("ff8000"))
     local r, g, b = d.NS.Glyph.Tint("ff0000")
-    assertTrue(r == 1 and g == 1 and b == 1, "the stub tints nothing")
+    local tr, tg, tb = d.NS.SkinColor("icon.tint")
+    assertTrue(r == tr and g == tg and b == tb, "the stub reads no stored color")
 end)
 
 test("parity: the IconBrowser seam's browser answers on both arms, the stub opening nothing", function()

@@ -327,7 +327,7 @@ Total.
 - slash: `bar show|hide|toggle` writes bar.shown through the CLI; no word toggles
 - slash: `test` flips test mode
 
-### test_launcher.lua (12)
+### test_launcher.lua (13)
 
 - launcher: one object named for the folder, labeled with the brand, wearing the logo
 - launcher: left-click opens the settings panel, in either state
@@ -335,6 +335,7 @@ Total.
 - launcher: each menu entry runs the shared handler
 - launcher: while disabled every entry but Enabled and Open settings is grayed
 - launcher: the tooltip's host line is the stack's label, absent without a stack
+- launcher: the host line is drawn in the skin's gtip.line, as the library's own lines are
 - launcher: the Minimap button row hides and shows the real button
 - launcher: no compartment function and no compartment TOC line (H6)
 - launcher: library-absent, no button, said once, and the row still writes the stored key
@@ -899,7 +900,7 @@ Total.
 - equip bracket: a stand-down between the load screen's two events clears the load flag
 - equip bracket: Diagnostic reports depth, the next update, the last error and the tripwire
 
-### test_tooltips.lua (21)
+### test_tooltips.lua (23)
 
 - tooltips: the line lands on bag, player inventory and hyperlink tooltips
 - tooltips: another unit's inventory item gets no line
@@ -907,6 +908,7 @@ Total.
 - tooltips: the stock shopping tooltips get the line, our own compare tooltips are left to themselves
 - tooltips: names are colored by status; banked is blue |cff4033ff
 - tooltips: the client's Equipment Sets line is replaced, otherwise one line is appended
+- tooltips: an appended line is in gtip.title, and a skin switch wipes the cached names
 - tooltips: a secret line text is skipped, never searched
 - tooltips: the line is cached per link and wiped on OUTFIT_EDITED and INVENTORY_CHANGED
 - tooltips: off with tooltip.usedBy, silent while stood down, none for a secret link or another tooltip
@@ -921,6 +923,7 @@ Total.
 - compare: GameTooltip's OnHide, Refresh and the stand-down hide every compare tooltip
 - outfit tooltip: the name, the trigger description, Missing: in red and Banked: in blue
 - outfit tooltip: nothing missing falls back to the newbie tip, which follows UberTooltips
+- outfit tooltip: the name is in gtip.title and the trigger description in gtip.body
 - outfit tooltip: `always` (the bar) draws the full tooltip with nothing missing, UberTooltips off
 
 ### test_stack.lua (27)
@@ -1455,12 +1458,13 @@ Total.
 - icons: a pruned mirror on the set id another mirror moved to does not take that mirror's glyph
 - icons: deleting a mirror leaves an override another outfit's set id still owns
 
-### test_broker.lua (16)
+### test_broker.lua (17)
 
 - broker: a data source named OutfitterRebornOutfits exists and is not on the minimap
 - broker: text and icon follow the worn outfit
 - broker: no outfit shows the brand and the default icon, untinted and cropped
 - broker: the hover menu lists categories then outfits, worn ones checked, missing in the missing color
+- broker: a menu row's glyph is drawn whole in its tint: the picked color, or the skin's icon.tint
 - broker: the menu leaves out an outfit whose trigger is off or that is hidden from the bar
 - broker: clicking a worn accessory removes it; clicking a Complete wears it
 - broker: a modifier-click asks to set current
@@ -1675,7 +1679,7 @@ Total.
 - credits: the README credits exactly the icon sets this build ships
 - credits: LICENSE keeps John Stephen's copyright with the Ka0s line directly under it
 
-### test_skin.lua (14)
+### test_skin.lua (16)
 
 - skin: every owner token a source file names is registered
 - skin: every skin primitive a source file calls is in the library's VOCAB
@@ -1691,6 +1695,8 @@ Total.
 - skin: a switch recolors a dialog's error line through of.dialog.error
 - skin: without the library a dialog's error line still draws of.dialog.error's red
 - skin: a switch marks the window, and its next tick recolors an item row's name
+- skin: a dialog's push-button and check labels, the progress track and an item row's face wear the skin
+- skin: the lines this addon writes on a client tooltip read gtip.title and gtip.body
 
 ### test_titlebar.lua (12)
 
@@ -1726,13 +1732,14 @@ Total.
 
 ### test_skin_values.lua (3)
 
-- skin values: every host row carries its file, substring, why and cause id
+- skin values: every host row carries its file, substring, why and a cause id or kit row category
 - skin values: no typed value outside the kit's categories and the host's rows
 - skin values: the check is falsifiable, a planted value of each shape is reported
 
-### test_skin_switch.lua (84)
+### test_skin_switch.lua (91)
 
 - skin switch: the check is falsifiable, a surface that redraws a literal is reported
+- skin switch: the check is falsifiable, a bar whose texture never moves is reported
 - skin switch: the window's shell changes
 - skin switch: the window's shell changes with the Scope ignored
 - skin switch: the window's settings button changes
@@ -1777,6 +1784,12 @@ Total.
 - skin switch: the progress dialog's shell changes with the Scope ignored
 - skin switch: the progress dialog's fill changes
 - skin switch: the progress dialog's fill changes with the Scope ignored
+- skin switch: the progress dialog's track changes
+- skin switch: the progress dialog's track changes with the Scope ignored
+- skin switch: the progress dialog's Cancel button's label changes
+- skin switch: the progress dialog's Cancel button's label changes with the Scope ignored
+- skin switch: a dialog checkbox's label changes
+- skin switch: a dialog checkbox's label changes with the Scope ignored
 - skin switch: a bool field's checkbox changes
 - skin switch: a bool field's checkbox changes with the Scope ignored
 - skin switch: a number field's box changes
@@ -1903,7 +1916,7 @@ Total.
 | test_schema.lua | 25 |
 | test_settings.lua | 16 |
 | test_slash.lua | 49 |
-| test_launcher.lua | 12 |
+| test_launcher.lua | 13 |
 | test_keybinds.lua | 22 |
 | test_disabled.lua | 24 |
 | test_locale.lua | 18 |
@@ -1926,7 +1939,7 @@ Total.
 | test_quickslots.lua | 19 |
 | test_drawer.lua | 35 |
 | test_equip_bracket.lua | 32 |
-| test_tooltips.lua | 21 |
+| test_tooltips.lua | 23 |
 | test_stack.lua | 27 |
 | test_em_sync.lua | 27 |
 | test_bank.lua | 14 |
@@ -1949,7 +1962,7 @@ Total.
 | test_bar.lua | 46 |
 | test_bar_look.lua | 13 |
 | test_outfit_icons.lua | 17 |
-| test_broker.lua | 16 |
+| test_broker.lua | 17 |
 | test_triggers_parity.lua | 13 |
 | test_preview.lua | 36 |
 | test_preview_place.lua | 8 |
@@ -1960,11 +1973,11 @@ Total.
 | test_trigger_dialog.lua | 11 |
 | test_diagnostics.lua | 12 |
 | test_credits.lua | 8 |
-| test_skin.lua | 14 |
+| test_skin.lua | 16 |
 | test_titlebar.lua | 12 |
 | test_tooltip_place.lua | 14 |
 | test_skin_values.lua | 3 |
-| test_skin_switch.lua | 84 |
+| test_skin_switch.lua | 91 |
 | test_client_globals.lua | 3 |
 | test_eol.lua | 2 |
 | test_layout_cap.lua | 13 |
@@ -1972,4 +1985,4 @@ Total.
 | test_lizard_sighted.lua | 8 |
 | test_prose.lua | 15 |
 | Skipped | 1 |
-| **Total** | **1630** |
+| **Total** | **1643** |
