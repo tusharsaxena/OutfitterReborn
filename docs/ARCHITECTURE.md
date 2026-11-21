@@ -383,6 +383,7 @@ them, and `docs/reviews/2026-09-16/` is the fork's last review, kept frozen.
 | [`perf-analysis/README.md`](perf-analysis/README.md) | Present | The performance harness is wired (`core/PerfSetup.lua`) |
 | [`slash-dispatch.md`](slash-dispatch.md) | Present | `NS.COMMANDS` holds the reserved verbs and the outfit verbs, well past the trigger of eight or more |
 | [`midnight-quirks.md`](midnight-quirks.md) | Present | `core/Compat.lua` carries client-version workarounds of its own (the table-detector ladder, the spec ladder's stub) and the secret-value rules |
+| [`forever-quirks.md`](forever-quirks.md) | Present | The addon ships on WoW Forever (Clients `Retail · Forever`): it carries the Forever catalog (forever-quirks-§1); its own section holds none yet |
 | [`compat-layer.md`](compat-layer.md) | Present | `core/Compat.lua` publishes far more than the trigger's three hand-written shims ([`compat-layer.md`](compat-layer.md) has the counting grep) |
 | [`message-bus.md`](message-bus.md) | Present | 23 messages in `NS.MSG` as measured on 2026-11-06 (the trigger is more than ten) |
 | [`profiles.md`](profiles.md) | Present | A Profiles page ships in the options UI (`settings/Profiles.lua`) |

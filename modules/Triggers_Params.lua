@@ -317,7 +317,7 @@ function P.CaptureCurrentSubzone()
 end
 
 -- A player target's full name: "Name-Realm", the realm normalized when the target is on ours. With
--- regional names (WoW Forever) a character is "First Surname" and has no realm (client-quirks-§5).
+-- regional names (WoW Forever) a character is "First Surname" and has no realm (forever-quirks-§4).
 local function playerEntry()
     local name, realm = Compat.UnitCharacterName("target")
     if not name or name == "" then return nil end

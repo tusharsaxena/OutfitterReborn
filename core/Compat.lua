@@ -8,7 +8,7 @@ local _, NS = ...
 --   Compat.GetSpecialization()  Compat.GetSpecializationInfo(index)
 --                                C_SpecializationInfo first, then the deprecated globals
 --   Compat.ClientKey()  Compat.ForClient(clients)   the client helpers (clients-§5)
---   Compat.UnitCharacterName(unit)  Compat.RegionalNames()   regional names (client-quirks-§5)
+--   Compat.UnitCharacterName(unit)  Compat.RegionalNames()   regional names (forever-quirks-§4)
 -- Hand-written ladders and reads (P3 C6):
 --   Compat.CanAccessTable(t)     canaccesstable, then issecrettable, then "readable"
 --   Compat.NumSpecializations()  the class's spec count, 0 when unknown
