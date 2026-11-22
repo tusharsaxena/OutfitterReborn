@@ -48,7 +48,7 @@ tooltip lines that now follow the skin.
 | S3 | Master controls | Every row reads and writes; Reset all asks first, and resets the profile only |
 | S4 | Skin | Choosing a skin repaints the panel; the choice survives `/reload` |
 | S5 | Keybindings | The Toggle outfit window binding is listed first under the addon's own header, then Toggle outfit bar |
-| S6 | Profiles | The note above AceDBOptions says outfits are per character; switching profiles applies the new profile's skin |
+| S6 | Profiles | The note above AceDBOptions says outfits are per character; switching profiles applies the new profile's skin. The outfits note shows on no other addon's Profiles page (Aura Master's, say; owner report 2026-11-22) |
 | S7 | Outfit Bar | Every row reacts at once on the bar |
 
 ## 3. Launcher, key bindings and slash
