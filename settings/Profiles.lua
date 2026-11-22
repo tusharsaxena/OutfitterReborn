@@ -1,5 +1,5 @@
 local _, NS = ...
--- settings/Profiles.lua — the Profiles sub-page, registered LAST: AceDBOptions' own table, drawn by
+-- settings/Profiles.lua — the Profiles sub-page, registered LAST: a copy of AceDBOptions' table, drawn by
 -- AceConfigDialog into the library's panel, under one line saying what a profile does not hold.
 
 local L = NS.L
