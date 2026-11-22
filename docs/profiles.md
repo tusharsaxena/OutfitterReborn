@@ -48,6 +48,6 @@ The callbacks are setup, not features: they stay live while the addon is disable
 
 ## The page
 
-`settings/Profiles.lua` registers the Profiles sub-page last: AceDBOptions' own table, drawn by
+`settings/Profiles.lua` registers the Profiles sub-page last: a copy of AceDBOptions' table, drawn by
 AceConfigDialog into the library's panel. It is the standard AceDB set: choose, create, copy, delete
 and reset.

@@ -224,7 +224,7 @@ both refuse in combat, and in test mode the radios are grayed.
 
 ## Profiles
 
-`settings/Profiles.lua`, page `profiles`, registered last: AceDBOptions' own table through
+`settings/Profiles.lua`, page `profiles`, registered last: a copy of AceDBOptions' table through
 AceConfigDialog, under one line saying that profiles hold settings only and that outfits belong to
 each character. See [profiles.md](profiles.md).
 

@@ -1,5 +1,5 @@
 local _, NS = ...
--- settings/Profiles.lua — the Profiles sub-page, registered LAST: AceDBOptions' own table, drawn by
+-- settings/Profiles.lua — the Profiles sub-page, registered LAST: a copy of AceDBOptions' table, drawn by
 -- AceConfigDialog into the library's panel, under one line saying what a profile does not hold.
 
 local L = NS.L
@@ -22,8 +22,13 @@ local function build(mainCategory)
     if not (AceDBOptions and AceConfig and AceConfigDialog and AceGUI) then return nil end
     if not (NS.db and NS.db.profile) then return nil end
 
-    local options = AceDBOptions:GetOptionsTable(NS.db)
-    options.args = options.args or {}
+    -- AceDBOptions hands every addon ONE args table, and puts it back on its cached options table at
+    -- every call, so the note goes on copies of both: written into theirs, it showed on every Ace
+    -- addon's Profiles page (owner report, 2026-11-22).
+    local options, args = {}, {}
+    for k, v in pairs(AceDBOptions:GetOptionsTable(NS.db)) do options[k] = v end
+    for k, v in pairs(options.args or {}) do args[k] = v end
+    options.args = args
     options.args.outfitsNote = { type = "description", name = NS.PROFILES_NOTE, order = 0, fontSize = "medium" }
     AceConfig:RegisterOptionsTable(APP, options)
     -- No Defaults button: a profile page has no defaults of its own to restore.

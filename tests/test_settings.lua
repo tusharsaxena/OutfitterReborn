@@ -300,6 +300,22 @@ test("settings: the Profiles page says outfits are per character, above AceDBOpt
         .. "by switching, copying or resetting a profile.")
 end)
 
+test("settings: the outfits note stays off AceDBOptions' shared table and every other addon's page", function()
+    local inst = T.load()
+    local M = inst.mocks
+    M.__subcategories["Profiles"]:__fire("OnShow")
+    local lib = M.LibStub("AceDBOptions-3.0")
+    local other = lib:GetOptionsTable({})
+    -- red under: the note written into the args table AceDBOptions hands every addon
+    assertNil(other.args.outfitsNote, "the note leaked onto another addon's Profiles page")
+    assertTrue(other.args.desc ~= nil, "the other addon keeps the library's own rows")
+    lib:GetOptionsTable(inst.NS.db)
+    local own = M.LibStub("AceConfig-3.0").__registered["OutfitterReborn-Profiles"]
+    -- red under: the library's cached table registered, whose args the next GetOptionsTable puts back
+    assertTrue(own.args.outfitsNote ~= nil, "this addon keeps its note")
+    assertTrue(own.args.desc ~= nil, "above the library's own rows")
+end)
+
 test("settings: library absent, the addon still loads and the reset still lands", function()
     local inst = T.load{ libFiles = {} }
     local NSi = inst.NS

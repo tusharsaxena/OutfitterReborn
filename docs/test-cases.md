@@ -257,7 +257,7 @@ Total.
 - schema: a trigger flag written on an outfit with no trigger leaves no trigger table (design §3.3)
 - schema: an outfit batch is all or nothing and forwards through NS.Schema.SetMany
 
-### test_settings.lua (16)
+### test_settings.lua (17)
 
 - settings: the parent category registers eagerly and every page body renders quietly
 - settings: the pages register General first, then Outfit Bar, Outfit Window, and Profiles last
@@ -274,6 +274,7 @@ Total.
 - settings: the H21 comment records why options are not split into LoadOnDemand
 - settings: the landing page has the logo, one row per verb and the credits line
 - settings: the Profiles page says outfits are per character, above AceDBOptions' controls
+- settings: the outfits note stays off AceDBOptions' shared table and every other addon's page
 - settings: library absent, the addon still loads and the reset still lands
 
 ### test_slash.lua (49)
@@ -1917,7 +1918,7 @@ Total.
 | test_surface_parity.lua | 31 |
 | test_perf_harness.lua | 19 |
 | test_schema.lua | 25 |
-| test_settings.lua | 16 |
+| test_settings.lua | 17 |
 | test_slash.lua | 49 |
 | test_launcher.lua | 13 |
 | test_keybinds.lua | 22 |
@@ -1988,4 +1989,4 @@ Total.
 | test_lizard_sighted.lua | 8 |
 | test_prose.lua | 15 |
 | Skipped | 1 |
-| **Total** | **1646** |
+| **Total** | **1647** |

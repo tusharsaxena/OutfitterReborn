@@ -243,9 +243,14 @@ local function build()
 
     -- The Profiles page's AceConfig trio (settings/Profiles.lua): the options table AceDBOptions
     -- builds, the registry it is handed to, and the dialog that draws it, each recorded.
+    -- As the real library does, every db's table points at ONE args table, shared by every addon.
+    local sharedArgs, optionTables = { desc = { type = "description", order = 1 } }, {}
     libs["AceDBOptions-3.0"] = {
         GetOptionsTable = function(_, db)
-            return { type = "group", name = "Profiles", args = { desc = { type = "description", order = 1 } }, __db = db }
+            local tbl = optionTables[db] or { type = "group", name = "Profiles", __db = db }
+            tbl.args = sharedArgs
+            optionTables[db] = tbl
+            return tbl
         end,
     }
     local registered = {}
