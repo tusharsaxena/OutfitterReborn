@@ -9,6 +9,7 @@ local _, NS = ...
 --                                C_SpecializationInfo first, then the deprecated globals
 --   Compat.ClientKey()  Compat.ForClient(clients)   the client helpers (clients-§5)
 --   Compat.UnitCharacterName(unit)  Compat.RegionalNames()   regional names (forever-quirks-§4)
+--   Compat.BankBagIDs()  Compat.IsBankerInteraction(type)    the bank (ContainerGroups, BankerKind)
 -- Hand-written ladders and reads (P3 C6):
 --   Compat.CanAccessTable(t)     canaccesstable, then issecrettable, then "readable"
 --   Compat.NumSpecializations()  the class's spec count, 0 when unknown
@@ -835,40 +836,24 @@ function Compat.SetCurrentTitle(id) return invokeBare(SetCurrentTitle, id) end
 -- The bank
 -- ---------------------------------------------------------------------------
 
--- A ceiling on one Enum series (BankBag_1 .. BankBag_n).
-local SERIES_LIMIT = 16
+-- LibKa0s-Compat-1.0's container groups and banker kinds (minor 6, LibKa0s#101), each with the stub
+-- arm. The library matches Enum.BagIndex member names by anchored pattern, per client by declaration:
+-- the character bank group is Bank, BankBag_N and CharacterBankTab_N on both clients, never the
+-- keyring (Forever's bags only, R5) and never an AccountBankTab_N (Retail's account group, R1). Without
+-- the library both stubs answer their no-answer value: no bank containers, and no banker.
 
--- Append index[prefix .. 1], index[prefix .. 2], ... to `out`, up to the first missing one.
-local function appendSeries(out, index, prefix)
-    for i = 1, SERIES_LIMIT do
-        local id = NS.Secrets.PlainNumber(index[prefix .. i])
-        if id == nil then return end
-        out[#out + 1] = id
-    end
-end
-
---- The character bank's container IDs: the bank tabs where the client has them (11.2 on), else the
---- bank container and its bags. The warband tabs are not scanned (INV §3.4, O19).
+--- The character bank's container IDs, sorted: LibKa0s-Compat ContainerGroups().bank. The warband
+--- tabs are not scanned (INV §3.4, O19), so the account group is never read. `{}` without the library.
 function Compat.BankBagIDs()
-    local index = type(Enum) == "table" and Enum.BagIndex
-    local out = {}
-    if type(index) ~= "table" then return out end
-    if index.CharacterBankTab_1 ~= nil then
-        appendSeries(out, index, "CharacterBankTab_")
-        return out
-    end
-    local bank = NS.Secrets.PlainNumber(index.Bank)
-    if bank then out[1] = bank end
-    appendSeries(out, index, "BankBag_")
-    return out
+    local groups = CompatLib and CompatLib.ContainerGroups and CompatLib.ContainerGroups()
+    return groups and groups.bank or {}
 end
 
---- Whether a PLAYER_INTERACTION_MANAGER_FRAME_SHOW/HIDE type is the character banker.
+--- Whether a PLAYER_INTERACTION_MANAGER_FRAME_SHOW/HIDE type is the character banker: LibKa0s-Compat
+--- BankerKind answering "character" (Banker or CharacterBanker). False without the library.
 function Compat.IsBankerInteraction(kind)
-    local types = type(Enum) == "table" and Enum.PlayerInteractionType
-    local plain = NS.Secrets.PlainNumber(kind)
-    if type(types) ~= "table" or plain == nil then return false end
-    return plain == types.Banker or (types.CharacterBanker ~= nil and plain == types.CharacterBanker)
+    local read = CompatLib and CompatLib.BankerKind
+    return read ~= nil and read(kind) == "character"
 end
 
 -- ---------------------------------------------------------------------------

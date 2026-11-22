@@ -718,10 +718,12 @@ test("compat: KnownTitles lists known titles by a plain case-insensitive sort, a
     end)
 end)
 
-test("compat: BankBagIDs reads the character bank tabs, else the bank and its bags", function()
+test("compat: BankBagIDs reads the character bank tabs and the bank and its bags, never a warband tab", function()
+    -- LibKa0s-Compat ContainerGroups().bank: every Bank / BankBag_N / CharacterBankTab_N member, sorted
+    -- (no client's enum carries both shapes; tests/test_inventory.lua pins the two real ones).
     with({ Enum = { BagIndex = { Bank = -1, CharacterBankTab_1 = 6, CharacterBankTab_2 = 7, AccountBankTab_1 = 12 } } },
         function()
-            assertEqual(table.concat(C.BankBagIDs(), ","), "6,7", "the warband tabs are not scanned (O19)")
+            assertEqual(table.concat(C.BankBagIDs(), ","), "-1,6,7", "the warband tabs are not scanned (O19)")
         end)
     with({ Enum = { BagIndex = { Bank = -1, BankBag_1 = 6, BankBag_2 = 7, BankBag_3 = 8 } } }, function()
         assertEqual(table.concat(C.BankBagIDs(), ","), "-1,6,7,8")

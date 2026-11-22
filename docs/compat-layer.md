@@ -7,7 +7,7 @@ publishing `NS.Compat`. The trigger counts its hand-written shims:
 cat core/Compat*.lua | grep -cE '^\s*function\s+[A-Za-z_][A-Za-z0-9_]*\.'
 ```
 
-which answers **74** (three or more fires the trigger). The members LibKa0s-Compat-1.0
+which answers **76** (three or more fires the trigger). The members LibKa0s-Compat-1.0
 supplies are documented by the library and are not repeated here beyond naming which ones this addon
 routes.
 
@@ -22,7 +22,7 @@ routes.
   scope, so Compat loads first, and a file-scope capture of `NS.Secrets` here would read nil
   (`test_loadorder` pins it).
 - **One file.** The family stays one file until `cat core/Compat*.lua | wc -l` would pass 1000
-  (compat; design C39). With the engine's accessors it is 956 lines as measured on 2026-11-06, close to that budget. A split by size alone,
+  (compat; design C39). With the engine's accessors it is 984 lines as measured on 2026-11-22, close to that budget. A split by size alone,
   or an underscore name such as `Compat_Items`, is outside the family pattern.
 
 ## Routed from LibKa0s-Compat-1.0
@@ -36,6 +36,8 @@ Each with a library-absent stub of the addon's own.
 | `Compat.IsSafeKey(v)` | Whether a value may index a table | The same two client detectors |
 | `Compat.GetSpecialization()` | The active spec index | `C_SpecializationInfo` first, then the deprecated global |
 | `Compat.GetSpecializationInfo(index)` | The spec's fields | The same ladder |
+| `Compat.BankBagIDs()` | The character bank's containers: `ContainerGroups().bank` (minor 6, LibKa0s#101), every `Bank`, `BankBag_N` and `CharacterBankTab_N` member by anchored name, sorted. Never the keyring (in Forever's bags group, which the addon does not read) and never a warband tab (the account group, O19) | `{}`: no bank container is scanned |
+| `Compat.IsBankerInteraction(type)` | Whether an interaction type is the character banker: `BankerKind(type) == "character"` (Banker or CharacterBanker; AccountBanker is `"account"`) | `false`: no banker opens the bank |
 
 The secret guards' stub is a deliberate duplication: "the library is missing" is not "the client has
 no secrets system", and a stub answering `IsSecret → false` on a 12.x client would send a secret into
@@ -75,7 +77,7 @@ and a raise reads as `nil` ("unknown"), which sends the caller to its tooltip fa
 | Pets and hooks | `SummonedPetGUID()`, `PetGUIDBySpecies(id)` (owned pets only; a secret GUID is never a handle), `SummonPet(guid)`, `HookPetSummon(fn)`, `HookCompare(fn)` | `nil` / `false` |
 | Equipment Manager | `EMSetIDs()` (bounded at 512, a secret id skipped), `EMSetInfo(id)`, `EMLocations(id)`, `EMIgnoredSlots(id)`, `EMLocation(location)` (alias `FlyoutLocationData`), `EMSetID(name)`, `EMNumSets()`, `EMMaxSets()`; writes `EMCreateSet`, `EMSaveSet`, `EMModifySet`, `EMDeleteSet`, `EMClearIgnored`, `EMIgnoreSlot(slotID, ignore)` | `{}` (the zero-sets path, Q8), `nil`, `0`, `10`, `false` |
 | Titles | `KnownTitles()` → `{ {id, name} }`, sorted case-insensitively, a secret name skipped; `SetCurrentTitle(id)` | `{}` / `false` |
-| Bank | `BankBagIDs()` (the character bank tabs, else the bank and its bags; never the warband tabs, O19), `IsBankerInteraction(type)` | `{}` / `false` |
+| Bank | `BankBagIDs()` and `IsBankerInteraction(type)`, routed from LibKa0s-Compat-1.0 (above) | `{}` / `false` |
 | Containers and cursor | `ContainerNumSlots`, `ContainerNumFreeSlots` → free, family; `ContainerIDToInventoryID`; `PickupContainerItem`, `PickupInventoryItem`, `PickupItemLocation(loc)`, `UseContainerItem`, `ShowContainerSellCursor`, `EquipCursorItem`, `ClearCursor` | `0` / `nil` / `false` |
 | Other | `PawnVisibleScales()`, `PawnItemValue(link, scale)`, `CanDualWield()`, `BitAnd(a, b)` (plain arithmetic, no `bit` library) | `{}` / `nil` / `false` / `0` |
 

@@ -113,7 +113,7 @@ has no row here, or a row leaves its §9.3 group or order.
 | `test_toc` | The TOC header: field order, Title, version, IconTexture, SavedVariables, the CurseForge project, no retired fields |
 | `test_loadorder` | The runner's load list is the TOC's; every path exists; the folder order; the `LOAD-BEARING` lines; no legacy file back |
 | `test_vendor_sync` | `libs/LibKa0s/` and `tests/_kit/` are exactly the tag root `CLAUDE.md` names, icons pruned to its declaration |
-| `test_surface_parity` | Every degrade stub carries the surface of what it stands in for; every leased major has its row; the degraded login resumes the whole graph and stands it down and up |
+| `test_surface_parity` | Every degrade stub carries the surface of what it stands in for; the bank readers' no-answer stubs; every leased major has its row; the degraded login resumes the whole graph and stands it down and up |
 | `test_disabled` | The disabled state is total: the kit's ten conformance steps on the real addon, and the Outfitter cases (an active trigger, the Equip bracket, the hook bodies, the Dock driver, the LoadPass timer, the rebuild) |
 | `test_secrets` | The secret-value seam: the conversions, the bounded walk, the guards on both arms, the Compat accessors, the seam scan, and the engine on the whole login (secret links as empty slots, a secret level, the tooltip/compare/quick-slot/iteminfo guards, the balanced Equip count) |
 | `test_secrets_states` | The states half of the secret-value seam: `PlayerIsFull`, the aura scan, the mana history |
@@ -153,7 +153,7 @@ has no row here, or a row leaves its §9.3 group or order.
 | `test_slots` | The slot tables, aliases and phantom ids against the legacy capture; the Horde lance swap |
 | `test_itemlink` | The link parse on full, short, signed, secret and nil links; the canonical bonus and modifier lists; the safe info lines |
 | `test_item_match` | Exact and partial matching against the legacy capture, claimed duplicates, aliases, the upgrade track, Azerite as a set, the cooldown-item rules |
-| `test_inventory` | The bag range with the bank closed and open, the debounce, the change payload, the sections, one item-info registration, per-pass claims |
+| `test_inventory` | The bag range with the bank closed and open, the bank containers and the banker per client (LibKa0s#101), the debounce, the change payload, the sections, one item-info registration, per-pass claims |
 | `test_outfits` | The record shape, categories, the LoadPass seeding, repair, rename, delete's order, the binding uniqueness, the slot tri-state |
 | `test_equip_plan` | The change list: durability order, two-hand and Titan's Grip, unique ranks against the legacy plans, the off-hand ordering, the swaps, an empty plan |
 | `test_equip_bracket` | The one Equip bracket: balanced on success and on a raise, its exact argument passing, no allocation and no held reference in the common case, the defers, the throttle, the muted SFX, the bags-full line, the `Diagnostic()` lines |
