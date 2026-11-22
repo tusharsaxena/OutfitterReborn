@@ -123,7 +123,7 @@ Total.
 - compat: the Equipment Manager reads walk bounded and answer plain
 - compat: the Equipment Manager writes reach the client with their arguments
 - compat: KnownTitles lists known titles by a plain case-insensitive sort, a secret name skipped
-- compat: BankBagIDs reads the character bank tabs, else the bank and its bags
+- compat: BankBagIDs reads the character bank tabs and the bank and its bags, never a warband tab
 - compat: pickups, uses and the cursor route by location and report the call
 - compat: Pawn scales and values, dual wield and BitAnd
 - secrets engine: a secret worn or carried link is an empty slot to the live scan
@@ -173,7 +173,7 @@ Total.
 - skin seam: the degraded HudFont draws the face, a picked flag and no shadow
 - skin seam: each host-copy skin token is the live library's Ka0s Default value
 
-### test_surface_parity.lua (30)
+### test_surface_parity.lua (31)
 
 - parity: the degraded load still initializes, enables and answers /or version
 - parity: the Options stub carries every public member of the live Helpers surface
@@ -190,6 +190,7 @@ Total.
 - parity: the IconBrowser seam's browser answers on both arms, the stub opening nothing
 - parity: the Env seam answers the TOC's version on both arms
 - parity: the Compat and Secrets seams carry the same surface on both arms
+- parity: the bank readers answer from LibKa0s-Compat live and their no-answer value without it
 - parity: the Pool stub carries every public member of the library
 - parity: both Pool arms recycle, park backward and key alike
 - parity: the Item lease carries the same two members on both arms
@@ -590,7 +591,7 @@ Total.
 - item match: SlotItemActive is false off cooldown and without a duration line
 - item match: HasUseEffect reads the item's spell
 
-### test_inventory.lua (24)
+### test_inventory.lua (26)
 
 - inventory: the bags are 0 through the reagent bag with the bank closed
 - inventory: with the bank open the character tabs join, and they make the bank-bag set
@@ -598,6 +599,8 @@ Total.
 - inventory: a banked item reads missing while the bank is closed, banked once it opens
 - inventory: Missing skips phantoms and empty markers, and hands EM outfits to NS.EM
 - inventory: the warband bank is not scanned (O19)
+- inventory: the bank set is each client's character tabs, never the keyring or a warband tab
+- inventory: the character banker opens the bank on both clients, the warband banker never
 - inventory: the cache holds equipped gear and bag gear, without BoEs or non-gear
 - inventory: the minimum-level check stays off (Q3)
 - inventory: bag events debounce into one 0.01 s sync
@@ -1911,7 +1914,7 @@ Total.
 | test_secrets.lua | 42 |
 | test_bus.lua | 12 |
 | test_skinsetup.lua | 22 |
-| test_surface_parity.lua | 30 |
+| test_surface_parity.lua | 31 |
 | test_perf_harness.lua | 19 |
 | test_schema.lua | 25 |
 | test_settings.lua | 16 |
@@ -1928,7 +1931,7 @@ Total.
 | test_zones.lua | 38 |
 | test_itemlink.lua | 42 |
 | test_item_match.lua | 20 |
-| test_inventory.lua | 24 |
+| test_inventory.lua | 26 |
 | test_outfits.lua | 45 |
 | test_reset.lua | 8 |
 | test_equip_plan.lua | 32 |
@@ -1985,4 +1988,4 @@ Total.
 | test_lizard_sighted.lua | 8 |
 | test_prose.lua | 15 |
 | Skipped | 1 |
-| **Total** | **1643** |
+| **Total** | **1646** |

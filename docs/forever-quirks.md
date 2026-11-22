@@ -197,4 +197,11 @@ Each needs an in-game probe, recorded with the build, or a second repo, before i
 
 ## OutfitterReborn-specific quirks
 
-None recorded yet. A Forever behavior this addon meets is written here, with its build.
+A Forever behavior this addon meets is written here, with its build.
+
+- **The bank's containers.** `Enum.BagIndex` names nine character tabs (`CharacterBankTab_1..9`, 6 to 14),
+  nine account tabs (15 to 23) and `Keyring` (-1). The addon's bank set is LibKa0s-Compat's
+  `ContainerGroups().bank` (from LibKa0s v1.110.0): the nine character tabs, never the keyring, which the
+  library puts in Forever's bags group, and never an account tab, because the library declares no account
+  bank on Forever. *Measured:* not probed in game; the enum is BagIndexConstantsDocumentation.lua for
+  build 70790, as the kit's Forever profile carries it. *Source:* LibKa0s#101.

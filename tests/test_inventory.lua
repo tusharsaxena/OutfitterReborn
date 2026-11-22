@@ -156,6 +156,72 @@ test("inventory: the warband bank is not scanned (O19)", function()
     assertEqual(#missing, 1, "a warbound-tab item reads missing, the documented gap")
 end)
 
+-- ── the bank's containers and banker, per client (LibKa0s#101) ────────────────────────────────
+--
+-- Characterization: pinned on the addon's own readers before the swap to LibKa0s-Compat's
+-- ContainerGroups().bank and BankerKind, and green after it. Each client's Enum.BagIndex is as
+-- BagIndexConstantsDocumentation.lua lists it (the kit's shapes, revision 60): Keyring -1 and the
+-- type constants -2 / -3 on both, then the character tabs, then the account tabs. Retail 12.1.5 has
+-- six and five, WoW Forever 1.60.1 nine and nine.
+
+local function bagIndex(character, account)
+    local e = { Accountbanktab = -3, Characterbanktab = -2, Keyring = -1,
+                Backpack = 0, Bag_1 = 1, Bag_2 = 2, Bag_3 = 3, Bag_4 = 4, ReagentBag = 5 }
+    for i = 1, character do e["CharacterBankTab_" .. i] = 5 + i end
+    for i = 1, account do e["AccountBankTab_" .. i] = 5 + character + i end
+    return e
+end
+
+local CLIENTS = {
+    retail  = { consts = { WOW_PROJECT_ID = 1, WOW_PROJECT_MAINLINE = 1, WOW_PROJECT_CAMELOT = false },
+                index = bagIndex(6, 5), bank = "6,7,8,9,10,11", warband = { 12, 16 } },
+    forever = { consts = { WOW_PROJECT_ID = 18, WOW_PROJECT_MAINLINE = 1, WOW_PROJECT_CAMELOT = 18 },
+                index = bagIndex(9, 9), bank = "6,7,8,9,10,11,12,13,14", warband = { 15, 23 } },
+}
+
+-- Point instance `inst` at client `client`: its project constants and an Enum carrying `enum`.
+local function asClient(inst, client, enum)
+    for k, v in pairs(client.consts) do inst.mocks[k] = v end
+    inst.mocks.Enum = enum
+end
+
+test("inventory: the bank set is each client's character tabs, never the keyring or a warband tab", function()
+    -- Neither client puts the keyring (-1), a type constant (-2, -3) or an account tab in the
+    -- character bank (R1, R5, R6, O19).
+    for name, client in pairs(CLIENTS) do
+        local inst = gearInstance("geared")
+        asClient(inst, client, { BagIndex = client.index })
+        local C, I = inst.NS.Compat, inst.NS.Inventory
+        assertEqual(table.concat(C.BankBagIDs(), ","), client.bank, name)
+        for _, bag in ipairs({ -3, -2, -1, 0, 5, client.warband[1], client.warband[2] }) do
+            assertFalse(contains(C.BankBagIDs(), bag), name .. ": " .. bag .. " is not a bank bag")
+        end
+        assertTrue(I.IsBankBag(6), name .. ": the first character tab is a bank bag")
+        assertFalse(I.IsBankBag(-1), name .. ": the keyring is not a bank bag")
+        inst.mocks.Enum = {}
+        assertEqual(#C.BankBagIDs(), 0, name .. ": no Enum.BagIndex, no bank")
+    end
+end)
+
+test("inventory: the character banker opens the bank on both clients, the warband banker never", function()
+    -- Banker and CharacterBanker open the character bank; AccountBanker (the warband bank, Retail
+    -- only, R1), any other type, nil and a non-number do not.
+    for name, client in pairs(CLIENTS) do
+        local inst = gearInstance("geared")
+        asClient(inst, client, { PlayerInteractionType = { None = 0, Merchant = 5, Banker = 8,
+                                                          CharacterBanker = 67, AccountBanker = 68 } })
+        local C = inst.NS.Compat
+        assertTrue(C.IsBankerInteraction(8), name .. ": Banker")
+        assertTrue(C.IsBankerInteraction(67), name .. ": CharacterBanker")
+        for _, kind in ipairs({ 68, 5, 0, "8" }) do
+            assertFalse(C.IsBankerInteraction(kind), name .. ": " .. tostring(kind))
+        end
+        assertFalse(C.IsBankerInteraction(nil), name .. ": nil")
+        inst.mocks.Enum = {}
+        assertFalse(C.IsBankerInteraction(8), name .. ": no enum, no banker")
+    end
+end)
+
 -- ── what the cache admits ─────────────────────────────────────────────────────────────────────
 
 test("inventory: the cache holds equipped gear and bag gear, without BoEs or non-gear", function()

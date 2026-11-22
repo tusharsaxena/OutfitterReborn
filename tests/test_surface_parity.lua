@@ -224,6 +224,16 @@ test("parity: the Compat and Secrets seams carry the same surface on both arms",
         { IsSecret = "function", Unsecret = "function", SafeNumber = "function" })
 end)
 
+test("parity: the bank readers answer from LibKa0s-Compat live and their no-answer value without it", function()
+    -- LibKa0s#101: Compat.BankBagIDs and IsBankerInteraction route through ContainerGroups().bank and
+    -- BankerKind; the library-absent stub scans no bank container and opens no bank.
+    local l, d = pair()
+    assertEqual(table.concat(l.NS.Compat.BankBagIDs(), ","), "6,7,8,9,10,11", "live: the character tabs")
+    assertTrue(l.NS.Compat.IsBankerInteraction(8), "live: the banker")
+    assertEqual(#d.NS.Compat.BankBagIDs(), 0, "stub: no bank containers")
+    assertFalse(d.NS.Compat.IsBankerInteraction(8), "stub: no banker")
+end)
+
 -- ── Pool ───────────────────────────────────────────────────────────────────────────────────────
 
 test("parity: the Pool stub carries every public member of the library", function()
