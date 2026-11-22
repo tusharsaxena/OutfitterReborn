@@ -1,0 +1,1 @@
+K101-OR-REV review record. Lenses: reviewer panel over K101-OR-01 (re-vendor v1.110.0) and K101-OR-02 (container groups + bank readiness from LibKa0s-Compat). Findings: none reported (0). Verdict: no defects to confirm; no fixes applied. Gate: Retail 1616/0/31 skip, Forever 1595/0/52 skip, luacheck 0/0.
