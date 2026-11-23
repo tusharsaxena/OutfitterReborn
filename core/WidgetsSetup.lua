@@ -363,18 +363,16 @@ local function hostMark(bar, icon, tip, onClick)
     return b
 end
 
---- The strip with no W.HeaderButtons: the same marks in the same order at the same offsets, and the
---- same answer, so a window reads one shape either way.
-local function hostStrip(bar, spec)
-    local H = NS.HEADER
+--- The degraded strip's answer shell and its own marks (settings, close): the waiver check, the
+--- companion (WidgetsHeader minor 2: no settings mark, no reason) and the opt-out.
+local function hostAnswer(bar, spec)
     local companion = spec.companion == true
-    if not companion and spec.settings == false
-        and (type(spec.settingsOptOut) ~= "string" or spec.settingsOptOut == "") then
-        error("NS.HeaderButtons: settings = false needs spec.settingsOptOut, the reason", 3)
+    local waived = not companion and spec.settings == false
+    if waived and (type(spec.settingsOptOut) ~= "string" or spec.settingsOptOut == "") then
+        error("NS.HeaderButtons: settings = false needs spec.settingsOptOut, the reason", 4)
     end
-    local hb = { extras = {}, order = {}, companion = companion or nil,
-        optOut = not companion and spec.settings == false and spec.settingsOptOut or nil }
-    if not companion and spec.settings ~= false then
+    local hb = { extras = {}, order = {}, companion = companion or nil, optOut = waived and spec.settingsOptOut or nil }
+    if not companion and not waived then
         hb.settings = hostMark(bar, "settings", spec.settingsTip or "Open settings", hostSettings(spec))
     end
     if spec.close ~= false then
@@ -382,6 +380,11 @@ local function hostStrip(bar, spec)
         local onClose = type(spec.close) == "function" and spec.close or function() win:Hide() end
         hb.close = spec.makeClose(bar, onClose)
     end
+    return hb
+end
+
+--- The marks outermost first: close, settings, then the extras from the last to the first.
+local function hostList(bar, spec, hb)
     local list = {}
     if hb.close then list[1] = { key = "close", btn = hb.close } end
     if hb.settings then list[#list + 1] = { key = "settings", btn = hb.settings } end
@@ -393,10 +396,19 @@ local function hostStrip(bar, spec)
         list[#list + 1] = { key = x.key, btn = b }
     end
     for i = #list, 1, -1 do hb.order[#hb.order + 1] = list[i].key end
+    return list
+end
+
+--- The strip with no W.HeaderButtons: the same marks in the same order at the same offsets, and the
+--- same answer, so a window reads one shape either way.
+local function hostStrip(bar, spec)
+    local H = NS.HEADER
+    local hb = hostAnswer(bar, spec)
+    local list = hostList(bar, spec, hb)
     hb.offsets, hb.right = {}, {}
-    local off = H.PAD
+    local off, point = H.PAD, spec.point or "RIGHT"
     for _, e in ipairs(list) do
-        if spec.place ~= false then e.btn:SetPoint(spec.point or "RIGHT", bar, spec.point or "RIGHT", -off, spec.y or 0) end
+        if spec.place ~= false then e.btn:SetPoint(point, bar, point, -off, spec.y or 0) end
         hb.offsets[e.key] = -off
         hb.right[#hb.right + 1] = { frame = e.btn, x = off }
         off = off + H.SIZE + H.GAP
