@@ -367,11 +367,14 @@ end
 --- same answer, so a window reads one shape either way.
 local function hostStrip(bar, spec)
     local H = NS.HEADER
-    if spec.settings == false and (type(spec.settingsOptOut) ~= "string" or spec.settingsOptOut == "") then
+    local companion = spec.companion == true
+    if not companion and spec.settings == false
+        and (type(spec.settingsOptOut) ~= "string" or spec.settingsOptOut == "") then
         error("NS.HeaderButtons: settings = false needs spec.settingsOptOut, the reason", 3)
     end
-    local hb = { extras = {}, order = {}, optOut = spec.settings == false and spec.settingsOptOut or nil }
-    if spec.settings ~= false then
+    local hb = { extras = {}, order = {}, companion = companion or nil,
+        optOut = not companion and spec.settings == false and spec.settingsOptOut or nil }
+    if not companion and spec.settings ~= false then
         hb.settings = hostMark(bar, "settings", spec.settingsTip or "Open settings", hostSettings(spec))
     end
     if spec.close ~= false then
@@ -403,18 +406,19 @@ local function hostStrip(bar, spec)
     return hb
 end
 
---- A window's title-bar marks (LibKa0s-Widgets-1.0's W.HeaderButtons, WidgetsHeader minor 1;
+--- A window's title-bar marks (LibKa0s-Widgets-1.0's W.HeaderButtons, WidgetsHeader minor 2;
 --- standalone-windows' *Title-bar controls*, AD-86-OR): right-aligned, left to right `spec.extras`,
 --- settings, close, each an 18 px mark 6 px from the corner and 6 apart, in `icon.tint` at rest and
 --- `text.link` under the pointer (the close `close.hot`), each with its tooltip. The owner is always
 --- this addon, so the marks wear its skin and the default settings click reaches the opener the
 --- launcher registered under its folder; the close is built through NS.MakeCloseButton (the one close
 --- wrapper, read at call time). `spec` is W.HeaderButtons' own: `close` (the click, or false),
+--- `companion` (true: a companion window, no settings mark and no reason, standalone-windows v2.119.0),
 --- `settings` (nil, a function, or false with `settingsOptOut`), `settingsTip`, `extras`, `point`,
 --- `y`, `place`, `frame`. Without the library the same strip is built by hand (hostStrip above).
 --- @param bar table the frame the marks are made on and, unless `place = false`, anchored to
 --- @param spec table
---- @return table hb { close, settings, extras, order, offsets, right, optOut }, also `(spec.frame or bar).headerButtons`
+--- @return table hb { close, settings, extras, order, offsets, right, optOut, companion }, also `(spec.frame or bar).headerButtons`
 function NS.HeaderButtons(bar, spec)
     local o = {}
     for k, v in pairs(spec) do o[k] = v end

@@ -15,7 +15,7 @@
 -- perf, sim, picker, icon browser) are the library's to pin. Every case builds its own instance through tests/skin_surfaces.lua.
 
 local T = _G.OUTFITTERREBORN_TEST
-local test, assertEqual, assertTrue, assertNil = T.test, T.assertEqual, T.assertTrue, T.assertNil
+local test, assertEqual, assertTrue, assertNil, assertError = T.test, T.assertEqual, T.assertTrue, T.assertNil, T.assertError
 
 local OWNER = "OutfitterReborn"
 
@@ -234,8 +234,10 @@ test("title bar: the outfit bar's settings mark opens the bar's settings page", 
     assertEqual(table.concat(opened, ","), "bar")
 end)
 
-test("title bar: every dialog's close is W.HeaderButtons', its settings mark opted out with a reason", function()
-    -- red under: modules/UIDialogs.lua's hand-placed close (no headerButtons, no recorded opt-out).
+test("title bar: every dialog is a companion: W.HeaderButtons' close alone, no settings mark, no waiver", function()
+    -- standalone-windows v2.119.0, *A companion window carries no settings mark*: each dialog opens
+    -- only from the outfit window, a row menu or the bar, and edits only that owner's outfit.
+    -- red under: the waiver path (settings = false with a settingsOptOut reason, FB-OR-01).
     local NS, M = live()
     local H = M.LibStub("LibKa0s-Widgets-1.0").HEADER
     for _, d in ipairs({ NS.OutfitDialog, NS.TriggerDialog, NS.RebuildDialog, NS.ProgressDialog }) do
@@ -243,20 +245,25 @@ test("title bar: every dialog's close is W.HeaderButtons', its settings mark opt
         local hb = f.headerButtons
         assertEqual(strip(hb), "close")
         assertTrue(hb.close == f.close, "the dialog keeps its close")
-        assertTrue(type(hb.optOut) == "string" and hb.optOut ~= "", "the opt-out names no reason")
+        assertNil(hb.settings, "a companion dialog carries a settings mark")
+        assertEqual(hb.companion, true, "the dialog is not recorded as a companion")
+        assertNil(hb.optOut, "a companion needs no waiver reason")
         assertEqual(hb.offsets.close, -H.PAD)
     end
 end)
 
-test("title bar: every dialog's opt-out reason holds for a draft, a confirm and a running search alike", function()
-    -- The progress dialog holds no draft (its hide cancels the optimize), so the recorded reason must
-    -- name what every dialog's hide does. red under: the "unsaved draft" wording (AD-86-OR review).
-    local NS = live()
-    for _, d in ipairs({ NS.OutfitDialog, NS.TriggerDialog, NS.RebuildDialog, NS.ProgressDialog }) do
-        local why = d.Frame().headerButtons.optOut
-        assertTrue(not why:find("draft", 1, true), "the reason speaks of a draft: " .. why)
-        assertTrue(why:find("discards or cancels", 1, true) ~= nil, "the reason does not say the hide discards or cancels")
-    end
+test("title bar: without the library a companion strip is the close alone, and needs no reason", function()
+    -- core/WidgetsSetup.lua's hostStrip mirrors WidgetsHeader minor 2's `companion`.
+    -- red under: hostStrip raising on settings ~= false without a reason, or building the gear.
+    local inst = T.load({ libFiles = {} })
+    local NS, DM = inst.NS, inst.mocks
+    local bar = DM.CreateFrame("Frame", nil, DM.UIParent)
+    local hb = NS.HeaderButtons(bar, { frame = bar, companion = true, close = function() end })
+    assertNil(hb.settings, "the degraded companion strip built a settings mark")
+    assertEqual(hb.companion, true)
+    assertNil(hb.optOut)
+    -- the waiver stays: settings = false still needs its reason
+    assertError(function() NS.HeaderButtons(bar, { frame = bar, settings = false }) end)
 end)
 
 test("title bar: the bar's lock mark carries its own tip, so every mark has a __tip", function()

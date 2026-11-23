@@ -630,3 +630,12 @@ skin's colors. Run each check under Ka0s Default first, then under one light-win
 | SD10 (owner U-7) | Hover the outfit tab on the character frame | *Toggle the Outfitter window* is in the skin's tooltip title color; the tab itself keeps the host sheet's look |
 | SD11 (owner U-22) | Give one outfit a glyph with no color (pick white in the icon browser) and another a glyph with a color; look at the window rows, the outfit bar and the Outfits broker's hover menu | The uncolored glyph draws in the skin's icon tint (soft gray under Ka0s Default, no longer pure white) and moves with a skin switch; the colored one keeps its color. In the broker menu both glyphs show whole (uncropped) in those tints; item icons there stay cropped |
 | SD12 (SD-RV-OR) | Settings, Outfit Bar, Frame tab | The Background block shows *Background color*, *Use class color* and *Use the skin's background*, and nothing else: no second *Use the skin's color* row |
+
+## 26. Owner feedback batch (LibKa0s v1.112.0, standard v2.119.0, FB-OR, 2026-11-24)
+
+Retail and Forever. The owner's findings of 2026-11-24 (Ka0sAddonsCommonTasks
+`docs/2026-11-24-FEEDBACK_BATCH/`). The Result column is the owner's to fill.
+
+| # | Do | See | Result |
+|---|---|---|---|
+| FB1 (FB-OR-01) | Open the outfit window and the outfit bar; then open New outfit, a trigger dialog, Rebuild and the optimize progress window | The outfit window reads settings · close and the bar lock · settings · close, each gear opening settings. Every dialog's title bar carries the close alone (no gear), 6 px from the top right | |

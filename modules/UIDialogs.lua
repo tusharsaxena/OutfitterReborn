@@ -24,12 +24,11 @@ local _, NS = ...
 -- (`S.EditBox`, padded), Label (`S.Text` in a role) and ErrorLine (the `of.dialog.error` token), so the
 -- five dialogs draw the same controls the same way.
 --
--- NO SETTINGS MARK (standalone-windows' *Title-bar controls*: an opt-out with its reason, which the
--- strip records as `settingsOptOut`; docs/ARCHITECTURE.md, Windows and dialogs). A dialog is
--- MODAL-tier: the settings panel would open under it, and hiding it first, as `hideOnSettings` does,
--- would discard or cancel what it holds (the outfit and trigger dialogs' draft, the rebuild's
--- unapplied stat choice, the progress dialog's running optimize), since every Hide does. Its strip
--- is the close alone, 6 px in from the top right.
+-- NO SETTINGS MARK (standalone-windows v2.119.0, *A companion window carries no settings mark*;
+-- docs/ARCHITECTURE.md, Windows and dialogs). Every dialog is a companion: it opens only from a
+-- control on the outfit window, a row menu or the bar, it edits only that owner's outfit or search,
+-- and it keeps no position of its own. So the strip is built with `companion = true`, which draws no
+-- gear and needs no waiver reason. Its strip is the close alone, 6 px in from the top right.
 --
 -- CALLS (at call time, no nil guard; design §12): NS.ProgressDialog.Install (Resume), NS.Window.Frame.
 
@@ -41,8 +40,6 @@ local STRATA = C.LAYERS.STRATA
 
 local frames = {}           -- every frame New built, in build order
 local TITLE_BAND = 26
--- Why a dialog's strip carries no settings mark (the header above, NO SETTINGS MARK).
-local SETTINGS_OPT_OUT = "a modal dialog: settings would open under it, and hiding it first discards or cancels what it holds"
 
 -- ── the controls ──────────────────────────────────────────────────────────────────────────────
 
@@ -163,7 +160,7 @@ local function chrome(f, spec)
     local hb = NS.HeaderButtons(f, {
         frame = f, point = "TOPRIGHT", y = -4,
         close = function() f:Hide() end,
-        settings = false, settingsOptOut = SETTINGS_OPT_OUT,
+        companion = true,
     })
     f.close = hb.close
     titleBand(f)

@@ -1712,8 +1712,8 @@ Total.
 - title bar: the outfit window's settings mark opens the settings panel, never while stood down
 - title bar: the outfit bar's marks read lock, settings, close on the band
 - title bar: the outfit bar's settings mark opens the bar's settings page
-- title bar: every dialog's close is W.HeaderButtons', its settings mark opted out with a reason
-- title bar: every dialog's opt-out reason holds for a draft, a confirm and a running search alike
+- title bar: every dialog is a companion: W.HeaderButtons' close alone, no settings mark, no waiver
+- title bar: without the library a companion strip is the close alone, and needs no reason
 - title bar: the bar's lock mark carries its own tip, so every mark has a __tip
 - title bar: without the library the bar's degraded strip matches the library's order and offsets
 
