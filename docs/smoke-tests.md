@@ -639,3 +639,4 @@ Retail and Forever. The owner's findings of 2026-11-24 (Ka0sAddonsCommonTasks
 | # | Do | See | Result |
 |---|---|---|---|
 | FB1 (FB-OR-01) | Open the outfit window and the outfit bar; then open New outfit, a trigger dialog, Rebuild and the optimize progress window | The outfit window reads settings · close and the bar lock · settings · close, each gear opening settings. Every dialog's title bar carries the close alone (no gear), 6 px from the top right | |
+| FB2 (FB-OR-02, owner O1) | Retail with Chonky (or Forever with tabs down the sheet's right edge): open the character sheet and the outfit window docked beside it, with the side tabs over the window's left edge | The hairline above *New outfit* runs the window's whole width, edge to edge; *New outfit* has not moved (it still starts just right of the tabs); the list and title still start right of the tabs | |

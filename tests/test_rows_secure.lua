@@ -628,11 +628,32 @@ test("window: with no library footer, New outfit and the Slots trio sit on a bar
     assertTrue(has(M.OutfitterRebornSlotsNone, "RIGHT", foot), "None is not on the bare footer")
     assertTrue(has(M.OutfitterRebornSlotsAll, "RIGHT", M.OutfitterRebornSlotsNone), "All is not beside None")
     assertEqual(M.OutfitterRebornNewOutfitButton.text:GetText(), NS.L["New outfit"])
-    -- Win.SetLeftInset re-anchors the bare frame as it does the library's (S5).
+    -- Win.SetLeftInset keeps the bare frame on the whole edge, as the library's, and moves New outfit
+    -- alone (S5, FB-OR-02).
     NS.Window.SetLeftInset(53)
-    local fp = foot.__pts[#foot.__pts]
-    -- red under: a SetLeftInset that moves only a library footer
-    assertTrue(fp[1] == "BOTTOMLEFT" and fp[2] == w and fp[4] == 53 - 8, "the bare footer's left edge is not re-anchored")
+    local fp
+    for _, q in ipairs(foot.__pts) do if q[1] == "BOTTOMLEFT" then fp = q end end
+    assertTrue(fp ~= nil and fp[2] == w and fp[4] == 0, "the bare footer left the window's edge")
+    local np = M.OutfitterRebornNewOutfitButton.__pts
+    assertEqual(np[#np][4], 53, "New outfit does not start at the inset")
     NS.Window.SetLeftInset(0)
-    assertEqual(foot.__pts[#foot.__pts][4], 0)
+    assertEqual(np[#np][4], 8)
+end)
+
+test("window: under a side strip the footer's hairline spans the whole window; New outfit stays at the inset (FB-OR-02)", function()
+    -- The owner's O1 (2026-11-24, images 35/36): with Chonky's tabs to the right of the sheet the
+    -- window widens and its contents move right, but the separator above New outfit started at the
+    -- moved edge. red under: Win.SetLeftInset re-anchoring the footer's BOTTOMLEFT by the shift.
+    local NS, M = opened()
+    local w = M.OutfitterRebornWindow
+    local foot, new = w.footer, M.OutfitterRebornNewOutfitButton
+    NS.Window.SetLeftInset(53)
+    for _, p in ipairs(foot.__pts) do
+        if p[1] == "BOTTOMLEFT" then assertEqual(p[4], 0, "the footer moved off the window's left edge") end
+    end
+    local np = new.__pts[#new.__pts]
+    assertTrue(np[1] == "LEFT" and np[2] == foot, "New outfit is not on the footer")
+    assertEqual(np[4], 53, "New outfit is not where it stood (the list's pad plus the shift)")
+    NS.Window.SetLeftInset(0)
+    assertEqual(new.__pts[#new.__pts][4], 8, "New outfit does not return to its pad")
 end)

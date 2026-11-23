@@ -156,7 +156,8 @@ function Win.Size() return Win.WIDTH + shiftOf(Win.inset), Win.HEIGHT + (Win.pus
 
 --- Widen the window by `px` on its left and move its contents right by as much (Forever smoke
 --- feedback S5): a side-tab strip that hangs over the docked window's left edge then lies over an
---- empty band of the window's own background, and the window is extended, never moved. The dock
+--- empty band of the window's own background, and the window is extended, never moved. The footer
+--- is the exception: it spans the widened window, and only New outfit on it moves (FB-OR-02). The dock
 --- passes the strip's reach (NS.Sheet.StripInset) on every placing and 0 standing alone. Out of
 --- lockdown only (the list holds secure children); a no-op when the inset is unchanged.
 --- @param px number
@@ -171,7 +172,9 @@ function Win.SetLeftInset(px)
     frame.divider:SetPoint("TOPLEFT", frame, "TOPLEFT", 1 + shift, -26)
     frame.titleBar:SetPoint("TOPLEFT", frame, "TOPLEFT", 1 + shift, 0)
     list:SetPoint("TOPLEFT", frame, "TOPLEFT", LEFT_PAD + shift, LIST_TOP - (Win.push or 0))
-    frame.footer:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", shift, 0)
+    -- The footer keeps the window's whole width, so its hairline runs edge to edge below the strip's
+    -- reach; New outfit alone moves by the shift and so stays where it stood (owner O1, FB-OR-02).
+    newButton:SetPoint("LEFT", frame.footer, "LEFT", LEFT_PAD + shift, 0)
 end
 
 --- Dress the window for test mode or take it off: the strip, the list's push, the height, New outfit

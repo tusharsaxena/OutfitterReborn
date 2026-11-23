@@ -144,13 +144,15 @@ test("dock (Forever): a strip down the sheet's edge widens the window and moves 
     local lp = list.__pts[#list.__pts]
     -- red under: the 2026-11-09 band (4 px margin plus the list's 8 px padding past the tabs, R2-2).
     assertEqual(lp[4], inset, "the rows start flush with the strip's edge")
-    -- AD-89-OR: the footer (W.Footer) moves right by the shift, its hairline flush with the title
-    -- divider, and New outfit keeps its 8 px padding inside it, so it still starts at the inset. This
-    -- pinned New outfit's own x against the window before; it now pins the footer's shift plus the pad.
+    -- FB-OR-02 (owner O1, 2026-11-24): the footer (W.Footer) keeps the window's whole width, so its
+    -- hairline runs edge to edge under the strip's reach, and New outfit alone moves by the shift: it
+    -- still starts at the inset, where it stood before. red under: the footer re-anchored by the shift.
     local new, foot = M.OutfitterRebornNewOutfitButton, win.footer
-    local fp = foot.__pts[#foot.__pts]
-    assertTrue(fp[1] == "BOTTOMLEFT" and fp[2] == win, "the footer's left edge is not re-anchored")
-    assertEqual(fp[4] + new.__pts[#new.__pts][4], inset, "so does the footer")
+    local fp
+    for _, q in ipairs(foot.__pts) do if q[1] == "BOTTOMLEFT" then fp = q end end
+    assertTrue(fp ~= nil and fp[2] == win, "the footer's left edge is not on the window")
+    assertEqual(fp[4], 0, "the footer's hairline does not span the window")
+    assertEqual(new.__pts[#new.__pts][4], inset, "New outfit moved from the inset")
     local tb = win.titleBar.__pts[#win.titleBar.__pts]
     assertTrue(tb[1] == "TOPLEFT" and tb[4] == 1 + inset - 8, "the title bar (the strip's dock) moves with the divider")
     -- The strip moves clear (a Chonky side panel opens): the follow narrows the window again.
