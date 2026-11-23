@@ -1617,13 +1617,14 @@ Total.
 - bar menu: a bar menu already dismissed is forgotten, so a later menu is not taken for it
 - bar menu: NS.CloseMenuFrom closes only what its owner claims, and answers whether it closed
 
-### test_dialogs.lua (24)
+### test_dialogs.lua (25)
 
 - dialogs: NS.Dialogs builds a MODAL, toplevel, clamped, Escape-closed frame that saves its place
 - dialogs: CloseAll closes every open dialog and its draft writes nothing
 - new outfit: Current items is the default, and the outfit is worn at once
 - new outfit: Empty makes an outfit with no items
 - new outfit: Best for <stat> builds from the optimizer and keeps the stat; an unknown stat refuses
+- new outfit: a disabled Done looks like a disabled button under every skin, enabled it is the primary (FB-OR-03)
 - new outfit: a used name is refused with the error line, and Done waits for a name
 - new outfit: a trigger fills an empty or auto-filled name, and one with params opens its settings
 - rename: the name field only, 140 px shorter, and Done renames
@@ -1974,7 +1975,7 @@ Total.
 | test_window_settings.lua | 12 |
 | test_flyout_tint.lua | 12 |
 | test_outfit_menu.lua | 35 |
-| test_dialogs.lua | 24 |
+| test_dialogs.lua | 25 |
 | test_trigger_dialog.lua | 11 |
 | test_diagnostics.lua | 12 |
 | test_credits.lua | 8 |
@@ -1990,4 +1991,4 @@ Total.
 | test_lizard_sighted.lua | 8 |
 | test_prose.lua | 15 |
 | Skipped | 1 |
-| **Total** | **1648** |
+| **Total** | **1649** |
