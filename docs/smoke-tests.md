@@ -648,12 +648,14 @@ Retail and Forever. The owner's findings of 2026-11-24 (Ka0sAddonsCommonTasks
 
 Retail and Forever. Round 2 of the owner's feedback batch (Ka0sAddonsCommonTasks
 `docs/2026-11-24-FEEDBACK_BATCH/R2_SMOKE_FEEDBACK.md`, decision D3): a menu's current entry is drawn in
-the menu's selected color, apart from the other rows in every skin (Ka0s Default's gold where a skin's
-own selected color sits too near its text, as Azeroth's does). The Result column is the owner's to fill.
+the menu's selected color, apart from the other rows in every skin. By the owner's ruling of 2026-11-24 on
+round 2 that color is Ka0s Default's gold in every skin, on Forever the default WoW Forever skin included
+(no longer its tan accent); a skin's own selected color stands in only where the gold sits too near its
+text, which no shipped skin does. The Result column is the owner's to fill.
 
 | # | Do | See | Result |
 |---|---|---|---|
-| MS1 (FB2-OR-01) | Under Ka0s Default, then Azeroth, then Slate: right-click an Accessory outfit with a trigger; tick *Turn trigger off* and *Ignore in comparison tooltips*; open *Key binding*, *Title* and *Automation* | Every ticked row, a toggle or a choice, has its tick in the column at the left and its text in the selected color (gold under Ka0s Default and Azeroth); unticked rows keep the plain text color. A ticked toggle shows one tick, not two, and its label lines up with the choice rows' | |
-| MS2 (FB2-OR-01) | Wear an accessory outfit; hover the Outfits broker on a display (Titan Panel, ChocolateBar or similar) under Ka0s Default and Azeroth; turn *Automatic changes* on | The worn outfit's row and *Automatic changes* carry the tick in the column and their text in the selected color; each outfit row still shows its own icon, and an outfit not worn reads plain | |
-| MS3 (FB2-OR-01) | Under Azeroth, open New outfit and drop both of its *Automation:* pickers (the category, then the trigger); then the Rebuild dialog's stat picker | The row of the current value is gold, apart from the parchment text of the other rows; under Ka0s Default it is gold as before | |
+| MS1 (FB2-OR-01) | Under Ka0s Default, then Azeroth, then Slate (on Forever, also WoW Forever): right-click an Accessory outfit with a trigger; tick *Turn trigger off* and *Ignore in comparison tooltips*; open *Key binding*, *Title* and *Automation* | Every ticked row, a toggle or a choice, has its tick in the column at the left and its text in gold, in every skin (Slate and WoW Forever included, not their accent); unticked rows keep the plain text color. A ticked toggle shows one tick, not two, and its label lines up with the choice rows' | |
+| MS2 (FB2-OR-01) | Wear an accessory outfit; hover the Outfits broker on a display (Titan Panel, ChocolateBar or similar) under Ka0s Default, Azeroth and Slate (on Forever, also WoW Forever); turn *Automatic changes* on | The worn outfit's row and *Automatic changes* carry the tick in the column and their text in gold, in every skin; each outfit row still shows its own icon, and an outfit not worn reads plain | |
+| MS3 (FB2-OR-01) | Under Azeroth, then Slate (on Forever, also WoW Forever), open New outfit and drop both of its *Automation:* pickers (the category, then the trigger); then the Rebuild dialog's stat picker | The row of the current value is gold in every skin, apart from the other rows' text (Azeroth's parchment, Slate's and WoW Forever's own), never the skin's accent; under Ka0s Default it is gold as before | |
 | MS4 (FB2-OR-REV) | Under Ka0s Default: put one item of an accessory outfit in the bank and wear the outfit anyway (its row in the window reads in the banked color); bank an item of a second outfit too, not worn; hover the Outfits broker | The worn outfit's row is in the selected color (gold), not the banked color, with its tick in the column; the second outfit, not worn, keeps the banked color. Take the first off: its row goes back to the banked color | |

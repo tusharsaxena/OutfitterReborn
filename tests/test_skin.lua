@@ -470,6 +470,9 @@ end)
 -- menu's selected color, apart from every other entry in every skin, a value color (class, quality)
 -- on that row replaced, and a mark alone is not enough. The library's W.Dropdown and W.ContextMenu do
 -- it from LibKa0s v1.113.0 (WidgetsDropdown minor 4); W.SelectedColor(owner) answers that color.
+-- The owner's ruling of 2026-11-24 on round 2 (FB2-LK-04): that color is Ka0s Default's gold in
+-- every skin, WoW Forever's (the default skin on Forever) included; a skin's own `menu.textSel` only
+-- stands in where the gold sits under 20 CIEDE2000 off its `menu.text`, which no shipped skin does.
 -- The dialogs' pickers are NS.MakeDropdown (W.Dropdown); the outfit menu, the Outfits broker's hover
 -- menu and the window's menus go through NS.OpenMenu (W.ContextMenu). A CreateCheckbox (a toggle:
 -- "Automatic changes", "Turn trigger off", a worn outfit in the broker) drew its tick inline in the
@@ -489,6 +492,7 @@ local function rgbOf(c) return c and ("%.3f,%.3f,%.3f"):format(c[1], c[2], c[3])
 local function painted(M, b) return rgbOf(M.__paint(b.fs).textColor) end
 local function selColor(W) local r, g, b = W.SelectedColor(OWNER); return rgbOf({ r, g, b }) end
 local function token(Skin, name) return rgbOf({ Skin:Color(OWNER, name) }) end
+local GOLD = rgbOf({ 1, 0.82, 0 })
 
 local function skinKeys(Skin)
     local out = {}
@@ -521,6 +525,7 @@ test("skin: a ticked toggle and a ticked radio paint the selected color, apart f
         local ok, m = NS.OpenMenu(M.UIParent, fill)
         assertTrue(ok and type(m) == "table" and m.buttons ~= nil, key .. ": the library's menu did not open")
         local sel, plain = selColor(W), token(Skin, "menu.text")
+        assertEqual(sel, GOLD, key .. ": the selected color is not Ka0s Default's gold")
         assertTrue(sel ~= plain, key .. ": the selected color is the plain text's")
         assertEqual(painted(M, rowOf(m, "Radio on")), sel, key .. ": the ticked radio")
         assertEqual(painted(M, rowOf(m, "Toggle on")), sel, key .. ": the ticked toggle")
@@ -537,7 +542,8 @@ end)
 
 test("skin: a picker's selected value paints the selected color, not its value color", function()
     -- The dialogs' pickers are the library's W.Dropdown (NS.MakeDropdown). red under: LibKa0s
-    -- v1.112.0's WidgetsDropdown (minor 3), whose Azeroth selection sat 16.3 ΔE00 off its plain rows.
+    -- v1.112.0's WidgetsDropdown (minor 3), whose Azeroth selection sat 16.3 ΔE00 off its plain rows,
+    -- and under v1.113.0's first cut, which kept a skin's accent (WoW Forever's tan) over the gold.
     local NS, M, Skin, W = menuLive()
     local VALUE = { 0.25, 0.78, 0.92 }
     -- The library's one popup, which a dropdown drops too (WidgetsDropdown's EnsureMenu).
@@ -553,6 +559,7 @@ test("skin: a picker's selected value paints the selected color, not its value c
         dd:__fire("OnClick")
         assertTrue(menu ~= nil and menu.buttons ~= nil, key .. ": the dropdown's menu did not open")
         local sel, plain = selColor(W), token(Skin, "menu.text")
+        assertEqual(sel, GOLD, key .. ": the selected color is not Ka0s Default's gold")
         assertEqual(painted(M, rowOf(menu, "Picked")), sel, key .. ": the selected row")
         assertTrue(sel ~= plain, key .. ": the selected row reads like a plain row")
         assertTrue(sel ~= rgbOf(VALUE), key .. ": the selected row keeps its value color")
