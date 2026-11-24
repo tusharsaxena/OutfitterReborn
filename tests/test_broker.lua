@@ -49,11 +49,34 @@ local function find(rows, text)
     return nil
 end
 
--- A checked row: the menu's tick in front of the row's own icon, so two inline textures.
+-- A checked row: the library's tick column, read from the row's `selected` predicate (FB2-OR-01;
+-- the label keeps its own icon and no inline tick, and the library paints it in the selected color).
 local function ticked(row)
     local _, n = row.label:gsub("|T", "")
-    return n >= 2
+    assertTrue(n == 1, "a row draws an inline tick beside its icon: " .. row.label)
+    return type(row.selected) == "function" and row.selected(row) == true
 end
+
+-- FB2-OR-REV (skinning-§4, *A selected entry reads apart*; decision D3): the worn outfit's name wears
+-- no status color of its own, because an inline escape outranks the library's selected color and the
+-- ticked row would read as a missing or banked one, not as the selection. A row not worn keeps it.
+test("broker: a worn outfit's row drops its status color, so the selected color shows", function()
+    local NS, M, ctl = scene()
+    local ids = outfits(NS)
+    local status = NS.Outfits.Status
+    NS.Outfits.Status = function(id)
+        if id == ids.ride or id == ids.cloak then return "missing" end
+        return status(id)
+    end
+    NS.Stack.Wear(ids.ride, { hw = true })
+    M.__fireTimers()
+    local rows = open(M, ctl)
+    local ride, cloak = find(rows, "Ride"), find(rows, "Cloak")
+    assertTrue(ticked(ride), "the worn outfit is not checked")
+    -- red under: outfitLabel wrapping every name in its status escape, the worn one included.
+    assertNil(ride.label:find("|c", 1, true), "the worn row carries an inline color: " .. ride.label)
+    assertTrue(cloak.label:find(NS.SkinEscape("of.outfit.missing") .. "Cloak", 1, true) ~= nil, cloak.label)
+end)
 
 test("broker: a data source named OutfitterRebornOutfits exists and is not on the minimap", function()
     local NS, M = scene()
@@ -109,7 +132,7 @@ test("broker: the hover menu lists categories then outfits, worn ones checked, m
     local rows = open(M, ctl)
     local order = {}
     for _, r in ipairs(rows) do order[#order + 1] = r.divider and "-" or plain(r.label) end
-    -- The checkbox rows carry the tick in front of a worn one, so the order is read without it.
+    -- The plain labels, read without the rows' icons and color escapes.
     assertEqual(table.concat(order, "|"), NS.BRAND .. "|Open outfit window|Automatic changes|"
         .. "Complete outfits|Bare|Accessories|Cloak|Ride|Left-click: outfit window|Right-click: settings")
     assertTrue(rows[1].title, "the brand is a title")

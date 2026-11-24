@@ -64,7 +64,7 @@ Total.
 - database: the outfit root refuses a nil id, an unknown id and any other first segment
 - database: db.char starts in the §3.1 shape, and the outfit store's writes land in it
 
-### test_packaging.lua (15)
+### test_packaging.lua (17)
 
 - packaging: the package folder is the TOC basename and the addon's folder name
 - packaging: every maintainer file and folder is ignored
@@ -81,6 +81,8 @@ Total.
 - packaging: docs/testing.md maps the retired harness's 144 cases, suite by suite (design §9.4)
 - packaging: docs/module-map.md's Not shipped table names every helper in tests/ and tools/ (P4.32)
 - packaging: the README badge and docs/test-cases.md agree, a Totals row per live suite (testing-§5)
+- packaging: the sample-name matcher sees the convention's names and nothing else (mutation self-test)
+- packaging: no named sample person is typed outside tests/ (LibKa0s#104, preview-mode)
 
 ### test_vendor_sync.lua (3)
 
@@ -1314,7 +1316,7 @@ Total.
 - list model: Status caches O.Status in the table it is handed, until that is wiped
 - list model: in test mode the list is the sample outfits under their headers, no item section
 
-### test_rows_secure.lua (28)
+### test_rows_secure.lua (29)
 
 - rows: NS.WindowRows is published with the secure surface
 - rows: fourteen rows and their secure children are created once, each SetAllPoints'd at birth
@@ -1344,6 +1346,7 @@ Total.
 - window: the footer's three buttons share the plain look; All and None dim their label (R2-3, R2-4)
 - window: the footer is the library's W.Footer, its buttons on it and the list above it (AD-89-OR)
 - window: with no library footer, New outfit and the Slots trio sit on a bare 24 px frame on the bottom edge
+- window: under a side strip the footer's hairline spans the whole window; New outfit stays at the inset (FB-OR-02)
 
 ### test_slot_enables.lua (29)
 
@@ -1462,8 +1465,9 @@ Total.
 - icons: a pruned mirror on the set id another mirror moved to does not take that mirror's glyph
 - icons: deleting a mirror leaves an override another outfit's set id still owns
 
-### test_broker.lua (17)
+### test_broker.lua (18)
 
+- broker: a worn outfit's row drops its status color, so the selected color shows
 - broker: a data source named OutfitterRebornOutfits exists and is not on the minimap
 - broker: text and icon follow the worn outfit
 - broker: no outfit shows the brand and the default icon, untinted and cropped
@@ -1616,13 +1620,14 @@ Total.
 - bar menu: a bar menu already dismissed is forgotten, so a later menu is not taken for it
 - bar menu: NS.CloseMenuFrom closes only what its owner claims, and answers whether it closed
 
-### test_dialogs.lua (24)
+### test_dialogs.lua (25)
 
 - dialogs: NS.Dialogs builds a MODAL, toplevel, clamped, Escape-closed frame that saves its place
 - dialogs: CloseAll closes every open dialog and its draft writes nothing
 - new outfit: Current items is the default, and the outfit is worn at once
 - new outfit: Empty makes an outfit with no items
 - new outfit: Best for <stat> builds from the optimizer and keeps the stat; an unknown stat refuses
+- new outfit: a disabled Done looks like a disabled button under every skin, enabled it is the primary (FB-OR-03)
 - new outfit: a used name is refused with the error line, and Done waits for a name
 - new outfit: a trigger fills an empty or auto-filled name, and one with params opens its settings
 - rename: the name field only, 140 px shorter, and Done renames
@@ -1683,7 +1688,7 @@ Total.
 - credits: the README credits exactly the icon sets this build ships
 - credits: LICENSE keeps John Stephen's copyright with the Ka0s line directly under it
 
-### test_skin.lua (16)
+### test_skin.lua (18)
 
 - skin: every owner token a source file names is registered
 - skin: every skin primitive a source file calls is in the library's VOCAB
@@ -1701,6 +1706,8 @@ Total.
 - skin: a switch marks the window, and its next tick recolors an item row's name
 - skin: a dialog's push-button and check labels, the progress track and an item row's face wear the skin
 - skin: the lines this addon writes on a client tooltip read gtip.title and gtip.body
+- skin: a ticked toggle and a ticked radio paint the selected color, apart from plain rows
+- skin: a picker's selected value paints the selected color, not its value color
 
 ### test_titlebar.lua (12)
 
@@ -1712,8 +1719,8 @@ Total.
 - title bar: the outfit window's settings mark opens the settings panel, never while stood down
 - title bar: the outfit bar's marks read lock, settings, close on the band
 - title bar: the outfit bar's settings mark opens the bar's settings page
-- title bar: every dialog's close is W.HeaderButtons', its settings mark opted out with a reason
-- title bar: every dialog's opt-out reason holds for a draft, a confirm and a running search alike
+- title bar: every dialog is a companion: W.HeaderButtons' close alone, no settings mark, no waiver
+- title bar: without the library a companion strip is the close alone, and needs no reason
 - title bar: the bar's lock mark carries its own tip, so every mark has a __tip
 - title bar: without the library the bar's degraded strip matches the library's order and offsets
 
@@ -1910,7 +1917,7 @@ Total.
 | test_toc.lua | 5 |
 | test_loadorder.lua | 13 |
 | test_database.lua | 11 |
-| test_packaging.lua | 15 |
+| test_packaging.lua | 17 |
 | test_vendor_sync.lua | 3 |
 | test_secrets.lua | 42 |
 | test_bus.lua | 12 |
@@ -1961,23 +1968,23 @@ Total.
 | test_dock.lua | 51 |
 | test_dock_forever.lua | 9 |
 | test_list_model.lua | 8 |
-| test_rows_secure.lua | 28 |
+| test_rows_secure.lua | 29 |
 | test_slot_enables.lua | 29 |
 | test_bar.lua | 46 |
 | test_bar_look.lua | 13 |
 | test_outfit_icons.lua | 17 |
-| test_broker.lua | 17 |
+| test_broker.lua | 18 |
 | test_triggers_parity.lua | 13 |
 | test_preview.lua | 36 |
 | test_preview_place.lua | 8 |
 | test_window_settings.lua | 12 |
 | test_flyout_tint.lua | 12 |
 | test_outfit_menu.lua | 35 |
-| test_dialogs.lua | 24 |
+| test_dialogs.lua | 25 |
 | test_trigger_dialog.lua | 11 |
 | test_diagnostics.lua | 12 |
 | test_credits.lua | 8 |
-| test_skin.lua | 16 |
+| test_skin.lua | 18 |
 | test_titlebar.lua | 12 |
 | test_tooltip_place.lua | 14 |
 | test_skin_values.lua | 3 |
@@ -1989,4 +1996,4 @@ Total.
 | test_lizard_sighted.lua | 8 |
 | test_prose.lua | 15 |
 | Skipped | 1 |
-| **Total** | **1647** |
+| **Total** | **1654** |

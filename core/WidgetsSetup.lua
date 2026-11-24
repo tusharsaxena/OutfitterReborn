@@ -111,22 +111,17 @@ local function tooltipText(item)
     return text
 end
 
--- A row's label: a toggle's carries its tick when selected; a radio's tick is the library's column.
-local function rowLabel(item)
-    if item.isSelected and not item.radio and item.isSelected(item.data) then
-        return NS.Skin.MarkText(NS.Icon("confirm"), 0) .. " " .. item.label
-    end
-    return item.label
-end
-
 --- Write a recorded item's state onto its W.ContextMenu row: label, disabled state, tooltip, and a
---- radio's tick predicate. The library reads these on every paint.
+--- toggle's or radio's tick predicate. The library reads these on every paint. Both kinds hand the
+--- library `selected`, so it draws the tick in its column and the ticked label in the menu's selected
+--- color (WidgetsDropdown minor 4): a toggle's tick drawn inline beside plain text was a mark alone,
+--- which skinning-§4 rules out (*A selected entry reads apart*, FB2-OR-01).
 local function paintRow(out, item)
-    out.label = rowLabel(item)
+    out.label = item.label
     if item.title then return end
     out.disabled = item.enabled == false or nil
     out.tooltip = tooltipText(item)
-    if item.radio then out.selected = function() return item.isSelected(item.data) and true or false end end
+    if item.isSelected then out.selected = function() return item.isSelected(item.data) and true or false end end
 end
 
 --- After a keep-open pick: the fill written again (`level`, the fresh root) onto the open rows, so
@@ -363,15 +358,16 @@ local function hostMark(bar, icon, tip, onClick)
     return b
 end
 
---- The strip with no W.HeaderButtons: the same marks in the same order at the same offsets, and the
---- same answer, so a window reads one shape either way.
-local function hostStrip(bar, spec)
-    local H = NS.HEADER
-    if spec.settings == false and (type(spec.settingsOptOut) ~= "string" or spec.settingsOptOut == "") then
-        error("NS.HeaderButtons: settings = false needs spec.settingsOptOut, the reason", 3)
+--- The degraded strip's answer shell and its own marks (settings, close): the waiver check, the
+--- companion (WidgetsHeader minor 2: no settings mark, no reason) and the opt-out.
+local function hostAnswer(bar, spec)
+    local companion = spec.companion == true
+    local waived = not companion and spec.settings == false
+    if waived and (type(spec.settingsOptOut) ~= "string" or spec.settingsOptOut == "") then
+        error("NS.HeaderButtons: settings = false needs spec.settingsOptOut, the reason", 4)
     end
-    local hb = { extras = {}, order = {}, optOut = spec.settings == false and spec.settingsOptOut or nil }
-    if spec.settings ~= false then
+    local hb = { extras = {}, order = {}, companion = companion or nil, optOut = waived and spec.settingsOptOut or nil }
+    if not companion and not waived then
         hb.settings = hostMark(bar, "settings", spec.settingsTip or "Open settings", hostSettings(spec))
     end
     if spec.close ~= false then
@@ -379,6 +375,11 @@ local function hostStrip(bar, spec)
         local onClose = type(spec.close) == "function" and spec.close or function() win:Hide() end
         hb.close = spec.makeClose(bar, onClose)
     end
+    return hb
+end
+
+--- The marks outermost first: close, settings, then the extras from the last to the first.
+local function hostList(bar, spec, hb)
     local list = {}
     if hb.close then list[1] = { key = "close", btn = hb.close } end
     if hb.settings then list[#list + 1] = { key = "settings", btn = hb.settings } end
@@ -390,10 +391,19 @@ local function hostStrip(bar, spec)
         list[#list + 1] = { key = x.key, btn = b }
     end
     for i = #list, 1, -1 do hb.order[#hb.order + 1] = list[i].key end
+    return list
+end
+
+--- The strip with no W.HeaderButtons: the same marks in the same order at the same offsets, and the
+--- same answer, so a window reads one shape either way.
+local function hostStrip(bar, spec)
+    local H = NS.HEADER
+    local hb = hostAnswer(bar, spec)
+    local list = hostList(bar, spec, hb)
     hb.offsets, hb.right = {}, {}
-    local off = H.PAD
+    local off, point = H.PAD, spec.point or "RIGHT"
     for _, e in ipairs(list) do
-        if spec.place ~= false then e.btn:SetPoint(spec.point or "RIGHT", bar, spec.point or "RIGHT", -off, spec.y or 0) end
+        if spec.place ~= false then e.btn:SetPoint(point, bar, point, -off, spec.y or 0) end
         hb.offsets[e.key] = -off
         hb.right[#hb.right + 1] = { frame = e.btn, x = off }
         off = off + H.SIZE + H.GAP
@@ -403,18 +413,19 @@ local function hostStrip(bar, spec)
     return hb
 end
 
---- A window's title-bar marks (LibKa0s-Widgets-1.0's W.HeaderButtons, WidgetsHeader minor 1;
+--- A window's title-bar marks (LibKa0s-Widgets-1.0's W.HeaderButtons, WidgetsHeader minor 2;
 --- standalone-windows' *Title-bar controls*, AD-86-OR): right-aligned, left to right `spec.extras`,
 --- settings, close, each an 18 px mark 6 px from the corner and 6 apart, in `icon.tint` at rest and
 --- `text.link` under the pointer (the close `close.hot`), each with its tooltip. The owner is always
 --- this addon, so the marks wear its skin and the default settings click reaches the opener the
 --- launcher registered under its folder; the close is built through NS.MakeCloseButton (the one close
 --- wrapper, read at call time). `spec` is W.HeaderButtons' own: `close` (the click, or false),
+--- `companion` (true: a companion window, no settings mark and no reason, standalone-windows v2.119.0),
 --- `settings` (nil, a function, or false with `settingsOptOut`), `settingsTip`, `extras`, `point`,
 --- `y`, `place`, `frame`. Without the library the same strip is built by hand (hostStrip above).
 --- @param bar table the frame the marks are made on and, unless `place = false`, anchored to
 --- @param spec table
---- @return table hb { close, settings, extras, order, offsets, right, optOut }, also `(spec.frame or bar).headerButtons`
+--- @return table hb { close, settings, extras, order, offsets, right, optOut, companion }, also `(spec.frame or bar).headerButtons`
 function NS.HeaderButtons(bar, spec)
     local o = {}
     for k, v in pairs(spec) do o[k] = v end

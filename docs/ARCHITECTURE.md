@@ -71,7 +71,7 @@ by `tools/seeds/seeds.py` (clients-§10), under the contract in [`validate-seeds
 | `TARGET` names | `Name-Realm` | `First Surname` (regional names) | `Compat.UnitCharacterName` |
 | Bank containers | the character tabs (`CharacterBankTab_1..6`, 6 to 11); the warband tabs are not scanned (O19) | the character tabs (`CharacterBankTab_1..9`, 6 to 14); the keyring is not scanned, and there is no warband bank | LibKa0s-Compat `ContainerGroups().bank`, through `Compat.BankBagIDs` |
 | Sheet button (D8) | the sidebar tab row (stock, EllesmereUI, Chonky), shown with the paper doll | the last button of `CharacterFrame.ModeTabs`, a `LargeSideTabButtonTemplate` CheckButton outside Blizzard's mode switching (PROBE P27), at the strip's scale, below the last tab or right of it on Chonky's skinned row, in Chonky's skin there; shown on every CharacterFrame tab (Forever smoke feedback S1, S4) | `modules/Sheet.lua` (`Sheet.ButtonAnchor`), `modules/Dock.lua` |
-| Window under the side strip (S5) | none | widened by the strip's reach, its contents moved right of it, when the strip runs down the window's left edge | `modules/Sheet.lua` (`Sheet.StripInset`), `modules/Window.lua` (`Win.SetLeftInset`) |
+| Window under the side strip (S5) | none | widened by the strip's reach, its contents moved right of it, when the strip runs down the window's left edge; the footer's hairline still spans the whole window and only *New outfit* on it moves (FB-OR-02) | `modules/Sheet.lua` (`Sheet.StripInset`), `modules/Window.lua` (`Win.SetLeftInset`) |
 | Flyout drawer (D4, S7) | the left column's arrows moved and mirrored, flyouts re-anchored to the slot | every arrow re-anchored and turned outward by F-UI's own rules, the flyout anchored by F-UI's formula for the outward direction, flush on a slot whose `BorderFrame` is hidden (S3) | `modules/QuickSlots.lua` (`FOREVER_DRAWER`) |
 | Default skin | Ka0s Default | WoW Forever | `core/SkinSetup.lua` (`Skin:DefaultSkin()`) |
 
@@ -243,7 +243,8 @@ placed by its own docking (`dock = "title"`), never anchored by the addon: the w
 down by `TEST_STRIP.HEIGHT` (plus the window's 2 px gap) while its strip shows, laid from config. The
 window's bottom row is the library's `Footer` (`NS.MakeFooter`, `FOOTER.HEIGHT` 24 px, no fill, a
 hairline in the skin's `divider`), with *New outfit* on its left and *Slots: All None* on its right;
-the list ends above it. The bar has no footer. The dialogs' Done / Cancel rows are a modal's button
+the list ends above it. Under a side strip the footer keeps the window's whole width, so the hairline
+runs edge to edge, and `Win.SetLeftInset` moves *New outfit* alone by the shift (owner O1, FB-OR-02). The bar has no footer. The dialogs' Done / Cancel rows are a modal's button
 row, which the footer rule does not cover.
 
 **Title-bar marks** (standalone-windows' *Title-bar controls*; AD-86-OR, LibKa0s#86, 2026-11-17). Every
@@ -259,11 +260,12 @@ reads lock · settings · close, laid on its title band by `S.Header` from the s
 keeps its state art and its two-line tooltip, the settings mark opens the bar's own settings page
 (as the header's right click does), and the drag strip stops 2 px short of the lock; the bar's narrowest
 width (`Bar.Layout.MIN_WIDTH`) is 136 to hold the title beside three marks. The **dialogs** (outfit,
-trigger, rebuild, progress) carry the close alone, their settings mark **opted out** with the reason
-the strip records (`settingsOptOut`): a dialog is `MODAL`-tier, so the settings panel would open
-under it, and hiding it first would discard or cancel what it holds (the outfit and trigger dialogs'
-draft, the rebuild's unapplied stat choice, the progress dialog's running optimize), since every
-Hide does. The addon builds no LibKa0s `DragHandle`, so the drag strip's settings mark does not arise.
+trigger, rebuild, progress) are **companion windows** (standalone-windows v2.119.0, *A companion
+window carries no settings mark*): each opens only from a control on the outfit window, a row menu
+or the bar, edits only that owner's outfit or search and keeps no position of its own, so its strip
+is built with `companion = true` and carries the close alone, with no gear and no waiver reason
+(`headerButtons.companion`; the hand-built strip honors the same key). The icon browser is the
+library's own companion. The addon builds no LibKa0s `DragHandle`, so the drag strip's settings mark does not arise.
 
 **Tooltip placement** (standalone-windows' *Tooltip placement*, frame-layering-§4; AD-92-OR,
 LibKa0s#92, 2026-11-18). Every tooltip the addon places itself is classified and placed through

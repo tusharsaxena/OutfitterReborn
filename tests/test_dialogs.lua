@@ -110,6 +110,31 @@ test("new outfit: Best for <stat> builds from the optimizer and keeps the stat; 
     assertEqual(rec.stat[1].stat, "ITEM_LEVEL")
 end)
 
+test("new outfit: a disabled Done looks like a disabled button under every skin, enabled it is the primary (FB-OR-03)", function()
+    -- The owner's O2 (2026-11-24, images 37-41 against Skin Tester's image 38): while the name is
+    -- empty Done is disabled, and through SkinPaintControls minor 20 it kept the primary fill under
+    -- the dim disabled label in every skin. red under: LibKa0s v1.111.0's SkinPaintControls (minor 20).
+    local NS, M = scene()
+    local Skin = M.LibStub("LibKa0s-Skin-1.0")
+    NS.OutfitDialog.OpenNew()
+    local done = typeName(NS, "").done
+    local function rgb(c) return c and ("%.3f %.3f %.3f"):format(c[1], c[2], c[3]) or "none" end
+    local function tok(name) return rgb({ Skin:Color("OutfitterReborn", name) }) end
+    local label = done.text or done.label
+    for _, def in ipairs(Skin:Skins()) do
+        Skin:SetChoice("OutfitterReborn", "ka0s", def.key)
+        -- The client fires OnDisable / OnEnable on SetEnabled; the mock does not.
+        done:SetEnabled(false); done:__fire("OnDisable")
+        assertFalse(done:IsEnabled())
+        assertEqual(rgb(M.__paint(done).backdropColor), tok("btn.bg"), def.key .. ": disabled Done is not the plain box")
+        assertEqual(rgb(M.__paint(label).textColor), tok("text.disabled"), def.key .. ": disabled label")
+        done:SetEnabled(true); done:__fire("OnEnable")
+        assertEqual(rgb(M.__paint(done).backdropColor), tok("btnPrimary.bg"), def.key .. ": enabled Done is not the primary")
+        assertEqual(rgb(M.__paint(label).textColor), tok("btnPrimary.text"), def.key .. ": enabled label")
+    end
+    Skin:SetChoice("OutfitterReborn", "ka0s", "ka0s")
+end)
+
 test("new outfit: a used name is refused with the error line, and Done waits for a name", function()
     local NS = scene()
     NS.Outfits.Create("Taken", {})

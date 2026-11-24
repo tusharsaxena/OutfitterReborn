@@ -10,6 +10,18 @@ local APP = "OutfitterReborn-Profiles"
 -- (H7), and the page says so above AceDBOptions' own controls.
 NS.PROFILES_NOTE = L["Profiles hold settings only. Outfits belong to each character and are not changed by switching, copying or resetting a profile."]
 
+-- AceDBOptions hands every addon ONE args table, and puts it back on its cached options table at
+-- every call, so the note goes on copies of both: written into theirs, it showed on every Ace
+-- addon's Profiles page (owner report, 2026-11-22).
+local function notedOptions(AceDBOptions)
+    local options, args = {}, {}
+    for k, v in pairs(AceDBOptions:GetOptionsTable(NS.db)) do options[k] = v end
+    for k, v in pairs(options.args or {}) do args[k] = v end
+    options.args = args
+    options.args.outfitsNote = { type = "description", name = NS.PROFILES_NOTE, order = 0, fontSize = "medium" }
+    return options
+end
+
 local function build(mainCategory)
     if not (Settings and Settings.RegisterCanvasLayoutSubcategory) then return nil end
     if not LibStub then return nil end
@@ -22,15 +34,7 @@ local function build(mainCategory)
     if not (AceDBOptions and AceConfig and AceConfigDialog and AceGUI) then return nil end
     if not (NS.db and NS.db.profile) then return nil end
 
-    -- AceDBOptions hands every addon ONE args table, and puts it back on its cached options table at
-    -- every call, so the note goes on copies of both: written into theirs, it showed on every Ace
-    -- addon's Profiles page (owner report, 2026-11-22).
-    local options, args = {}, {}
-    for k, v in pairs(AceDBOptions:GetOptionsTable(NS.db)) do options[k] = v end
-    for k, v in pairs(options.args or {}) do args[k] = v end
-    options.args = args
-    options.args.outfitsNote = { type = "description", name = NS.PROFILES_NOTE, order = 0, fontSize = "medium" }
-    AceConfig:RegisterOptionsTable(APP, options)
+    AceConfig:RegisterOptionsTable(APP, notedOptions(AceDBOptions))
     -- No Defaults button: a profile page has no defaults of its own to restore.
     local ctx = H.CreatePanel("OutfitterRebornProfilesPanel", L["Profiles"], {
         pageKey        = PAGE,

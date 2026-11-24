@@ -13,7 +13,8 @@ from the inventory's best evidence (`-- PROBE Pn` at the code site). Section 22 
 of the LibKa0s v1.105.0 adoption (2026-11-17): the docked test strips and the window's footer.
 Section 24 is that adoption's report verbs (2026-11-18): `missing`, `zone` and `iteminfo` in the
 debug console. Section 25 is the skin-defaults run (LibKa0s v1.108.0, 2026-11-20): the looks and the
-tooltip lines that now follow the skin.
+tooltip lines that now follow the skin. Section 26 is the owner's feedback batch of 2026-11-24, and
+section 27 its round 2: a menu's selected entry reads apart (LibKa0s v1.113.0).
 
 ## Sign-off
 
@@ -179,6 +180,7 @@ this list. Each is checked by the rows named beside it; an O-number is a design 
 | O38 Title submenu with 200+ titles | Usability | W9 |
 | O41 `GetPrimaryTooltipInfo()` field names | Tooltip info | B4 |
 | O3 `/or` collision | Other addons | X3 |
+| A selected entry's color on a real screen | The paint recorder proves the token per skin; whether the selected row reads apart at a glance is the eye's (skinning-§4) | MS1-MS4 |
 
 ## 11. Sheet, window and broker (2026-11-04)
 
@@ -630,3 +632,30 @@ skin's colors. Run each check under Ka0s Default first, then under one light-win
 | SD10 (owner U-7) | Hover the outfit tab on the character frame | *Toggle the Outfitter window* is in the skin's tooltip title color; the tab itself keeps the host sheet's look |
 | SD11 (owner U-22) | Give one outfit a glyph with no color (pick white in the icon browser) and another a glyph with a color; look at the window rows, the outfit bar and the Outfits broker's hover menu | The uncolored glyph draws in the skin's icon tint (soft gray under Ka0s Default, no longer pure white) and moves with a skin switch; the colored one keeps its color. In the broker menu both glyphs show whole (uncropped) in those tints; item icons there stay cropped |
 | SD12 (SD-RV-OR) | Settings, Outfit Bar, Frame tab | The Background block shows *Background color*, *Use class color* and *Use the skin's background*, and nothing else: no second *Use the skin's color* row |
+
+## 26. Owner feedback batch (LibKa0s v1.112.0, standard v2.119.0, FB-OR, 2026-11-24)
+
+Retail and Forever. The owner's findings of 2026-11-24 (Ka0sAddonsCommonTasks
+`docs/2026-11-24-FEEDBACK_BATCH/`). The Result column is the owner's to fill.
+
+| # | Do | See | Result |
+|---|---|---|---|
+| FB1 (FB-OR-01) | Open the outfit window and the outfit bar; then open New outfit, a trigger dialog, Rebuild and the optimize progress window | The outfit window reads settings · close and the bar lock · settings · close, each gear opening settings. Every dialog's title bar carries the close alone (no gear), 6 px from the top right | |
+| FB2 (FB-OR-02, owner O1) | Retail with Chonky (or Forever with tabs down the sheet's right edge): open the character sheet and the outfit window docked beside it, with the side tabs over the window's left edge | The hairline above *New outfit* runs the window's whole width, edge to edge; *New outfit* has not moved (it still starts just right of the tabs); the list and title still start right of the tabs | |
+| FB3 (FB-OR-03, owner O2) | Open New outfit with the name empty, under Ka0s Default, Slate, Glass and High Contrast; then type a name; compare with Skin Tester's Normal / Primary / Disabled buttons | Empty name: *Done* looks like Skin Tester's *Disabled* (the plain button box, the dim label), no longer dim text on the bright primary fill. With a name it turns into the primary look; clearing the name takes it back. *Cancel* is unchanged | |
+
+## 27. A selected entry reads apart (LibKa0s v1.113.0, standard v2.120.0, FB2-OR-01, 2026-11-24)
+
+Retail and Forever. Round 2 of the owner's feedback batch (Ka0sAddonsCommonTasks
+`docs/2026-11-24-FEEDBACK_BATCH/R2_SMOKE_FEEDBACK.md`, decision D3): a menu's current entry is drawn in
+the menu's selected color, apart from the other rows in every skin. By the owner's ruling of 2026-11-24 on
+round 2 that color is Ka0s Default's gold in every skin, on Forever the default WoW Forever skin included
+(no longer its tan accent); a skin's own selected color stands in only where the gold sits too near its
+text, which no shipped skin does. The Result column is the owner's to fill.
+
+| # | Do | See | Result |
+|---|---|---|---|
+| MS1 (FB2-OR-01) | Under Ka0s Default, then Azeroth, then Slate (on Forever, also WoW Forever): right-click an Accessory outfit with a trigger; tick *Turn trigger off* and *Ignore in comparison tooltips*; open *Key binding*, *Title* and *Automation* | Every ticked row, a toggle or a choice, has its tick in the column at the left and its text in gold, in every skin (Slate and WoW Forever included, not their accent); unticked rows keep the plain text color. A ticked toggle shows one tick, not two, and its label lines up with the choice rows' | |
+| MS2 (FB2-OR-01) | Wear an accessory outfit; hover the Outfits broker on a display (Titan Panel, ChocolateBar or similar) under Ka0s Default, Azeroth and Slate (on Forever, also WoW Forever); turn *Automatic changes* on | The worn outfit's row and *Automatic changes* carry the tick in the column and their text in gold, in every skin; each outfit row still shows its own icon, and an outfit not worn reads plain | |
+| MS3 (FB2-OR-01) | Under Azeroth, then Slate (on Forever, also WoW Forever), open New outfit and drop both of its *Automation:* pickers (the category, then the trigger); then the Rebuild dialog's stat picker | The row of the current value is gold in every skin, apart from the other rows' text (Azeroth's parchment, Slate's and WoW Forever's own), never the skin's accent; under Ka0s Default it is gold as before | |
+| MS4 (FB2-OR-REV) | Under Ka0s Default: put one item of an accessory outfit in the bank and wear the outfit anyway (its row in the window reads in the banked color); bank an item of a second outfit too, not worn; hover the Outfits broker | The worn outfit's row is in the selected color (gold), not the banked color, with its tick in the column; the second outfit, not worn, keeps the banked color. Take the first off: its row goes back to the banked color | |
