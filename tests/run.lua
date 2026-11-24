@@ -214,6 +214,8 @@ local SUITES = {
     { name = "test_titlebar" },
     { name = "test_tooltip_place" },
 
+    { name = "test_foreverdb_missing" },
+
     { name = "test_skin_values", dir = "tests/_kit/" },
     { name = "test_skin_switch", dir = "tests/_kit/" },
     { name = "test_client_globals", dir = "tests/_kit/" },

@@ -1743,6 +1743,10 @@ Total.
 - tooltip place: a sample bar button's tooltip opens beside the whole bar
 - tooltip place: no source file owns a tooltip at the cursor or a corner anchor
 
+### test_foreverdb_missing.lua (1)
+
+- foreverdb missing: without ForeverDB the missing line is the plain list it always was
+
 ### test_skin_values.lua (3)
 
 - skin values: every host row carries its file, substring, why and a cause id or kit row category
@@ -1989,6 +1993,7 @@ Total.
 | test_skin.lua | 18 |
 | test_titlebar.lua | 12 |
 | test_tooltip_place.lua | 14 |
+| test_foreverdb_missing.lua | 1 |
 | test_skin_values.lua | 3 |
 | test_skin_switch.lua | 91 |
 | test_client_globals.lua | 3 |
@@ -1998,4 +2003,4 @@ Total.
 | test_lizard_sighted.lua | 8 |
 | test_prose.lua | 15 |
 | Skipped | 1 |
-| **Total** | **1656** |
+| **Total** | **1657** |
