@@ -90,9 +90,11 @@ python3 -c "import PIL; print(PIL.__version__)"
 ```
 
 **curl**, only for **refreshing** the zone table. `tools/gen-zones.lua` diffs a wago.tools `Map.db2`
-export against `defaults/Zones.lua`, and its header fetches the export with
-`curl -o Map.csv https://wago.tools/db2/Map/csv` before `lua tools/gen-zones.lua Map.csv`. Like
-Pillow, it is not needed to build, run or test the addon.
+export against `defaults/Zones.lua`, pinned to one build:
+`lua tools/gen-zones.lua --build <build> --fetch Map.csv` runs curl against
+`https://wago.tools/db2/Map/csv?build=<build>` before the diff (the build is the newest live `wow`
+build from `https://wago.tools/api/builds`). Like Pillow, it is not needed to build, run or test the
+addon.
 
 ```sh
 sudo apt-get install -y curl

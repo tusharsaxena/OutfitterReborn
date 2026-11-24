@@ -315,6 +315,40 @@ test("gen-zones: it loads defaults/Zones.lua without the client", function()
     assertEqual(#zones.BRAWL_MAP_IDS, #All().BRAWL_MAP_IDS, "the brawls it read")
 end)
 
+test("gen-zones: the export is pinned to a build, and the report names it", function()
+    local G = genZones()
+    -- red under: the unpinned `https://wago.tools/db2/Map/csv` fetch (the diff could not say which
+    -- build it describes, and a second run could read another).
+    assertEqual(G.exportURL("12.1.5.70961"), "https://wago.tools/db2/Map/csv?build=12.1.5.70961", "the URL")
+    assertFalse(pcall(G.exportURL, nil), "no build is refused")
+    assertFalse(pcall(G.exportURL, "latest"), "a non-build is refused")
+    local cmd = G.fetchCommand("12.1.5.70961", "Map.csv")
+    assertTrue(cmd:find("?build=12.1.5.70961", 1, true) ~= nil, "the fetch carries the pin")
+    assertTrue(cmd:find("-A 'OutfitterReborn-seed-check'", 1, true) ~= nil, "the fetch names its agent")
+    assertFalse(pcall(G.fetchCommand, "12.1.5.70961", "it's.csv"), "a quote in the path is refused")
+    local d = G.diff(All(), G.parseCSV("ID,MapName_lang,InstanceType\n"))
+    assertEqual(G.report(d, "12.1.5.70961"):match("^[^\n]*"), "Map.db2 at wago.tools build 12.1.5.70961",
+        "the report's first line")
+    local clean = G.report({ added = {}, removed = {}, wrongKind = {} }, "1.60.1.71091")
+    assertTrue(clean:find("matches the export", 1, true) ~= nil, "a clean pinned diff still says so")
+end)
+
+test("gen-zones: the command line requires --build", function()
+    local G = genZones()
+    local opts = G.parseArgs({ "--build", "12.1.5.70961", "--fetch", "Map.csv", "Z.lua" })
+    assertEqual(opts.build, "12.1.5.70961", "build")
+    assertEqual(opts.fetch, true, "fetch")
+    assertEqual(opts.csv, "Map.csv", "csv")
+    assertEqual(opts.zones, "Z.lua", "zones")
+    assertEqual(G.parseArgs({ "Map.csv", "--build", "1.60.1.71091" }).fetch, false, "no --fetch, any order")
+    -- red under: the old `lua tools/gen-zones.lua Map.csv` form still running unpinned.
+    assertNil(G.parseArgs({ "Map.csv" }), "no build")
+    assertNil(G.parseArgs({ "--build", "12.1.5", "Map.csv" }), "a short build")
+    assertNil(G.parseArgs({ "--build", "12.1.5.70961" }), "no CSV")
+    assertNil(G.parseArgs({ "--build", "12.1.5.70961", "--bogus", "Map.csv" }), "an unknown option")
+    assertNil(G.parseArgs({ "--build", "12.1.5.70961", "a", "b", "c" }), "too many arguments")
+end)
+
 -- ── defaults/TriggerData.lua ─────────────────────────────────────────────────────────────────
 -- The trigger ID tables sit beside the zone table: the same "IDs, never names" data, and no suite
 -- of their own in the design §9.3 catalog (the triggers' suites, P4.15 on, pin how they are read).

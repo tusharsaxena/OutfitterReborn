@@ -13,6 +13,7 @@ How to verify Ka0s Outfitter Reborn (testing-§6). What to install first is in t
 | `lua tests/run.lua -j auto` | The same, split across one worker per CPU (testing-§14) |
 | `lua tests/run.lua --list > docs/test-cases.md` | Regenerates the case inventory without running anything |
 | `~/.claude/dev-copilot/bin/ka0s-bounded luacheck .` | Lint, configured by `.luacheckrc`; must report 0 warnings and 0 errors. `luacheck` loads no kit, so it runs through the bounded runner (testing-§15) |
+| `python3 -m pytest -q tools/seeds` | The seed tool's cases ([validate-seeds.md](validate-seeds.md)); without pytest, `python3 -m unittest discover -s tools/seeds -p 'test_*.py'` |
 | `luac -p path/to/file.lua` | Syntax-check one file |
 | `bash tests/_kit/run-automated-tests.sh` | All four out-of-game suites, written to a dated bundle ([automated-tests/README.md](automated-tests/README.md)); run it through the bounded runner |
 
@@ -21,7 +22,8 @@ Every Lua run is bounded by the vendored kit as it loads (memory, time, process 
 ## The commit gate
 
 Before **every** commit: `lua tests/run.lua` green, `KA0S_KIT_CLIENT=forever lua tests/run.lua` green
-**and** `~/.claude/dev-copilot/bin/ka0s-bounded luacheck .` at 0/0 (testing-§4). The runner's
+**and** `~/.claude/dev-copilot/bin/ka0s-bounded luacheck .` at 0/0 (testing-§4), plus
+`python3 -m pytest -q tools/seeds` green (the seed contract's `## Gate`). The runner's
 `--suite lint --suite tests --no-bundle` is the Retail pair and writes nothing;
 `KA0S_KIT_CLIENT=forever tests/_kit/run-automated-tests.sh --suite tests --no-bundle` is the Forever
 half. Work is test-first: a failing case that pins the behavior, then the code.

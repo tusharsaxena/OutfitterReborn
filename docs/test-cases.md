@@ -485,7 +485,7 @@ Total.
 - slots: the dropped tables stay dropped (design §5.1, INV §18)
 - slots: C_PaperDollInfo.GetInventorySlotInfo is asked before the deprecated shim (OR-F4)
 
-### test_zones.lua (38)
+### test_zones.lua (40)
 
 - zones: NS.Zones is published with its rows and the brawl list
 - zones: every row has a unique SCREAMING_SNAKE id and a known kind
@@ -508,6 +508,8 @@ Total.
 - gen-zones: a clean export diffs clean
 - gen-zones: the diff names a new map, a vanished one and a kind that moved
 - gen-zones: it loads defaults/Zones.lua without the client
+- gen-zones: the export is pinned to a build, and the report names it
+- gen-zones: the command line requires --build
 - trigger data: NS.TriggerData is published by defaults/TriggerData.lua
 - trigger data: the aura and form tables are design §6.10's, each naming a known state
 - trigger data: the Argent mounts are per faction, each with the two either faction rides
@@ -1936,7 +1938,7 @@ Total.
 | test_removed_apis.lua | 2 |
 | test_mock_gear.lua | 27 |
 | test_slots.lua | 17 |
-| test_zones.lua | 38 |
+| test_zones.lua | 40 |
 | test_itemlink.lua | 42 |
 | test_item_match.lua | 20 |
 | test_inventory.lua | 26 |
@@ -1996,4 +1998,4 @@ Total.
 | test_lizard_sighted.lua | 8 |
 | test_prose.lua | 15 |
 | Skipped | 1 |
-| **Total** | **1654** |
+| **Total** | **1656** |
