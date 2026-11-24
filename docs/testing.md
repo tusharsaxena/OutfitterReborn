@@ -82,11 +82,13 @@ places in Lua, and the kit's sighted shadow is what the complexity suite measure
   `tools/legacy_capture.lua` and never hand-edited (its README says how to regenerate it). The new
   suites assert against it: a *keep* pin asserts the legacy value, a *fix* pin the corrected one with
   a `-- legacy:` note.
-- **Made-up players are the collection's sample characters** (LibKa0s#87, preview-mode): a suite
-  that names a player reads it from the vendored `LibKa0s-Sim-1.0`'s `Sample("retail")` (`Name-Realm`,
-  `Samplerealm`, and `Mockrealm` for another realm) or `Sample("forever")` (`First Surname`, no realm),
-  never a hand-made name or a real realm. The legacy capture's credits are real data and stay as
-  captured.
+- **Made-up players are the collection's sample characters** (LibKa0s#87, LibKa0s#104, preview-mode):
+  a suite that names a player reads it from the vendored `LibKa0s-Sim-1.0`'s `Sample("retail")`
+  (`Name-Realm`, the library's sample realm, and the third protagonist's realm for another realm),
+  `Sample("forever")` (`First Surname`, no realm) or, past the five, the seeded `SampleCrowd`, never a
+  hand-made name or a real realm. The legacy capture's credits are real data and stay as captured.
+  No named sample person is typed outside `tests/` (`test_packaging`'s sample-names gate, FB2-OR-01):
+  the addon's own test mode shows sample outfits, never a sample person.
 - **A suite holds every frame it makes.** The kit tracks frames and their event registrations in
   weak-keyed tables, so a frame only those tables reach is collected at the next GC cycle and stops
   hearing its events; a client frame never is. When the cycle lands depends on the heap the earlier
@@ -120,7 +122,7 @@ has no row here, or a row leaves its §9.3 group or order.
 | `test_no_loadstring` | No code runs from text anywhere: no `loadstring`, `load(`, `setfenv`, `RunScript`, no script field on a trigger, no `CUSTOM` id |
 | `test_removed_apis` | No live file names an API, event or library the game or this rewrite removed (INV §18) |
 | `test_file_budget` | Every authored Lua file, `tests/` and `tools/` included, stays under 1000 lines |
-| `test_packaging` | What reaches players: the package folder, every maintainer file ignored, nothing ignored loaded, every media path resolves, the icon declaration is exactly what is drawn. Also the doc set's account of the rest: no `pending` suite, a row here per declared suite in its design §9.3 group and order, the retired-harness map, a `module-map.md` `## Not shipped` row per helper, and the README badge equal to `docs/test-cases.md` |
+| `test_packaging` | What reaches players: the package folder, every maintainer file ignored, nothing ignored loaded, every media path resolves, the icon declaration is exactly what is drawn. Also the doc set's account of the rest: no `pending` suite, a row here per declared suite in its design §9.3 group and order, the retired-harness map, a `module-map.md` `## Not shipped` row per helper, and the README badge equal to `docs/test-cases.md`. And one source of sample names (FB2-OR-01, LibKa0s#104): no `Sample*`/`Mock*` person literal in any tracked text file outside `tests/`, `libs/` and the frozen bundles |
 | `test_credits` | The landing credits, the README Credits block, the LICENSE copyright lines |
 | `test_bus` | The full catalog, its wire names, exactly one sender per key over every call site |
 | `test_mock_gear` | The domain mock's fidelity: plans move items for real, bag-full, the secret wrap, the Equipment Manager flake |

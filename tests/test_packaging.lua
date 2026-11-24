@@ -434,3 +434,73 @@ test("packaging: the README badge and docs/test-cases.md agree, a Totals row per
         end
     end
 end)
+
+-- ── one source of sample names (FB2-OR-01, LibKa0s#104) ───────────────────────────────────────
+-- preview-mode, *Sample characters* (standard v2.120.0, decision D1 of Ka0sAddonsCommonTasks
+-- docs/2026-11-24-FEEDBACK_BATCH/R2_SMOKE_FEEDBACK.md): every named sample person an addon draws comes
+-- from LibKa0s-Sim-1.0, `Sim.Sample()` for the five protagonists and the seeded `Sim.SampleCrowd` for
+-- everyone else, and no addon keeps a name list of its own (anti-pattern #128). This addon's test mode
+-- shows sample OUTFITS (defaults/PreviewOutfits.lua, "Test Outfit 1".."5"), never a sample person, and it
+-- runs no sim, so the audit moved nothing; this gate keeps it so. A person literal is the convention's
+-- shape: one capitalized word starting `Sample` or `Mock` with more lowercase letters after it (a name,
+-- surname, pet or realm, `Samplerealm` and `Mockrealm` included), English inflections aside. It may live
+-- only under tests/ (the suites read the library too, docs/testing.md), libs/ (the library is where the
+-- names live) and the frozen bundles under docs/. It fails, never skips, when it cannot list the tree.
+
+local SAMPLE_SKIP = { "tests/", "libs/", "docs/audits/", "docs/reviews/", "docs/automated-tests/",
+                      "docs/perf-analysis/", "docs/revendor/", "docs/superpowers/" }
+local SAMPLE_TEXT = { lua = true, toc = true, xml = true, md = true, txt = true, json = true }
+local NOT_PEOPLE = { Samples = true, Sampled = true, Sampler = true, Sampling = true,
+                     Mocked = true, Mocks = true, Mocking = true, Mockup = true, Mockups = true }
+
+--- Every sample-person literal in `text`, in order.
+local function personLiterals(text)
+    local found = {}
+    for word in text:gmatch("%f[%w_](%u%l+)%f[^%w_]") do
+        if (word:match("^Sample%l+$") or word:match("^Mock%l+$")) and not NOT_PEOPLE[word] then
+            found[#found + 1] = word
+        end
+    end
+    return found
+end
+
+--- Every tracked text file the gate reads.
+local function sampleScanned()
+    local p = io.popen('git -C "' .. T.root .. '" ls-files 2>/dev/null')
+    assertTrue(p ~= nil, "io.popen gave no handle for `git ls-files`, so the gate cannot look")
+    local out = {}
+    for path in p:lines() do
+        local skip = not SAMPLE_TEXT[(path:match("%.(%w+)$") or ""):lower()]
+        for _, prefix in ipairs(SAMPLE_SKIP) do
+            if path:sub(1, #prefix) == prefix then skip = true end
+        end
+        if not skip then out[#out + 1] = path end
+    end
+    p:close()
+    assertTrue(#out > 50, "`git ls-files` listed only " .. #out .. " text files outside the skipped trees")
+    return out
+end
+
+test("packaging: the sample-name matcher sees the convention's names and nothing else (mutation self-test)", function()
+    assertEqual(table.concat(personLiterals('x = "Samplewarrior-Samplerealm"; y = { "Mockpriest" }'), ","),
+        "Samplewarrior,Samplerealm,Mockpriest", "a planted name, its realm and a Mock name are each flagged")
+    assertEqual(#personLiterals("Sim.Sample(client), Sim.SampleCrowd(c, 8, 1), Sample outfit, Mock, Mocking"), 0,
+        "the library's calls, the bare words and an English inflection are not people")
+    assertEqual(#personLiterals("ExampleSamplewarrior unSamplewarrior"), 0, "a name inside a word is not a literal")
+end)
+
+test("packaging: no named sample person is typed outside tests/ (LibKa0s#104, preview-mode)", function()
+    -- red under: a Sample*/Mock* literal in shipping code or a living doc (docs/testing.md typed the
+    -- library's two realm names before FB2-OR-01).
+    local hits = {}
+    for _, path in ipairs(sampleScanned()) do
+        local text = readFile(path)
+        assertTrue(text ~= nil, path .. " is tracked but unreadable")
+        local n = 0
+        for line in (text:gsub("\r", "") .. "\n"):gmatch("([^\n]*)\n") do
+            n = n + 1
+            for _, word in ipairs(personLiterals(line)) do hits[#hits + 1] = path .. ":" .. n .. " " .. word end
+        end
+    end
+    assertEqual(#hits, 0, "sample-person literals outside tests/: " .. table.concat(hits, ", "))
+end)

@@ -64,7 +64,7 @@ Total.
 - database: the outfit root refuses a nil id, an unknown id and any other first segment
 - database: db.char starts in the §3.1 shape, and the outfit store's writes land in it
 
-### test_packaging.lua (15)
+### test_packaging.lua (17)
 
 - packaging: the package folder is the TOC basename and the addon's folder name
 - packaging: every maintainer file and folder is ignored
@@ -81,6 +81,8 @@ Total.
 - packaging: docs/testing.md maps the retired harness's 144 cases, suite by suite (design §9.4)
 - packaging: docs/module-map.md's Not shipped table names every helper in tests/ and tools/ (P4.32)
 - packaging: the README badge and docs/test-cases.md agree, a Totals row per live suite (testing-§5)
+- packaging: the sample-name matcher sees the convention's names and nothing else (mutation self-test)
+- packaging: no named sample person is typed outside tests/ (LibKa0s#104, preview-mode)
 
 ### test_vendor_sync.lua (3)
 
@@ -1914,7 +1916,7 @@ Total.
 | test_toc.lua | 5 |
 | test_loadorder.lua | 13 |
 | test_database.lua | 11 |
-| test_packaging.lua | 15 |
+| test_packaging.lua | 17 |
 | test_vendor_sync.lua | 3 |
 | test_secrets.lua | 42 |
 | test_bus.lua | 12 |
@@ -1993,4 +1995,4 @@ Total.
 | test_lizard_sighted.lua | 8 |
 | test_prose.lua | 15 |
 | Skipped | 1 |
-| **Total** | **1651** |
+| **Total** | **1653** |
