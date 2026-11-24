@@ -21,6 +21,7 @@ section 27 its round 2: a menu's selected entry reads apart (LibKa0s v1.113.0).
 | Date | Build | Result |
 |---|---|---|
 | — | — | Not run yet. The headless gate is green at P5 (`docs/automated-tests/`, newest bundle); the first full pass is before the 1.1.0 tag |
+| 2026-11-24 | Retail and WoW Forever | PASS (owner, 2026-11-24): S6 on Retail, and section 25's SD1 to SD12 on both clients |
 
 ## How to run it
 
