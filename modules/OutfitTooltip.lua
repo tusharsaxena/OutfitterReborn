@@ -15,8 +15,18 @@ local _, NS = ...
 -- (the outfit window for a row, the whole bar for a bar button) by NS.PlaceBodyTip: right of the
 -- group, else left, top level with the element. Never the cursor, never a corner anchor.
 --
+-- MISSING ITEMS ON WOW FOREVER (SF-OR-02, LibKa0s#105). A missing item is one the player does not
+-- carry, so the client often cannot describe it until it is cached. With `window.foreverdb` on and
+-- ForeverDB available (NS.ForeverDB.Available: Forever only, installed, loaded on that first call),
+-- each missing name is drawn in its quality color, and the level it needs follows it while the player
+-- is below that level. Each field is the client's answer (Compat.ItemInfo) when it has one, and
+-- ForeverDB's (NS.ForeverDB.Item) only for a field the client left nil. Anything else (Retail, no
+-- ForeverDB, a reshaped one, a failed load, the setting off) draws the plain list it always drew.
+-- Banked items are carried, so they stay plain. The first hover over an outfit with missing items is
+-- what loads ForeverDB (about 12 MB, docs/performance.md); nothing here runs at login.
+--
 -- CALLS (at call time, no nil guard; design §12): NS.Outfits.Get, NS.Inventory.Missing,
--- NS.Triggers.Get.
+-- NS.Triggers.Get, NS.ForeverDB.Available/Item, NS.GetSetting, NS.QualityColor.
 
 local OT = {}
 NS.OutfitTooltip = OT
@@ -50,18 +60,63 @@ local function itemName(item)
     return Secrets.PlainString(item.name) or Secrets.PlainString(item.link) or ("item:" .. tostring(item.id))
 end
 
--- "Missing: a, b" with the label in white and the items in `token`'s color.
-local function itemList(label, token, items)
+local function escape(r, g, b)
+    local function byte(v) return math.floor(v * 255 + 0.5) end
+    return ("|cff%02x%02x%02x"):format(byte(r), byte(g), byte(b))
+end
+
+-- Whether missing items are described: the setting on, and ForeverDB there to fill the gaps. The
+-- Available call is the one that loads ForeverDB, the first time a tooltip lists a missing item.
+local function describing()
+    if NS.GetSetting("window.foreverdb") == false then return false end
+    return (NS.ForeverDB.Available()) == true
+end
+
+-- A missing item's quality and required level: the client's, then ForeverDB's for a field it left nil.
+local function describe(item)
+    local id = Secrets.PlainNumber(item.id)
+    if not id then return nil, nil end
+    local _, quality, _, minLevel = Compat.ItemInfo(id)
+    if quality == nil or minLevel == nil then
+        local row = NS.ForeverDB.Item(id)
+        if row then
+            if quality == nil then quality = Secrets.PlainNumber(row.quality) end
+            if minLevel == nil then minLevel = Secrets.PlainNumber(row.requiredLevel) end
+        end
+    end
+    return quality, minLevel
+end
+
+-- A missing name in its quality color (back to the line's color after it), with the level the
+-- player still lacks. An unknown quality keeps the line's color; an unknown player level shows it.
+local function describedName(item, playerLevel)
+    local quality, minLevel = describe(item)
+    local name = itemName(item)
+    local r, g, b
+    if quality ~= nil then r, g, b = NS.QualityColor(quality) end
+    if r ~= nil then name = escape(r, g, b) .. name .. "|r" end
+    if minLevel and minLevel > 1 and (playerLevel == nil or playerLevel < minLevel) then
+        name = L["%s (level %d)"]:format(name, minLevel)
+    end
+    return name
+end
+
+-- "Missing: a, b" with the label in white and the items in `token`'s color; `described` draws each
+-- one through describedName.
+local function itemList(label, token, items, described)
     local names = {}
-    for i, item in ipairs(items) do names[i] = itemName(item) end
+    local level = described and Compat.UnitLevel("player")
+    for i, item in ipairs(items) do
+        names[i] = described and describedName(item, level) or itemName(item)
+    end
     local white = NS.SkinEscape("text.highlight") or ""
     return white .. label .. " " .. (NS.SkinEscape(token) or "") .. table.concat(names, ", ") .. "|r"
 end
 
-local function addList(tip, label, token, items)
+local function addList(tip, label, token, items, described)
     if #items == 0 then return end
     local r, g, b = NS.SkinColor(token)
-    tip:AddLine(itemList(label, token, items), r, g, b, true)
+    tip:AddLine(itemList(label, token, items, described), r, g, b, true)
 end
 
 local function full(tip, rec, desc, missing, banked, owner, group)
@@ -69,7 +124,7 @@ local function full(tip, rec, desc, missing, banked, owner, group)
     tip:ClearLines()
     addTitle(tip, rec)
     if desc then addBody(tip, desc) end
-    addList(tip, L["Missing:"], "of.outfit.missing", missing)
+    addList(tip, L["Missing:"], "of.outfit.missing", missing, #missing > 0 and describing())
     addList(tip, L["Banked:"], "of.outfit.banked", banked)
     tip:Show()
     NS.PlaceBodyTip(tip, owner, group)

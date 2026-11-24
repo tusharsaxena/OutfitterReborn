@@ -175,7 +175,7 @@ Total.
 - skin seam: the degraded HudFont draws the face, a picked flag and no shadow
 - skin seam: each host-copy skin token is the live library's Ka0s Default value
 
-### test_surface_parity.lua (31)
+### test_surface_parity.lua (33)
 
 - parity: the degraded load still initializes, enables and answers /or version
 - parity: the Options stub carries every public member of the live Helpers surface
@@ -198,6 +198,8 @@ Total.
 - parity: the Item lease carries the same two members on both arms
 - parity: the Item fallback reads every link as the library does
 - parity: on both arms the Item lease answers nil for a non-string and a secret link
+- parity: the ForeverDB lease carries the same two members on both arms
+- parity: the degraded ForeverDB lease answers the library's all-absent values
 - parity: the Widgets seam answers on both arms, nil being a real answer
 - parity: OpenMenu draws the same fill on both arms
 - secure queue: out of lockdown a write runs now, and nothing is registered
@@ -1743,9 +1745,16 @@ Total.
 - tooltip place: a sample bar button's tooltip opens beside the whole bar
 - tooltip place: no source file owns a tooltip at the cursor or a corner anchor
 
-### test_foreverdb_missing.lua (1)
+### test_foreverdb_missing.lua (8)
 
 - foreverdb missing: without ForeverDB the missing line is the plain list it always was
+- foreverdb missing: nothing loads ForeverDB at login; the first hover loads it once
+- foreverdb missing: an item the client cannot describe takes ForeverDB's quality and level
+- foreverdb missing: the client's answer wins over ForeverDB's, field by field
+- foreverdb missing: reshaped or failing to load, the list stays plain
+- foreverdb missing: with the setting off, nothing loads and the list stays plain
+- foreverdb missing: on Retail it is inert: no row, no load, the plain list
+- foreverdb missing: on WoW Forever the Outfit rows group offers the switch, on by default
 
 ### test_skin_values.lua (3)
 
@@ -1928,7 +1937,7 @@ Total.
 | test_secrets.lua | 42 |
 | test_bus.lua | 12 |
 | test_skinsetup.lua | 22 |
-| test_surface_parity.lua | 31 |
+| test_surface_parity.lua | 33 |
 | test_perf_harness.lua | 19 |
 | test_schema.lua | 25 |
 | test_settings.lua | 17 |
@@ -1993,7 +2002,7 @@ Total.
 | test_skin.lua | 18 |
 | test_titlebar.lua | 12 |
 | test_tooltip_place.lua | 14 |
-| test_foreverdb_missing.lua | 1 |
+| test_foreverdb_missing.lua | 8 |
 | test_skin_values.lua | 3 |
 | test_skin_switch.lua | 91 |
 | test_client_globals.lua | 3 |
@@ -2003,4 +2012,4 @@ Total.
 | test_lizard_sighted.lua | 8 |
 | test_prose.lua | 15 |
 | Skipped | 1 |
-| **Total** | **1657** |
+| **Total** | **1666** |

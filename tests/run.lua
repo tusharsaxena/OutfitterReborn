@@ -13,13 +13,13 @@ Loader.addonName = "OutfitterReborn"
 -- The vendored library's files, read out of LibKa0s.xml in its own order rather than remembered:
 -- omit one and its module refuses to register, the host takes its stub, and the suite measures the
 -- stub -- green, and testing nothing (testing-§9). The floor below fails loudly if the .xml ever
--- stops naming a file of one of the seventeen majors this addon leases (§1.3; Glow, Toast, Charts and
--- Sim load with the rest of the .xml and are not leased).
+-- stops naming a file of one of the majors this addon leases (§1.3, and ForeverDB since SF-OR-02; Glow, Toast,
+-- Charts and Sim load with the rest of the .xml and are not leased).
 local LIB_FILES = Loader.xmlFiles(root .. "/libs/LibKa0s/LibKa0s.xml")
 do
     local EXPECTED = {
         "Core.lua", "CorePixel.lua", "Env.lua", "Compat.lua", "Lifecycle.lua", "Bus.lua", "Schema.lua",
-        "Pool.lua", "Item.lua", "Media.lua", "MediaIcons.lua",
+        "Pool.lua", "Item.lua", "ForeverDB.lua", "Media.lua", "MediaIcons.lua",
         "Skin.lua", "SkinOwnerTokens.lua", "SkinDefs.lua", "SkinDefsOthers.lua", "SkinPaint.lua",
         "SkinPaintExtras.lua", "SkinPaintHud.lua", "SkinAceConfirm.lua", "SkinPaintControls.lua",
         "SkinPaintNav.lua",
