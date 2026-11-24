@@ -13,7 +13,8 @@ from the inventory's best evidence (`-- PROBE Pn` at the code site). Section 22 
 of the LibKa0s v1.105.0 adoption (2026-11-17): the docked test strips and the window's footer.
 Section 24 is that adoption's report verbs (2026-11-18): `missing`, `zone` and `iteminfo` in the
 debug console. Section 25 is the skin-defaults run (LibKa0s v1.108.0, 2026-11-20): the looks and the
-tooltip lines that now follow the skin.
+tooltip lines that now follow the skin. Section 26 is the owner's feedback batch of 2026-11-24, and
+section 27 its round 2: a menu's selected entry reads apart (LibKa0s v1.113.0).
 
 ## Sign-off
 
@@ -179,6 +180,7 @@ this list. Each is checked by the rows named beside it; an O-number is a design 
 | O38 Title submenu with 200+ titles | Usability | W9 |
 | O41 `GetPrimaryTooltipInfo()` field names | Tooltip info | B4 |
 | O3 `/or` collision | Other addons | X3 |
+| A selected entry's color on a real screen | The paint recorder proves the token per skin; whether the selected row reads apart at a glance is the eye's (skinning-§4) | MS1-MS3 |
 
 ## 11. Sheet, window and broker (2026-11-04)
 
@@ -641,3 +643,16 @@ Retail and Forever. The owner's findings of 2026-11-24 (Ka0sAddonsCommonTasks
 | FB1 (FB-OR-01) | Open the outfit window and the outfit bar; then open New outfit, a trigger dialog, Rebuild and the optimize progress window | The outfit window reads settings · close and the bar lock · settings · close, each gear opening settings. Every dialog's title bar carries the close alone (no gear), 6 px from the top right | |
 | FB2 (FB-OR-02, owner O1) | Retail with Chonky (or Forever with tabs down the sheet's right edge): open the character sheet and the outfit window docked beside it, with the side tabs over the window's left edge | The hairline above *New outfit* runs the window's whole width, edge to edge; *New outfit* has not moved (it still starts just right of the tabs); the list and title still start right of the tabs | |
 | FB3 (FB-OR-03, owner O2) | Open New outfit with the name empty, under Ka0s Default, Slate, Glass and High Contrast; then type a name; compare with Skin Tester's Normal / Primary / Disabled buttons | Empty name: *Done* looks like Skin Tester's *Disabled* (the plain button box, the dim label), no longer dim text on the bright primary fill. With a name it turns into the primary look; clearing the name takes it back. *Cancel* is unchanged | |
+
+## 27. A selected entry reads apart (LibKa0s v1.113.0, standard v2.120.0, FB2-OR-01, 2026-11-24)
+
+Retail and Forever. Round 2 of the owner's feedback batch (Ka0sAddonsCommonTasks
+`docs/2026-11-24-FEEDBACK_BATCH/R2_SMOKE_FEEDBACK.md`, decision D3): a menu's current entry is drawn in
+the menu's selected color, apart from the other rows in every skin (Ka0s Default's gold where a skin's
+own selected color sits too near its text, as Azeroth's does). The Result column is the owner's to fill.
+
+| # | Do | See | Result |
+|---|---|---|---|
+| MS1 (FB2-OR-01) | Under Ka0s Default, then Azeroth, then Slate: right-click an Accessory outfit with a trigger; tick *Turn trigger off* and *Ignore in comparison tooltips*; open *Key binding*, *Title* and *Automation* | Every ticked row, a toggle or a choice, has its tick in the column at the left and its text in the selected color (gold under Ka0s Default and Azeroth); unticked rows keep the plain text color. A ticked toggle shows one tick, not two, and its label lines up with the choice rows' | |
+| MS2 (FB2-OR-01) | Wear an accessory outfit; hover the Outfits broker on a display (Titan Panel, ChocolateBar or similar) under Ka0s Default and Azeroth; turn *Automatic changes* on | The worn outfit's row and *Automatic changes* carry the tick in the column and their text in the selected color; each outfit row still shows its own icon, and an outfit not worn reads plain | |
+| MS3 (FB2-OR-01) | Under Azeroth, open New outfit and drop both of its *Automation:* pickers (the category, then the trigger); then the Rebuild dialog's stat picker | The row of the current value is gold, apart from the parchment text of the other rows; under Ka0s Default it is gold as before | |
