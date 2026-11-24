@@ -49,10 +49,12 @@ local function find(rows, text)
     return nil
 end
 
--- A checked row: the menu's tick in front of the row's own icon, so two inline textures.
+-- A checked row: the library's tick column, read from the row's `selected` predicate (FB2-OR-01;
+-- the label keeps its own icon and no inline tick, and the library paints it in the selected color).
 local function ticked(row)
     local _, n = row.label:gsub("|T", "")
-    return n >= 2
+    assertTrue(n == 1, "a row draws an inline tick beside its icon: " .. row.label)
+    return type(row.selected) == "function" and row.selected(row) == true
 end
 
 test("broker: a data source named OutfitterRebornOutfits exists and is not on the minimap", function()
@@ -109,7 +111,7 @@ test("broker: the hover menu lists categories then outfits, worn ones checked, m
     local rows = open(M, ctl)
     local order = {}
     for _, r in ipairs(rows) do order[#order + 1] = r.divider and "-" or plain(r.label) end
-    -- The checkbox rows carry the tick in front of a worn one, so the order is read without it.
+    -- The plain labels, read without the rows' icons and color escapes.
     assertEqual(table.concat(order, "|"), NS.BRAND .. "|Open outfit window|Automatic changes|"
         .. "Complete outfits|Bare|Accessories|Cloak|Ride|Left-click: outfit window|Right-click: settings")
     assertTrue(rows[1].title, "the brand is a title")

@@ -111,22 +111,17 @@ local function tooltipText(item)
     return text
 end
 
--- A row's label: a toggle's carries its tick when selected; a radio's tick is the library's column.
-local function rowLabel(item)
-    if item.isSelected and not item.radio and item.isSelected(item.data) then
-        return NS.Skin.MarkText(NS.Icon("confirm"), 0) .. " " .. item.label
-    end
-    return item.label
-end
-
 --- Write a recorded item's state onto its W.ContextMenu row: label, disabled state, tooltip, and a
---- radio's tick predicate. The library reads these on every paint.
+--- toggle's or radio's tick predicate. The library reads these on every paint. Both kinds hand the
+--- library `selected`, so it draws the tick in its column and the ticked label in the menu's selected
+--- color (WidgetsDropdown minor 4): a toggle's tick drawn inline beside plain text was a mark alone,
+--- which skinning-§4 rules out (*A selected entry reads apart*, FB2-OR-01).
 local function paintRow(out, item)
-    out.label = rowLabel(item)
+    out.label = item.label
     if item.title then return end
     out.disabled = item.enabled == false or nil
     out.tooltip = tooltipText(item)
-    if item.radio then out.selected = function() return item.isSelected(item.data) and true or false end end
+    if item.isSelected then out.selected = function() return item.isSelected(item.data) and true or false end end
 end
 
 --- After a keep-open pick: the fill written again (`level`, the fresh root) onto the open rows, so

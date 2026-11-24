@@ -218,7 +218,10 @@ test("menu: the toggles keep the menu open, Turn trigger off writes outfit.trigg
     assertTrue(NS.Outfits.Get(acc).trigger.disabled)
     -- red under: the row writing rec.trigger.disabled itself, past NS.SetByPath (no OUTFIT_EDITED, no rebind).
     assertEqual(edited[1], acc .. ":trigger")
-    assertTrue(off.label:find("|T", 1, true) ~= nil, "the toggled row does not show its tick")
+    -- FB2-OR-01: the tick is the library's column (the row's `selected`), so the label stays plain
+    -- text and the library paints it in the selected color. red under: the inline tick of old.
+    assertTrue(off.selected ~= nil and off.selected(off), "the toggled row is not ticked")
+    assertNil(off.label:find("|T", 1, true), "the toggle draws an inline tick of its own")
     local combat = ctl.row("Disable outfit in combat")
     combat.onClick(nil, combat)
     assertTrue(NS.Outfits.Get(acc).trigger.combatDisabled)
@@ -402,7 +405,7 @@ test("menu: once Save in equipment manager stores the outfit, the open menu's ot
     local ignore = exact(top, "Ignore in comparison tooltips")
     ignore.onClick(nil, ignore)
     assertTrue(NS.Outfits.Get(emId).ignoreComparisons == true, "the toggle did not reach the stored outfit")
-    assertTrue(ignore.label:find("|T", 1, true) ~= nil, "the toggle's tick does not read the stored outfit")
+    assertTrue(ignore.selected(ignore), "the toggle's tick does not read the stored outfit")
 end)
 
 test("menu: Title picks and a trigger without params keep the menu open; the parent's label follows", function()
@@ -546,11 +549,11 @@ test("menu: a ticked toggle clicked after its outfit is deleted repaints without
     open(NS, ctl, acc)
     local ignore = exact(ctl.menus[1].rows, "Ignore in comparison tooltips")
     ignore.onClick(nil, ignore)
-    assertTrue(ignore.label:find("|T", 1, true) ~= nil, "the toggle shows its tick")
+    assertTrue(ignore.selected(ignore), "the toggle is not ticked")
     assertTrue(NS.Outfits.Delete(acc))
     ignore.onClick(nil, ignore)
-    -- red under: menu.refresh without its repaint of menu.own (the row keeps the stale tick)
-    assertNil(ignore.label:find("|T", 1, true), "the deleted outfit's toggle still shows its tick")
+    -- red under: a tick predicate that indexes the deleted record, or one read once and kept
+    assertFalse(ignore.selected(ignore), "the deleted outfit's toggle still shows its tick")
     assertEqual(plain(ignore.label), "Ignore in comparison tooltips")
 end)
 

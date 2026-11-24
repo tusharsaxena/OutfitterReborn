@@ -1685,7 +1685,7 @@ Total.
 - credits: the README credits exactly the icon sets this build ships
 - credits: LICENSE keeps John Stephen's copyright with the Ka0s line directly under it
 
-### test_skin.lua (16)
+### test_skin.lua (18)
 
 - skin: every owner token a source file names is registered
 - skin: every skin primitive a source file calls is in the library's VOCAB
@@ -1703,6 +1703,8 @@ Total.
 - skin: a switch marks the window, and its next tick recolors an item row's name
 - skin: a dialog's push-button and check labels, the progress track and an item row's face wear the skin
 - skin: the lines this addon writes on a client tooltip read gtip.title and gtip.body
+- skin: a ticked toggle and a ticked radio paint the selected color, apart from plain rows
+- skin: a picker's selected value paints the selected color, not its value color
 
 ### test_titlebar.lua (12)
 
@@ -1979,7 +1981,7 @@ Total.
 | test_trigger_dialog.lua | 11 |
 | test_diagnostics.lua | 12 |
 | test_credits.lua | 8 |
-| test_skin.lua | 16 |
+| test_skin.lua | 18 |
 | test_titlebar.lua | 12 |
 | test_tooltip_place.lua | 14 |
 | test_skin_values.lua | 3 |
@@ -1991,4 +1993,4 @@ Total.
 | test_lizard_sighted.lua | 8 |
 | test_prose.lua | 15 |
 | Skipped | 1 |
-| **Total** | **1649** |
+| **Total** | **1651** |

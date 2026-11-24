@@ -13,6 +13,8 @@
 --     { fromSkin = true, hud = true }, and no source file writes inline `|T` markup by hand;
 --   - the two surfaces drawn at render follow a switch: an item row's quality-colored name (the window
 --     re-renders after NS.Skin.OnLooksChanged) and a dialog's error line (`of.dialog.error`).
+--   - a selected entry reads apart (FB2-OR-01): a ticked toggle or radio of NS.OpenMenu and a
+--     picker's selected value paint W.SelectedColor in every shipped skin, apart from plain rows.
 --
 -- Every case builds its own instance through tests/skin_surfaces.lua, so nothing leaks between cases.
 
@@ -459,5 +461,104 @@ test("skin: the lines this addon writes on a client tooltip read gtip.title and 
     sheet:__fire("OnEnter")
     lineIs(1, "gtip.title", "the sheet button")
     sheet:__fire("OnLeave")
+    Skin:SetChoice(OWNER, "ka0s", "ka0s")
+end)
+
+-- ── a selected entry reads apart (FB2-OR-01, skinning-§4) ─────────────────────────────────────
+-- Ka0sAddonsCommonTasks docs/2026-11-24-FEEDBACK_BATCH/R2_SMOKE_FEEDBACK.md, decision D3 (standard
+-- v2.120.0, *A selected entry reads apart*): every dropdown or menu draws its current entry in the
+-- menu's selected color, apart from every other entry in every skin, a value color (class, quality)
+-- on that row replaced, and a mark alone is not enough. The library's W.Dropdown and W.ContextMenu do
+-- it from LibKa0s v1.113.0 (WidgetsDropdown minor 4); W.SelectedColor(owner) answers that color.
+-- The dialogs' pickers are NS.MakeDropdown (W.Dropdown); the outfit menu, the Outfits broker's hover
+-- menu and the window's menus go through NS.OpenMenu (W.ContextMenu). A CreateCheckbox (a toggle:
+-- "Automatic changes", "Turn trigger off", a worn outfit in the broker) drew its tick inline in the
+-- label and gave the library no `selected`, so a ticked toggle was a mark beside plain text; it now
+-- hands its predicate to `selected`, and the library draws the tick in its column. These cases run
+-- the real library (no menu recorder) on their own instance with the kit's paint recorder.
+
+local function menuLive()
+    local installPaint = dofile(T.root .. "/tests/_kit/mock_paint.lua")
+    local inst = T.load({ mutate = function(M) installPaint(M) end })
+    local M = inst.mocks
+    M.__cursorX, M.__cursorY = 100, 100
+    return inst.NS, M, M.LibStub("LibKa0s-Skin-1.0"), M.LibStub("LibKa0s-Widgets-1.0")
+end
+
+local function rgbOf(c) return c and ("%.3f,%.3f,%.3f"):format(c[1], c[2], c[3]) or "none" end
+local function painted(M, b) return rgbOf(M.__paint(b.fs).textColor) end
+local function selColor(W) local r, g, b = W.SelectedColor(OWNER); return rgbOf({ r, g, b }) end
+local function token(Skin, name) return rgbOf({ Skin:Color(OWNER, name) }) end
+
+local function skinKeys(Skin)
+    local out = {}
+    for _, def in ipairs(Skin:Skins()) do out[#out + 1] = def.key end
+    assertTrue(#out >= 9, "every shipped skin walked, got " .. #out)
+    return out
+end
+
+-- The menu's row whose label ends `text` (a toggle's label once carried a tick in front).
+local function rowOf(m, text)
+    for _, b in ipairs(m.buttons) do
+        if b:IsShown() and tostring(b.fs:GetText()):sub(-#text) == text then return b end
+    end
+    error("no menu row " .. text)
+end
+
+test("skin: a ticked toggle and a ticked radio paint the selected color, apart from plain rows", function()
+    -- red under: a CreateCheckbox row drawn as an inline tick beside plain text (no `selected` handed
+    -- to W.ContextMenu), which skinning-§4 rules out: "a mark alone is not enough".
+    local NS, M, Skin, W = menuLive()
+    local function fill(root)
+        root:CreateRadio("Radio on", function() return true end, function() end)
+        root:CreateRadio("Radio off", function() return false end, function() end)
+        root:CreateCheckbox("Toggle on", function() return true end, function() end)
+        root:CreateCheckbox("Toggle off", function() return false end, function() end)
+        root:CreateButton("Plain", function() end)
+    end
+    for _, key in ipairs(skinKeys(Skin)) do
+        Skin:SetChoice(OWNER, "ka0s", key)
+        local ok, m = NS.OpenMenu(M.UIParent, fill)
+        assertTrue(ok and type(m) == "table" and m.buttons ~= nil, key .. ": the library's menu did not open")
+        local sel, plain = selColor(W), token(Skin, "menu.text")
+        assertTrue(sel ~= plain, key .. ": the selected color is the plain text's")
+        assertEqual(painted(M, rowOf(m, "Radio on")), sel, key .. ": the ticked radio")
+        assertEqual(painted(M, rowOf(m, "Toggle on")), sel, key .. ": the ticked toggle")
+        assertEqual(painted(M, rowOf(m, "Radio off")), plain, key .. ": an unticked radio")
+        assertEqual(painted(M, rowOf(m, "Toggle off")), plain, key .. ": an unticked toggle")
+        assertEqual(painted(M, rowOf(m, "Plain")), plain, key .. ": a plain row")
+        -- One tick, the library's column: no inline tick markup is left in the toggle's label.
+        assertTrue(not tostring(rowOf(m, "Toggle on").fs:GetText()):find("|T", 1, true),
+            key .. ": the ticked toggle still draws its own inline tick")
+        NS.CloseMenu()
+    end
+    Skin:SetChoice(OWNER, "ka0s", "ka0s")
+end)
+
+test("skin: a picker's selected value paints the selected color, not its value color", function()
+    -- The dialogs' pickers are the library's W.Dropdown (NS.MakeDropdown). red under: LibKa0s
+    -- v1.112.0's WidgetsDropdown (minor 3), whose Azeroth selection sat 16.3 ΔE00 off its plain rows.
+    local NS, M, Skin, W = menuLive()
+    local VALUE = { 0.25, 0.78, 0.92 }
+    -- The library's one popup, which a dropdown drops too (WidgetsDropdown's EnsureMenu).
+    local menu = W.ContextMenu(M.UIParent, { { label = "probe" } }, { owner = OWNER })
+    W.CloseMenu()
+    for _, key in ipairs(skinKeys(Skin)) do
+        Skin:SetChoice(OWNER, "ka0s", key)
+        local dd = NS.MakeDropdown(M.UIParent, 120)
+        dd:SetOptions({ { value = "a", label = "Picked", color = VALUE },
+                        { value = "b", label = "Other", color = VALUE },
+                        { value = "c", label = "Plain" } })
+        dd:SelectValue("a")
+        dd:__fire("OnClick")
+        assertTrue(menu ~= nil and menu.buttons ~= nil, key .. ": the dropdown's menu did not open")
+        local sel, plain = selColor(W), token(Skin, "menu.text")
+        assertEqual(painted(M, rowOf(menu, "Picked")), sel, key .. ": the selected row")
+        assertTrue(sel ~= plain, key .. ": the selected row reads like a plain row")
+        assertTrue(sel ~= rgbOf(VALUE), key .. ": the selected row keeps its value color")
+        assertEqual(painted(M, rowOf(menu, "Other")), rgbOf(VALUE), key .. ": a plain row keeps its value color")
+        assertEqual(painted(M, rowOf(menu, "Plain")), plain, key .. ": a plain row")
+        W.CloseMenu()
+    end
     Skin:SetChoice(OWNER, "ka0s", "ka0s")
 end)
