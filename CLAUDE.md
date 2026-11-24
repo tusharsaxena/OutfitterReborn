@@ -44,5 +44,5 @@ addon serves Retail and WoW Forever, so the suite runs under both kit profiles, 
 Never
 auto-stage/commit/push and never bump the version without an explicit instruction.
 
-Bundles [LibKa0s](https://github.com/tusharsaxena/LibKa0s) v1.113.0 (MIT).
+Bundles [LibKa0s](https://github.com/tusharsaxena/LibKa0s) v1.114.0 (MIT).
 LibKa0s icons: all (icon browser).
