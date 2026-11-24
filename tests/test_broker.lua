@@ -57,6 +57,27 @@ local function ticked(row)
     return type(row.selected) == "function" and row.selected(row) == true
 end
 
+-- FB2-OR-REV (skinning-§4, *A selected entry reads apart*; decision D3): the worn outfit's name wears
+-- no status color of its own, because an inline escape outranks the library's selected color and the
+-- ticked row would read as a missing or banked one, not as the selection. A row not worn keeps it.
+test("broker: a worn outfit's row drops its status color, so the selected color shows", function()
+    local NS, M, ctl = scene()
+    local ids = outfits(NS)
+    local status = NS.Outfits.Status
+    NS.Outfits.Status = function(id)
+        if id == ids.ride or id == ids.cloak then return "missing" end
+        return status(id)
+    end
+    NS.Stack.Wear(ids.ride, { hw = true })
+    M.__fireTimers()
+    local rows = open(M, ctl)
+    local ride, cloak = find(rows, "Ride"), find(rows, "Cloak")
+    assertTrue(ticked(ride), "the worn outfit is not checked")
+    -- red under: outfitLabel wrapping every name in its status escape, the worn one included.
+    assertNil(ride.label:find("|c", 1, true), "the worn row carries an inline color: " .. ride.label)
+    assertTrue(cloak.label:find(NS.SkinEscape("of.outfit.missing") .. "Cloak", 1, true) ~= nil, cloak.label)
+end)
+
 test("broker: a data source named OutfitterRebornOutfits exists and is not on the minimap", function()
     local NS, M = scene()
     local obj = object(M)

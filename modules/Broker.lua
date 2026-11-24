@@ -105,13 +105,16 @@ end
 
 -- ── the menu ────────────────────────────────────────────────────────────────────────────────
 
---- An outfit row's label: its icon, then its name in the window's status color. A game icon is the
---- library's cropped inline markup (NS.IconText); a glyph is drawn whole in its tint, the picked color
---- or the skin's `icon.tint` (NS.Glyph.Markup; owner U-22, 2026-11-20), as on the object's own icon.
+--- An outfit row's label: its icon, then its name in the window's status color (a worn one's in none,
+--- so the menu's selected color shows). A game icon is the library's cropped inline markup
+--- (NS.IconText); a glyph is drawn whole in its tint, the picked color or the skin's `icon.tint`
+--- (NS.Glyph.Markup; owner U-22, 2026-11-20), as on the object's own icon.
 local function outfitLabel(id, statusCache)
     local rec = NS.Outfits.Get(id)
     local name = rec and type(rec.name) == "string" and rec.name or "?"
-    local token = NS.WindowRows.STATUS_TOKEN[NS.WindowListModel.Status(id, statusCache)]
+    -- The worn row wears no status color: an inline escape outranks the menu's selected color, and the
+    -- ticked row must read as the selection (skinning-§4, *A selected entry reads apart*, FB2-OR-REV).
+    local token = not NS.Stack.IsWorn(id) and NS.WindowRows.STATUS_TOKEN[NS.WindowListModel.Status(id, statusCache)]
     local esc = token and NS.SkinEscape(token)
     if esc then name = esc .. name .. "|r" end
     local tex, r, g, b = NS.OutfitIcon(rec)

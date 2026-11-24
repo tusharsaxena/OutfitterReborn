@@ -180,7 +180,7 @@ this list. Each is checked by the rows named beside it; an O-number is a design 
 | O38 Title submenu with 200+ titles | Usability | W9 |
 | O41 `GetPrimaryTooltipInfo()` field names | Tooltip info | B4 |
 | O3 `/or` collision | Other addons | X3 |
-| A selected entry's color on a real screen | The paint recorder proves the token per skin; whether the selected row reads apart at a glance is the eye's (skinning-§4) | MS1-MS3 |
+| A selected entry's color on a real screen | The paint recorder proves the token per skin; whether the selected row reads apart at a glance is the eye's (skinning-§4) | MS1-MS4 |
 
 ## 11. Sheet, window and broker (2026-11-04)
 
@@ -656,3 +656,4 @@ own selected color sits too near its text, as Azeroth's does). The Result column
 | MS1 (FB2-OR-01) | Under Ka0s Default, then Azeroth, then Slate: right-click an Accessory outfit with a trigger; tick *Turn trigger off* and *Ignore in comparison tooltips*; open *Key binding*, *Title* and *Automation* | Every ticked row, a toggle or a choice, has its tick in the column at the left and its text in the selected color (gold under Ka0s Default and Azeroth); unticked rows keep the plain text color. A ticked toggle shows one tick, not two, and its label lines up with the choice rows' | |
 | MS2 (FB2-OR-01) | Wear an accessory outfit; hover the Outfits broker on a display (Titan Panel, ChocolateBar or similar) under Ka0s Default and Azeroth; turn *Automatic changes* on | The worn outfit's row and *Automatic changes* carry the tick in the column and their text in the selected color; each outfit row still shows its own icon, and an outfit not worn reads plain | |
 | MS3 (FB2-OR-01) | Under Azeroth, open New outfit and drop both of its *Automation:* pickers (the category, then the trigger); then the Rebuild dialog's stat picker | The row of the current value is gold, apart from the parchment text of the other rows; under Ka0s Default it is gold as before | |
+| MS4 (FB2-OR-REV) | Under Ka0s Default: put one item of an accessory outfit in the bank and wear the outfit anyway (its row in the window reads in the banked color); bank an item of a second outfit too, not worn; hover the Outfits broker | The worn outfit's row is in the selected color (gold), not the banked color, with its tick in the column; the second outfit, not worn, keeps the banked color. Take the first off: its row goes back to the banked color | |
