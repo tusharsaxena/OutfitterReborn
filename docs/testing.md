@@ -58,10 +58,10 @@ places in Lua, and the kit's sighted shadow is what the complexity suite measure
 
 - **`tests/_kit/`** is the shared harness, vendored byte-identical from the LibKa0s tag named in root
   `CLAUDE.md` (test kit revision 62). Never edit it; `test_vendor_sync` fails on any drift.
-- **`tests/run.lua`** loads the vendored library in `LibKa0s.xml` order (asserting the seventeen leased
-  majors' files are present) and the addon in **TOC order** (`Loader.tocFiles`), so the harness cannot
-  drift from what the client loads (testing-§9). It runs `OnInitialize` and `OnEnable` like the
-  client, and `loadInstance` builds isolated instances (a library-absent load passes `libFiles = {}`).
+- **`tests/run.lua`** loads the vendored library in `LibKa0s.xml` order (asserting the leased majors'
+  files are present, ForeverDB among them since SF-OR-02) and the addon in **TOC order**
+  (`Loader.tocFiles`), so the harness cannot drift from what the client loads (testing-§9). It runs
+  `OnInitialize` and `OnEnable` like the client, and `loadInstance` builds isolated instances (a library-absent load passes `libFiles = {}`).
   It exposes `_G.OUTFITTERREBORN_TEST` to the local suites.
 - **`tests/wow_mock.lua`** extends the kit's base mock with what this addon calls, and installs the
   two domain halves on every build: `tests/mock_gear.lua` (worn items, bags, the bank, the cursor and
