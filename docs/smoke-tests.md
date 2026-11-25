@@ -23,6 +23,7 @@ ForeverDB adoption (LibKa0s v1.114.0, 2026-11-25): an outfit tooltip's missing i
 |---|---|---|
 | — | — | Not run yet. The headless gate is green at P5 (`docs/automated-tests/`, newest bundle); the first full pass is before the 1.1.0 tag |
 | 2026-11-24 | Retail and WoW Forever | PASS (owner, 2026-11-24): S6 on Retail, and section 25's SD1 to SD12 on both clients |
+| 2026-11-25 | Retail and WoW Forever | PASS (owner, 2026-11-25): section 28's SEEDS-OR-1 and SEEDS-OR-2 on WoW Forever, and SEEDS-OR-3 on Retail |
 
 ## How to run it
 
@@ -672,6 +673,6 @@ fill.
 
 | # | Do | See | Result |
 |---|---|---|---|
-| SEEDS-OR-1 (with ForeverDB) | ForeverDB 2026.11.24.46 enabled. Log in; check `/run print(C_AddOns.IsAddOnLoaded("ForeverDB"))`, then hover the outfit with the missing item in the outfit window, then check again | Before the hover it prints `false` (nothing loads it at login, unless another addon such as Command Center did); after, `true`. The tooltip's *Missing:* line draws the item's name in its quality color (green, blue, purple...), and a level the character has not reached follows it in the missing red, as `(level 40)`; at or above that level there is no suffix. Turning the switch off draws the plain red list again. `/or diag` shows the `ForeverDB: present=yes loaded=yes` line | |
-| SEEDS-OR-2 (without ForeverDB) | ForeverDB disabled in the AddOns list. Log in and hover the same outfit | No Lua error; the *Missing:* line is the plain list in the missing red, as before this change. The switch's tooltip says it needs the ForeverDB addon. `/or diag` shows `ForeverDB: present=yes loaded=no` | |
-| SEEDS-OR-3 (Retail) | On Retail, open Outfit Window > List; hover an outfit with a missing item | There is no ForeverDB switch on the page, and the *Missing:* line is the plain list as before. `/or set window.foreverdb false` is refused (Retail has no such setting) and nothing changes | |
+| SEEDS-OR-1 (with ForeverDB) | ForeverDB 2026.11.24.46 enabled. Log in; check `/run print(C_AddOns.IsAddOnLoaded("ForeverDB"))`, then hover the outfit with the missing item in the outfit window, then check again | Before the hover it prints `false` (nothing loads it at login, unless another addon such as Command Center did); after, `true`. The tooltip's *Missing:* line draws the item's name in its quality color (green, blue, purple...), and a level the character has not reached follows it in the missing red, as `(level 40)`; at or above that level there is no suffix. Turning the switch off draws the plain red list again. `/or diag` shows the `ForeverDB: present=yes loaded=yes` line | PASS (owner, 2026-11-25) |
+| SEEDS-OR-2 (without ForeverDB) | ForeverDB disabled in the AddOns list. Log in and hover the same outfit | No Lua error; the *Missing:* line is the plain list in the missing red, as before this change. The switch's tooltip says it needs the ForeverDB addon. `/or diag` shows `ForeverDB: present=yes loaded=no` | PASS (owner, 2026-11-25) |
+| SEEDS-OR-3 (Retail) | On Retail, open Outfit Window > List; hover an outfit with a missing item | There is no ForeverDB switch on the page, and the *Missing:* line is the plain list as before. `/or set window.foreverdb false` is refused (Retail has no such setting) and nothing changes | PASS (owner, 2026-11-25) |
