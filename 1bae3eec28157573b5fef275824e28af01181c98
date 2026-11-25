@@ -1,0 +1,4 @@
+Independent review, Ka0sAddonsCommonTasks docs/2026-11-25-SEEDS_AND_FOREVERDB (workflows wf_df07c1ab-8d1, wf_219c4c4a-92a)
+SF-OR-01+02: 1 findings (minor); fix pass: 1bae3ee SF-OR-01: review fixes (testing.md no longer counts the leased majors); fix gate green=True
+  - [minor] docs/testing.md:61 This line still says tests/run.lua asserts 'the seventeen leased majors' files'. SF-OR-02 added ForeverDB.lua to run.lua's EXPECTED floor, so the lease count is now eighteen. The run.lua comment was r
+Lead gate re-run 2026-11-25 at this head: green (see EXECUTION_RECORD.md).
