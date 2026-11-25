@@ -282,9 +282,6 @@ L["Lists the items still in their original Binds on Equip state, under the outfi
 L["Show the Equipment Manager mark"] = "Show the Equipment Manager mark"
 L["Shows the Equipment Manager's icon on each outfit row: full when the outfit is stored there, dimmed when it is not."] = "Shows the Equipment Manager's icon on each outfit row: full when the outfit is stored there, dimmed when it is not."
 L["Show the automation mark"] = "Show the automation mark"
--- SF-OR-02 (settings/OutfitWindow.lua, WoW Forever only)
-L["Describe missing items from ForeverDB"] = "Describe missing items from ForeverDB"
-L["In an outfit's tooltip, draws each missing item in its quality color and adds the level it needs while you are below it. The game's own answer comes first; ForeverDB fills in an item the game has not loaded yet. Needs the ForeverDB addon, which is optional; without it the tooltip lists the names as before."] = "In an outfit's tooltip, draws each missing item in its quality color and adds the level it needs while you are below it. The game's own answer comes first; ForeverDB fills in an item the game has not loaded yet. Needs the ForeverDB addon, which is optional; without it the tooltip lists the names as before."
 L["Shows a lightning mark on each outfit that has a trigger, dimmed while the trigger or automatic outfit changes are off."] = "Shows a lightning mark on each outfit that has a trigger, dimmed while the trigger or automatic outfit changes are off."
 
 -- P4.24 keys (modules/Commands.lua, settings/Slash.lua verbs, core/LauncherSetup.lua bindings)

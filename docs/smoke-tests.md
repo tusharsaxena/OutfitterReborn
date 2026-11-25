@@ -15,7 +15,8 @@ Section 24 is that adoption's report verbs (2026-11-18): `missing`, `zone` and `
 debug console. Section 25 is the skin-defaults run (LibKa0s v1.108.0, 2026-11-20): the looks and the
 tooltip lines that now follow the skin. Section 26 is the owner's feedback batch of 2026-11-24, and
 section 27 its round 2: a menu's selected entry reads apart (LibKa0s v1.113.0). Section 28 is the
-ForeverDB adoption (LibKa0s v1.114.0, 2026-11-25): an outfit tooltip's missing items on WoW Forever.
+ForeverDB adoption (LibKa0s v1.114.0, 2026-11-25): an outfit tooltip's missing items on WoW Forever,
+retired by section 29 (ISF-OR-01, 2026-11-25), where this addon stops reading ForeverDB.
 
 ## Sign-off
 
@@ -665,6 +666,9 @@ text, which no shipped skin does. The Result column is the owner's to fill.
 
 ## 28. Missing items described from ForeverDB (LibKa0s v1.114.0, SF-OR-02, LibKa0s#105, 2026-11-25)
 
+Retired by section 29 (ISF-OR-01): the switch and the ForeverDB read are gone. The rows stay as the
+record of what passed.
+
 WoW Forever unless a row says Retail. ForeverDB is optional (`## OptionalDeps`), and the switch is
 Outfit Window > List > Outfit rows > *Describe missing items from ForeverDB*, on by default. To make an
 item missing, build an outfit while wearing it, then sell or mail the item away (or pick one from a
@@ -676,3 +680,16 @@ fill.
 | SEEDS-OR-1 (with ForeverDB) | ForeverDB 2026.11.24.46 enabled. Log in; check `/run print(C_AddOns.IsAddOnLoaded("ForeverDB"))`, then hover the outfit with the missing item in the outfit window, then check again | Before the hover it prints `false` (nothing loads it at login, unless another addon such as Command Center did); after, `true`. The tooltip's *Missing:* line draws the item's name in its quality color (green, blue, purple...), and a level the character has not reached follows it in the missing red, as `(level 40)`; at or above that level there is no suffix. Turning the switch off draws the plain red list again. `/or diag` shows the `ForeverDB: present=yes loaded=yes` line | PASS (owner, 2026-11-25) |
 | SEEDS-OR-2 (without ForeverDB) | ForeverDB disabled in the AddOns list. Log in and hover the same outfit | No Lua error; the *Missing:* line is the plain list in the missing red, as before this change. The switch's tooltip says it needs the ForeverDB addon. `/or diag` shows `ForeverDB: present=yes loaded=no` | PASS (owner, 2026-11-25) |
 | SEEDS-OR-3 (Retail) | On Retail, open Outfit Window > List; hover an outfit with a missing item | There is no ForeverDB switch on the page, and the *Missing:* line is the plain list as before. `/or set window.foreverdb false` is refused (Retail has no such setting) and nothing changes | PASS (owner, 2026-11-25) |
+
+## 29. ForeverDB leaves Outfitter Reborn (ISF-OR-01, 2026-11-25)
+
+Only Drop Watcher reads ForeverDB now. Outfitter Reborn names it nowhere: not in `## OptionalDeps`,
+not on the Outfit Window page, not in its tooltip code. Make an item missing as in section 28. The
+Result column is the owner's to fill.
+
+| # | Do | See | Result |
+|---|---|---|---|
+| ISF-OR-1 (Forever, ForeverDB enabled, Drop Watcher disabled) | Log in; check `/run print(C_AddOns.IsAddOnLoaded("ForeverDB"))`; hover the outfit with the missing item in the outfit window; check again | Both checks print `false`: Outfitter Reborn never loads ForeverDB. The *Missing:* line draws the item in its quality color, with `(level N)` while you are below its level, when the game has the item loaded; an item the game has not loaded is the plain red name. No Lua error | |
+| ISF-OR-2 (Forever and Retail) | Open Outfit Window > List > Outfit rows; type `/or set window.foreverdb false` | There is no *Describe missing items from ForeverDB* switch on either client, and the command is refused as an unknown setting | |
+| ISF-OR-3 (Forever, a profile that had the switch off) | Before updating, turn *Describe missing items from ForeverDB* off on a second profile; update, log in, `/reload` | No Lua error; `/dump OutfitterRebornDB.profiles` shows no `foreverdb` key under any profile's `window`, and `OutfitterRebornDB.global.schemaVersion` is 2 | |
+| ISF-OR-4 (Retail) | On Retail, hover an outfit with a missing item | The *Missing:* line is the plain list in the missing red, as it always was | |

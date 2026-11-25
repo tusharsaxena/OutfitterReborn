@@ -64,15 +64,6 @@ NS.RegisterSchemaRows({
       tooltip = L["Shows a lightning mark on each outfit that has a trigger, dimmed while the trigger or automatic outfit changes are off."] },
 })
 
--- WoW Forever only (clients-§4): the outfit tooltip's missing items, described with ForeverDB's help
--- (SF-OR-02, LibKa0s#105; modules/OutfitTooltip.lua). Retail registers no row, so neither the panel
--- nor `/or set` offers it there.
-NS.RegisterSchemaRows(NS.ForClientRows({
-    { path = "window.foreverdb", page = PAGE, group = LIST, subgroup = ROWS, type = "bool", clients = { "forever" },
-      label = L["Describe missing items from ForeverDB"], default = D.foreverdb,
-      tooltip = L["In an outfit's tooltip, draws each missing item in its quality color and adds the level it needs while you are below it. The game's own answer comes first; ForeverDB fills in an item the game has not loaded yet. Needs the ForeverDB addon, which is optional; without it the tooltip lists the names as before."] },
-}))
-
 -- ── The page ────────────────────────────────────────────────────────────────────────────────────
 NS.WINDOW_PAGE = {
     key             = PAGE,

@@ -1,10 +1,5 @@
 package-as: OutfitterReborn
 
-# ForeverDB (WoW Forever data) is optional: the missing items of an outfit's tooltip read it when it is
-# installed (clients-§11). Never a required dependency; no player needs it.
-optional-dependencies:
-  - forever-db
-
 # Libraries are vendored in libs/ and committed to git -- NOT fetched as externals.
 
 ignore:

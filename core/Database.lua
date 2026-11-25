@@ -3,7 +3,7 @@ local addonName, NS = ...
 -- and char walks) and the two Schema instances' resolveRoot functions.
 
 -- The runner's target: the highest step's `to` (savedvariables-§1).
-NS.SCHEMA_VERSION = 1
+NS.SCHEMA_VERSION = 2
 
 -- Each step is idempotent against a fresh default store. A step may declare `scope = "profile"`, run
 -- once for every stored profile (`sv.profiles`), or `scope = "char"`, run once for every stored
@@ -12,6 +12,11 @@ NS.SCHEMA_VERSION = 1
 -- outfit record has to reach the characters that are not logged in.
 local STEPS = {
     { to = 1, run = function() end },   -- 0 -> 1: the fresh 1.1.0 store, a no-op
+    -- 1 -> 2 (ISF-OR-01): the "Describe missing items from ForeverDB" switch is gone (only Drop
+    -- Watcher reads ForeverDB), so every stored profile drops its `window.foreverdb`.
+    { to = 2, scope = "profile", run = function(_, profile)
+        if type(profile) == "table" and type(profile.window) == "table" then profile.window.foreverdb = nil end
+    end },
 }
 NS.__migrationSteps = STEPS   -- test seam only
 

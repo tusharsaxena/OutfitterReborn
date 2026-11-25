@@ -57,9 +57,7 @@ test("window settings: the page holds the window's rows on two tabs, each with a
         .. "window.drawer=Character sheet,window.dockGap=Character sheet,"
         .. "window.sections.unused=List/Item sections,window.sections.warbound=List/Item sections,"
         .. "window.sections.boe=List/Item sections,window.marks.em=List/Outfit rows,"
-        .. "window.marks.trigger=List/Outfit rows"
-        -- re-pinned (SF-OR-02): WoW Forever adds the ForeverDB switch under Outfit rows (Retail has no row).
-        .. (FOREVER and ",window.foreverdb=List/Outfit rows" or ""))
+        .. "window.marks.trigger=List/Outfit rows")
     for _, path in ipairs(PATHS) do
         local row = NS.FindSchemaRow(path)
         assertEqual(type(row.tooltip), "string", path .. " has no tooltip")
