@@ -1751,7 +1751,7 @@ Total.
 - missing items: on WoW Forever a field the client left nil is left out
 - missing items: on Retail the list stays plain whatever the client answers
 - missing items: with ForeverDB installed, no hover loads it and its item is not described
-- missing items: no file outside libs/ and tests/_kit/ names the ForeverDB library or lease
+- missing items: no file outside libs/ and tests/_kit/ reads ForeverDB, in code or manifest
 - missing items: the TOC names no ForeverDB dependency
 
 ### test_skin_values.lua (3)

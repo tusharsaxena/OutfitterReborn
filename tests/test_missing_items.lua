@@ -159,34 +159,49 @@ test("missing items: with ForeverDB installed, no hover loads it and its item is
     assertEqual(NS["Forever" .. "DB"], nil, "the ForeverDB lease is gone")
 end)
 
--- The names below are built in pieces so this file does not match its own scan.
-local PATTERNS = { "NS%." .. "ForeverDB", "LibKa0s%-" .. "ForeverDB" }
+-- The names below are built in pieces so this file does not match its own scan; the file is also
+-- left out of it, since it has to name what it looks for. Comments are blanked first (as in Skill
+-- Master's tests/test_no_foreverdb.lua), so a comment telling this history is no read, and then a bare
+-- name is enough: the global (`_G.ForeverDB`, `ForeverDB.item`), a `LoadAddOn("ForeverDB")`, the
+-- library (`LibKa0s-ForeverDB`) and the lease (`NS.ForeverDB`) all hold it. Case matters: the retired
+-- `window.foreverdb` key that core/Database.lua's step 2 clears does not match.
+local PATTERNS = { "Forever" .. "DB", "forever%-" .. "db" }
+local SELF = "tests/test_missing_items.lua"
 
 local function scanned(path)
-    return (path:find("%.lua$") ~= nil or path:find("%.toc$") ~= nil)
-        and not path:find("^libs/") and not path:find("^tests/_kit/")
+    return (path:find("%.lua$") ~= nil or path:find("%.toc$") ~= nil or path == ".pkgmeta")
+        and path ~= SELF and not path:find("^libs/") and not path:find("^tests/_kit/")
 end
 
-test("missing items: no file outside libs/ and tests/_kit/ names the ForeverDB library or lease", function()
+--- `text` with its Lua comments blanked (long ones first); a .toc or .pkgmeta is scanned whole.
+--- Rough on purpose: no addon string literal holds "--".
+local function code(path, text)
+    if not path:find("%.lua$") then return text end
+    text = text:gsub("%-%-%[(=*)%[.-%]%1%]", "")
+    return (text:gsub("%-%-[^\n]*", ""))
+end
+
+test("missing items: no file outside libs/ and tests/_kit/ reads ForeverDB, in code or manifest", function()
     local p = io.popen('git -C "' .. T.root .. '" ls-files --cached --others --exclude-standard 2>/dev/null')
     assertTrue(p ~= nil, "io.popen gave no handle for `git ls-files`")
     local files, hits = 0, {}
     for path in p:lines() do
         if scanned(path) then
-            local f = io.open(T.root .. "/" .. path, "r")
+            local f = io.open(T.root .. "/" .. path, "rb")
             if f then
                 files = files + 1
-                local text = f:read("*a")
+                local body = code(path, (f:read("*a"):gsub("\r\n", "\n")))
                 f:close()
                 for _, pat in ipairs(PATTERNS) do
-                    if text:find(pat) then hits[#hits + 1] = path end
+                    if body:find(pat) then hits[#hits + 1] = path .. ": " .. pat:gsub("%%", "") end
                 end
             end
         end
     end
     p:close()
     assertTrue(files > 50, "`git ls-files` listed only " .. files .. " files")
-    -- red under: core/ForeverDBSetup.lua back, or any module calling the library.
+    -- red under: core/ForeverDBSetup.lua back, a module calling the library or reading the ForeverDB
+    -- global, a LoadAddOn of it anywhere, or ForeverDB named in the TOC or .pkgmeta.
     assertEqual(table.concat(hits, ", "), "")
 end)
 
