@@ -114,15 +114,10 @@ recorder cost and none of it is the addon's. Each new ceiling is about 2% over i
 
 ## Measured costs
 
-**ForeverDB, on WoW Forever only: about 12 MB, loaded on first use.** ForeverDB is an optional
-LoadOnDemand data addon of some 12 MB on disk (version 2026.11.24.46), read through
-LibKa0s-ForeverDB-1.0 (`core/ForeverDBSetup.lua`, SF-OR-02). Nothing loads it at login: the first
-hover over an outfit with missing items calls `Available()`, which loads it once for the session,
-and then the client's memory holds it until logout, whichever addon loaded it. Retail never loads it,
-and neither does Forever with *Describe missing items from ForeverDB* off or ForeverDB not installed.
-The offline scenarios do not reach it (none hovers an outfit with missing items on Forever), so no
-ceiling moves; the cost belongs to ForeverDB's own memory line in the client, not to this addon's.
-`test_foreverdb_missing` pins that login loads nothing and that the first hover loads once.
+**ForeverDB: nothing.** This addon never loads or reads ForeverDB (ISF-OR-01, 2026-11-25; from
+SF-OR-02 until then, the outfit tooltip's missing list loaded it on its first hover). The tooltip
+describes a missing item from the client's answer alone, so its cost is the same few string builds
+as the plain list. `test_missing_items` pins that a hover loads nothing with ForeverDB installed.
 
 **The idle docked window: about 192 bytes a step.** Measured 2026-11-04 by `tests/perf.lua`'s
 `dockIdle` scenario (Lua 5.1, the same figure with capture off and on, ceiling 200). One step is one

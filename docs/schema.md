@@ -78,12 +78,13 @@ Where each of the fork's keys went is the design's §3.2 table.
 
 ## Migrations
 
-`NS.SCHEMA_VERSION = 1`. `NS:RunMigrations()` (`core/Database.lua`) runs from `OnInitialize`, before
+`NS.SCHEMA_VERSION = 2`. `NS:RunMigrations()` (`core/Database.lua`) runs from `OnInitialize`, before
 anything reads `NS.db.profile`, and again over a reset profile:
 
 | Step | From → to | What it does |
 |---|---|---|
 | 1 | 0 → 1 | The fresh 1.1.0 store: a no-op |
+| 2 | 1 → 2 | Every stored profile (`scope = "profile"`) drops `window.foreverdb`, the retired *Describe missing items from ForeverDB* switch (SF-OR-02, removed by ISF-OR-01: only Drop Watcher reads ForeverDB) |
 
 - A step runs only when `global.schemaVersion` is below its `to`, and the runner advances the stamp
   only after the step returns, so a step that raises runs again at the next login.

@@ -4,7 +4,7 @@
 ![CurseForge Version](https://img.shields.io/curseforge/v/1698220)
 ![License](https://img.shields.io/badge/License-MIT-orange)
 ![Standard](https://img.shields.io/badge/Ka0s-WoW_Addon_Standard-yellow)
-![Tests](https://img.shields.io/badge/Tests-1666%2F1666_passing-green)
+![Tests](https://img.shields.io/badge/Tests-1664%2F1664_passing-green)
 
 Supports Retail and WoW Forever. Ka0s Outfitter Reborn manages your gear. You build named outfits from what you own and put them on with a click, a key or a slash command, or you let the addon change them for you: when you cast your fishing line, climb on a mount, shift into bear form, swap specs or walk into a particular battleground. It knows which items each outfit needs, tells you when one has gone missing or is sitting in the bank, and can put together the best outfit your bags hold for a stat or a Pawn scale.
 
@@ -66,7 +66,7 @@ The same addon runs on WoW Forever, with what vanilla Azeroth has:
 | A macro or another addon stopped working with it | The old `Outfitter_*` functions are gone. A `/script Outfitter_WearOutfit(...)` macro becomes `/or wear` with the outfit's name. OutfitterFu, the outfit support in FishingBuddy and ArkInventory, and stat-category plugins all called those functions, and they stay broken until their authors update them. |
 | Why does the outfit window vanish in combat? | Its rows hold the buttons that let you cast a spell such as Disenchant on an item in the list, and the game won't let an addon show, hide or move a window holding those during combat. It comes back when combat ends if the sheet is still open. |
 | Why can't I drag the outfit window somewhere else? | It's attached to the character sheet and goes wherever the sheet goes. |
-| What does ForeverDB add on WoW Forever? | If you have [ForeverDB](https://www.curseforge.com/wow/addons/forever-db) installed, an outfit's tooltip draws the items you're missing in their quality colors and shows the level each one needs while you're below it, even for an item the game hasn't loaded yet. It's optional, and nothing else changes without it. The switch is on the Outfit Window page. |
+| Why are some missing items in color on WoW Forever? | On WoW Forever an outfit's tooltip draws the items you're missing in their quality colors and shows the level each one needs while you're below it. It uses what the game already knows, so an item the game hasn't loaded yet keeps the plain red name. |
 | Does it work with Pawn? | Yes. With Pawn or WeightsWatcher installed, your scales are offered as stats when you build or rebuild an outfit for a stat. |
 | `/or auto off` turned triggers off on my other characters too | Automatic changes are a setting, and settings belong to a profile. Every character on the shared Default profile shares them. Give a character its own profile on the Profiles page to keep them apart. Outfits always belong to one character, whatever the profile. |
 | A trigger didn't take its outfit off after I reloaded | A trigger remembers that it put an outfit on only until you reload or log out. After that it treats the outfit as one you chose and leaves it on. Take it off by hand. |

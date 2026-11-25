@@ -105,6 +105,23 @@ test("database: a step already stamped never runs again", function()
     assertEqual(runs, 0)
 end)
 
+test("database: step 2 drops the retired window.foreverdb from every stored profile (ISF-OR-01)", function()
+    local inst, restore = seeded({
+        global = { schemaVersion = 1 },
+        profiles = { Default = { window = { foreverdb = false, drawer = false } },
+                     Alt = { window = { foreverdb = true } }, Bare = {} },
+    })
+    initialize(inst)
+    restore()
+    local sv = _G.OutfitterRebornDB
+    -- red under: no step 2, or one that walks only the active profile.
+    assertEqual(sv.profiles.Default.window.foreverdb, nil)
+    assertEqual(sv.profiles.Alt.window.foreverdb, nil, "a profile nobody is on")
+    assertEqual(sv.profiles.Default.window.drawer, false, "the rest of the window table is kept")
+    assertEqual(sv.profiles.Bare.window, nil, "a profile with no window table gains none")
+    assertEqual(inst.NS.db.global.schemaVersion, 2)
+end)
+
 test("database: a profile reset re-runs the steps over the reset profile, and keeps db.char", function()
     local inst = T.load()
     local NS = inst.NS

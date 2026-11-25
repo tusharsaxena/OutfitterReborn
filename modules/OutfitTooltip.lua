@@ -15,18 +15,15 @@ local _, NS = ...
 -- (the outfit window for a row, the whole bar for a bar button) by NS.PlaceBodyTip: right of the
 -- group, else left, top level with the element. Never the cursor, never a corner anchor.
 --
--- MISSING ITEMS ON WOW FOREVER (SF-OR-02, LibKa0s#105). A missing item is one the player does not
--- carry, so the client often cannot describe it until it is cached. With `window.foreverdb` on and
--- ForeverDB available (NS.ForeverDB.Available: Forever only, installed, loaded on that first call),
--- each missing name is drawn in its quality color, and the level it needs follows it while the player
--- is below that level. Each field is the client's answer (Compat.ItemInfo) when it has one, and
--- ForeverDB's (NS.ForeverDB.Item) only for a field the client left nil. Anything else (Retail, no
--- ForeverDB, a reshaped one, a failed load, the setting off) draws the plain list it always drew.
--- Banked items are carried, so they stay plain. The first hover over an outfit with missing items is
--- what loads ForeverDB (about 12 MB, docs/performance.md); nothing here runs at login.
+-- MISSING ITEMS ON WOW FOREVER (SF-OR-02, narrowed by ISF-OR-01). A missing item is one the player
+-- does not carry. On WoW Forever each missing name is drawn in its quality color, and the level it
+-- needs follows it while the player is below that level, from the client's answer (Compat.ItemInfo)
+-- alone; nothing here reads ForeverDB. A field the client has not answered yet is left out: with
+-- neither, the name is drawn in the line's color as it always was. Retail draws the plain list
+-- (a file-scope per-client pick, clients-§5). Banked items are carried, so they stay plain.
 --
 -- CALLS (at call time, no nil guard; design §12): NS.Outfits.Get, NS.Inventory.Missing,
--- NS.Triggers.Get, NS.ForeverDB.Available/Item, NS.GetSetting, NS.QualityColor.
+-- NS.Triggers.Get, NS.QualityColor.
 
 local OT = {}
 NS.OutfitTooltip = OT
@@ -65,25 +62,15 @@ local function escape(r, g, b)
     return ("|cff%02x%02x%02x"):format(byte(r), byte(g), byte(b))
 end
 
--- Whether missing items are described: the setting on, and ForeverDB there to fill the gaps. The
--- Available call is the one that loads ForeverDB, the first time a tooltip lists a missing item.
-local function describing()
-    if NS.GetSetting("window.foreverdb") == false then return false end
-    return (NS.ForeverDB.Available()) == true
-end
+-- Whether missing items are described: WoW Forever only (Retail keeps the plain list it always drew).
+local DESCRIBED = NS.PerClient({ retail = false, forever = true }) == true
 
--- A missing item's quality and required level: the client's, then ForeverDB's for a field it left nil.
+-- A missing item's quality and required level, from the client's answer alone; nil for a field the
+-- client has not loaded.
 local function describe(item)
     local id = Secrets.PlainNumber(item.id)
     if not id then return nil, nil end
     local _, quality, _, minLevel = Compat.ItemInfo(id)
-    if quality == nil or minLevel == nil then
-        local row = NS.ForeverDB.Item(id)
-        if row then
-            if quality == nil then quality = Secrets.PlainNumber(row.quality) end
-            if minLevel == nil then minLevel = Secrets.PlainNumber(row.requiredLevel) end
-        end
-    end
     return quality, minLevel
 end
 
@@ -124,7 +111,7 @@ local function full(tip, rec, desc, missing, banked, owner, group)
     tip:ClearLines()
     addTitle(tip, rec)
     if desc then addBody(tip, desc) end
-    addList(tip, L["Missing:"], "of.outfit.missing", missing, #missing > 0 and describing())
+    addList(tip, L["Missing:"], "of.outfit.missing", missing, DESCRIBED)
     addList(tip, L["Banked:"], "of.outfit.banked", banked)
     tip:Show()
     NS.PlaceBodyTip(tip, owner, group)
