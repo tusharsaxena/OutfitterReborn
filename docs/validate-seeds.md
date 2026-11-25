@@ -225,7 +225,15 @@ luacheck must report 0 warnings and 0 errors, and every suite 0 failed. Without 
   download's size and sha256, and `--replay` from the trimmed `raw/` reproduces `candidates.json`
   byte for byte. A bundle is about 100 KB.
 - **`tools/gen-zones.lua`** is the older, Lua-only zone diff (`tests/test_zones.lua` covers it). It
-  reads one hand-fetched `Map.db2` export and does not pin a build; `seeds.py` covers the same
-  check per client and pinned, so a re-validation run uses `seeds.py`.
+  is pinned too: `--build <build>` is required, `--fetch` downloads
+  `https://wago.tools/db2/Map/csv?build=<build>` with the User-Agent `OutfitterReborn-seed-check`,
+  and the report's first line names the build. It diffs the whole table as Retail reads it, so it
+  takes a `wow` build only (12.1.5.70961 on 2026-11-25 diffed clean). `seeds.py` covers the same
+  check per client, so a re-validation run uses `seeds.py`; `gen-zones.lua` is the quick check when
+  a zone row is added by hand.
+- **No ForeverDB evidence** (clients-§10, *A second evidence source for Forever*). ForeverDB answers
+  server-side facts for the classic-era world; the only ids here the DB2 cannot check are the 23
+  Retail quest NPCs (Argent Tournament and Ulduar, *Not checkable* above), which ForeverDB does not
+  hold. The `forever` flavor reads its DB2 alone.
 - **Whether a shared helper** should carry the build pin, the cache, the bundle and the rulings for
   every Ka0s addon is decided in LibKa0s#91.

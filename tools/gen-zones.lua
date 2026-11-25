@@ -1,8 +1,16 @@
 -- tools/gen-zones.lua — diffs a wago.tools Map.db2 export against defaults/Zones.lua (design §6.5).
 -- Never loaded by the client, never shipped (.pkgmeta ignores tools/).
 --
---   curl -o Map.csv https://wago.tools/db2/Map/csv
---   lua tools/gen-zones.lua Map.csv [defaults/Zones.lua]
+--   lua tools/gen-zones.lua --build <build> --fetch Map.csv [defaults/Zones.lua]
+--   lua tools/gen-zones.lua --build <build> Map.csv [defaults/Zones.lua]
+--
+-- The export is pinned to one build (clients-§10): `--build` is required, and the report names it.
+-- Take the build from https://wago.tools/api/builds, the newest live (non-bgdl) `wow` build. The
+-- table is diffed whole, as Retail reads it, so a `wowf` build would report every Retail-only map
+-- as removed; the per-client check is tools/seeds/seeds.py's. `--fetch` downloads the export
+-- first, through curl, from https://wago.tools/db2/Map/csv?build=<build> with the User-Agent
+-- OutfitterReborn-seed-check (wago.tools refuses an anonymous agent). Without it, the CSV must
+-- already be an export of that build.
 --
 -- It reads every map of InstanceType 3 (battleground) or 4 (arena) from the export and reports:
 --   added      a map the export has and the table does not: a new row, a new map id on an existing
@@ -106,9 +114,59 @@ function M.diff(zones, records)
     return d
 end
 
---- The diff as the lines a person reads.
-function M.report(d)
+--- The wago.tools build a pin names: four dot-separated numbers, as the builds API spells them.
+function M.validBuild(build)
+    return type(build) == "string" and build:match("^%d+%.%d+%.%d+%.%d+$") ~= nil
+end
+
+M.USER_AGENT = "OutfitterReborn-seed-check"
+
+--- The export's URL at one build. Errors on anything but a valid build: an unpinned fetch reads
+--- whatever wago.tools calls current, and the diff could not say which build it describes.
+function M.exportURL(build)
+    assert(M.validBuild(build), "gen-zones: --build must be a wago.tools build such as 12.1.5.70961")
+    return "https://wago.tools/db2/Map/csv?build=" .. build
+end
+
+--- The curl command `--fetch` runs. The build is validated and the path single-quoted for the
+--- shell; a path that holds a single quote is refused rather than escaped.
+function M.fetchCommand(build, path)
+    assert(type(path) == "string" and path ~= "" and not path:find("'", 1, true),
+        "gen-zones: the CSV path must be non-empty and hold no single quote")
+    return ("curl -fsSL -A '%s' -o '%s' '%s'"):format(M.USER_AGENT, path, M.exportURL(build))
+end
+
+--- The command line: `--build <build>` (required), `--fetch`, then the CSV path and the optional
+--- Zones.lua path. Answers the options, or nil and the reason.
+function M.parseArgs(argv)
+    local opts, pos, i = { fetch = false }, {}, 1
+    while argv[i] ~= nil do
+        local a = argv[i]
+        if a == "--build" then
+            opts.build = argv[i + 1]
+            i = i + 1
+        elseif a == "--fetch" then
+            opts.fetch = true
+        elseif a:sub(1, 2) == "--" then
+            return nil, "unknown option " .. a
+        else
+            pos[#pos + 1] = a
+        end
+        i = i + 1
+    end
+    if not M.validBuild(opts.build) then
+        return nil, "--build <build> is required (a wago.tools build such as 12.1.5.70961)"
+    end
+    if not pos[1] then return nil, "the Map.csv path is required" end
+    if pos[3] then return nil, "too many arguments" end
+    opts.csv, opts.zones = pos[1], pos[2]
+    return opts
+end
+
+--- The diff as the lines a person reads, under a line naming the build when one is given.
+function M.report(d, build)
     local out = {}
+    if build then out[1] = ("Map.db2 at wago.tools build %s"):format(build) end
     for _, e in ipairs(d.added) do
         out[#out + 1] = ("added      %5d  InstanceType %d  %s"):format(e.id, e.instanceType, e.name)
     end
@@ -118,7 +176,9 @@ function M.report(d)
     for _, e in ipairs(d.wrongKind) do
         out[#out + 1] = ("wrongKind  %5d  InstanceType %d, listed under %s"):format(e.id, e.instanceType, e.owner)
     end
-    if #out == 0 then out[1] = "defaults/Zones.lua matches the export: no map added, removed or moved" end
+    if #d.added + #d.removed + #d.wrongKind == 0 then
+        out[#out + 1] = "defaults/Zones.lua matches the export: no map added, removed or moved"
+    end
     return table.concat(out, "\n")
 end
 
@@ -141,18 +201,29 @@ local function readAll(path)
     return s
 end
 
-local function main(csvPath, zonesPath)
-    if not csvPath then
-        io.stderr:write("usage: lua tools/gen-zones.lua Map.csv [defaults/Zones.lua]\n")
+local USAGE = "usage: lua tools/gen-zones.lua --build <build> [--fetch] Map.csv [defaults/Zones.lua]\n"
+
+local function main(argv)
+    local opts, err = M.parseArgs(argv)
+    if not opts then
+        io.stderr:write("gen-zones: " .. err .. "\n" .. USAGE)
         return 2
     end
-    local d = M.diff(M.loadZones(zonesPath or "defaults/Zones.lua"), M.parseCSV(readAll(csvPath)))
-    print(M.report(d))
+    if opts.fetch then
+        -- os.execute answers 0 on Lua 5.1 and true on 5.2+ when the command succeeds.
+        local ok = os.execute(M.fetchCommand(opts.build, opts.csv))
+        if ok ~= true and ok ~= 0 then
+            io.stderr:write("gen-zones: fetching " .. M.exportURL(opts.build) .. " failed\n")
+            return 2
+        end
+    end
+    local d = M.diff(M.loadZones(opts.zones or "defaults/Zones.lua"), M.parseCSV(readAll(opts.csv)))
+    print(M.report(d, opts.build))
     return (#d.added + #d.removed + #d.wrongKind == 0) and 0 or 1
 end
 
 if arg and type(arg[0]) == "string" and arg[0]:match("gen%-zones%.lua$") then
-    os.exit(main(arg[1], arg[2]))
+    os.exit(main(arg))
 end
 
 return M

@@ -19,6 +19,8 @@ L["Equipment Sets: %s"] = "Equipment Sets: %s"
 L["Outfitter"] = "Outfitter"
 L["Missing:"] = "Missing:"
 L["Banked:"] = "Banked:"
+-- SF-OR-02: a missing item the player is still below the level of
+L["%s (level %d)"] = "%s (level %d)"
 
 -- P4.18 keys (modules/QuickSlots.lua, modules/QuickSlots_Sort.lua)
 

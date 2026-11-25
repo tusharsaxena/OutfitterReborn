@@ -13,6 +13,7 @@ How to verify Ka0s Outfitter Reborn (testing-§6). What to install first is in t
 | `lua tests/run.lua -j auto` | The same, split across one worker per CPU (testing-§14) |
 | `lua tests/run.lua --list > docs/test-cases.md` | Regenerates the case inventory without running anything |
 | `~/.claude/dev-copilot/bin/ka0s-bounded luacheck .` | Lint, configured by `.luacheckrc`; must report 0 warnings and 0 errors. `luacheck` loads no kit, so it runs through the bounded runner (testing-§15) |
+| `python3 -m pytest -q tools/seeds` | The seed tool's cases ([validate-seeds.md](validate-seeds.md)); without pytest, `python3 -m unittest discover -s tools/seeds -p 'test_*.py'` |
 | `luac -p path/to/file.lua` | Syntax-check one file |
 | `bash tests/_kit/run-automated-tests.sh` | All four out-of-game suites, written to a dated bundle ([automated-tests/README.md](automated-tests/README.md)); run it through the bounded runner |
 
@@ -21,7 +22,8 @@ Every Lua run is bounded by the vendored kit as it loads (memory, time, process 
 ## The commit gate
 
 Before **every** commit: `lua tests/run.lua` green, `KA0S_KIT_CLIENT=forever lua tests/run.lua` green
-**and** `~/.claude/dev-copilot/bin/ka0s-bounded luacheck .` at 0/0 (testing-§4). The runner's
+**and** `~/.claude/dev-copilot/bin/ka0s-bounded luacheck .` at 0/0 (testing-§4), plus
+`python3 -m pytest -q tools/seeds` green (the seed contract's `## Gate`). The runner's
 `--suite lint --suite tests --no-bundle` is the Retail pair and writes nothing;
 `KA0S_KIT_CLIENT=forever tests/_kit/run-automated-tests.sh --suite tests --no-bundle` is the Forever
 half. Work is test-first: a failing case that pins the behavior, then the code.
@@ -55,11 +57,11 @@ places in Lua, and the kit's sighted shadow is what the complexity suite measure
 ## How the harness is built
 
 - **`tests/_kit/`** is the shared harness, vendored byte-identical from the LibKa0s tag named in root
-  `CLAUDE.md` (test kit revision 60). Never edit it; `test_vendor_sync` fails on any drift.
-- **`tests/run.lua`** loads the vendored library in `LibKa0s.xml` order (asserting the seventeen leased
-  majors' files are present) and the addon in **TOC order** (`Loader.tocFiles`), so the harness cannot
-  drift from what the client loads (testing-§9). It runs `OnInitialize` and `OnEnable` like the
-  client, and `loadInstance` builds isolated instances (a library-absent load passes `libFiles = {}`).
+  `CLAUDE.md` (test kit revision 62). Never edit it; `test_vendor_sync` fails on any drift.
+- **`tests/run.lua`** loads the vendored library in `LibKa0s.xml` order (asserting the leased majors'
+  files are present, ForeverDB among them since SF-OR-02) and the addon in **TOC order**
+  (`Loader.tocFiles`), so the harness cannot drift from what the client loads (testing-§9). It runs
+  `OnInitialize` and `OnEnable` like the client, and `loadInstance` builds isolated instances (a library-absent load passes `libFiles = {}`).
   It exposes `_G.OUTFITTERREBORN_TEST` to the local suites.
 - **`tests/wow_mock.lua`** extends the kit's base mock with what this addon calls, and installs the
   two domain halves on every build: `tests/mock_gear.lua` (worn items, bags, the bank, the cursor and
@@ -210,6 +212,7 @@ has no row here, or a row leaves its §9.3 group or order.
 | `test_skin` | Only our frames are skinned; the window, bar, dialogs and menus follow a skin switch; a selected entry reads apart (a ticked toggle or radio of a context menu and a picker's selected value paint the menu's selected color in every skin, FB2-OR-01) |
 | `test_titlebar` | The title-bar controls of the windows this addon draws (the outfit window, the outfit bar, the four dialogs): every control shows a tooltip in `gtip.title`, and rests in `icon.tint` and lights in `text.link` (a close in `close.hot`) under every shipped skin (LibKa0s v1.105.0 smoke round 1, rulings 3 and 4) |
 | `test_tooltip_place` | Where this addon's own tooltips open (standalone-windows, *Tooltip placement*; AD-92-OR): every body element's tooltip (a window row, a row's EM mark, a bar button, the outfit tooltip) is owned at `ANCHOR_NONE` and placed by `NS.PlaceBodyTip` beside its window group, right then left, top level with the element, on the kit's fake screen, the comparison side set to match and remembered for the compare tooltips (body rule 5), a late-grown tooltip placed again; unreadable geometry attaches above, never the cursor; a source guard holds `core/` and `modules/` to no cursor or corner anchor outside the closed allowlist |
+| `test_foreverdb_missing` | The outfit tooltip's missing items on WoW Forever (SF-OR-02, LibKa0s#105), on the kit's ForeverDB fake: without ForeverDB, reshaped, a failed load, on Retail or with the setting off, the plain list it always was; with it, each name in its quality color and the level it needs while the player is below it, the client's answer winning over ForeverDB's field by field; nothing loads ForeverDB at login, and the first hover over an outfit with missing items loads it once |
 | `test_perf_harness` | The ten buckets in order with the one nest, each reached on the whole addon (`equipExecute` only inside `E.Update`), the six offline scenarios doing what they are named for (the idle docked window's announcing nothing and leaving no update pending among them), the `perf` verb, the latch's `perf` hold |
 | `test_glyphs` | The display-glyph guard over the addon's own Lua. The zhCN, zhTW, koKR and ruRU overlays are skipped (no western safe set holds them); their faces are left to the H8 client check |
 

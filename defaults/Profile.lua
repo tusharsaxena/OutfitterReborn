@@ -37,7 +37,9 @@ NS.defaults = {
         -- row marks. Every switch on, gap 0: the window as it has always looked.
         window     = { sheetButton = true, slotBoxes = true, drawer = true, dockGap = 0,
                        sections = { unused = true, warbound = true, boe = true },
-                       marks = { em = true, trigger = true } },
+                       marks = { em = true, trigger = true },
+                       -- WoW Forever with ForeverDB: describe an outfit's missing items (SF-OR-02).
+                       foreverdb = true },
         -- Named non-setting state (architecture-§5): the bar's dragged place, each dialog's.
         windows    = { bar = { point = "TOPLEFT", x = 200, y = -200 }, dialogs = {} },
         skin       = { source = "ka0s", skin = NS.DEFAULT_SKIN or "ka0s", ignorePanel = true, ignoreFonts = false,

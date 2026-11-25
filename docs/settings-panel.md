@@ -209,6 +209,7 @@ declaration order:
 | `window.sections.boe` | `true` | Show Unopened |
 | `window.marks.em` | `true` | Show the Equipment Manager mark (*Outfit rows*): off, the name takes its place |
 | `window.marks.trigger` | `true` | Show the automation mark |
+| `window.foreverdb` | `true` | Describe missing items from ForeverDB (*Outfit rows*; WoW Forever only, no row on Retail): an outfit tooltip's missing items in their quality colors, with the level each needs while the player is below it; the client's answer first, ForeverDB's for what the client has not loaded. Needs the optional ForeverDB addon; without it the list is plain |
 
 No row has an `onChange`, and the page draws no color, font or border block, so no FromSkin companion
 or composed group is owed. Each surface follows a `window.*` write (`SETTINGS_CHANGED`) and a profile

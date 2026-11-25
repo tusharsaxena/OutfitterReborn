@@ -342,6 +342,21 @@ test("parity: on both arms the Item lease answers nil for a non-string and a sec
     if not ok then error(err, 0) end
 end)
 
+-- ── ForeverDB (SF-OR-02) ──────────────────────────────────────────────────────────────────────
+
+test("parity: the ForeverDB lease carries the same two members on both arms", function()
+    bothArms("NS.ForeverDB", function(NS) return NS.ForeverDB end, { Available = "function", Item = "function" })
+end)
+
+test("parity: the degraded ForeverDB lease answers the library's all-absent values", function()
+    -- red under: a stub that answers true, or raises, without the library (core/ForeverDBSetup.lua).
+    local _, d = pair()
+    local ok, reason = d.NS.ForeverDB.Available()
+    assertFalse(ok)
+    assertEqual(reason, "missing")
+    assertNil(d.NS.ForeverDB.Item(990101))
+end)
+
 -- ── Widgets ────────────────────────────────────────────────────────────────────────────────────
 
 test("parity: the Widgets seam answers on both arms, nil being a real answer", function()

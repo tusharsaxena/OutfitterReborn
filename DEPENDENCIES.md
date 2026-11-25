@@ -14,11 +14,15 @@ such rather than listed as a requirement.
   Forever's second (toc-file-§3). One codebase serves both clients (clients-§1).
 - **Nothing else.** Every library is vendored under `libs/` and committed (library-stack), LibKa0s
   at the release the provenance line in `CLAUDE.md` names (no version is restated here), so the player installs no separate library
-  addon. `## OptionalDeps:` names the vendored libraries, EllesmereUI, Pawn and WeightsWatcher for
+  addon. `## OptionalDeps:` names the vendored libraries, EllesmereUI, Pawn, WeightsWatcher and ForeverDB for
   load ordering, not as things to download. Pawn and WeightsWatcher are optional stat sources: the
   addon reads them when they are loaded and falls back to its own scoring when they are not.
   EllesmereUI and ChonkyCharacterSheet are optional too: when one's character sheet is up, the
   outfit tab and window follow it (`modules/Sheet.lua`), and EllesmereUI can be the skin source.
+  ForeverDB (WoW Forever data, GPL-3.0, CurseForge `forever-db`, also under `.pkgmeta`'s
+  `optional-dependencies`) is optional: when it is installed, an outfit tooltip's missing items take
+  their quality and level from it where the client has not loaded them (`core/ForeverDBSetup.lua`,
+  through LibKa0s-ForeverDB-1.0). Nothing of its data is copied into this repo.
   Ace3: WoWUIDev/Ace3@ac3d1225 (untagged master; LibKa0s#76).
 
 ## Development: the contributor toolchain
@@ -90,9 +94,11 @@ python3 -c "import PIL; print(PIL.__version__)"
 ```
 
 **curl**, only for **refreshing** the zone table. `tools/gen-zones.lua` diffs a wago.tools `Map.db2`
-export against `defaults/Zones.lua`, and its header fetches the export with
-`curl -o Map.csv https://wago.tools/db2/Map/csv` before `lua tools/gen-zones.lua Map.csv`. Like
-Pillow, it is not needed to build, run or test the addon.
+export against `defaults/Zones.lua`, pinned to one build:
+`lua tools/gen-zones.lua --build <build> --fetch Map.csv` runs curl against
+`https://wago.tools/db2/Map/csv?build=<build>` before the diff (the build is the newest live `wow`
+build from `https://wago.tools/api/builds`). Like Pillow, it is not needed to build, run or test the
+addon.
 
 ```sh
 sudo apt-get install -y curl

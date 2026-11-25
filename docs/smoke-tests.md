@@ -14,7 +14,8 @@ of the LibKa0s v1.105.0 adoption (2026-11-17): the docked test strips and the wi
 Section 24 is that adoption's report verbs (2026-11-18): `missing`, `zone` and `iteminfo` in the
 debug console. Section 25 is the skin-defaults run (LibKa0s v1.108.0, 2026-11-20): the looks and the
 tooltip lines that now follow the skin. Section 26 is the owner's feedback batch of 2026-11-24, and
-section 27 its round 2: a menu's selected entry reads apart (LibKa0s v1.113.0).
+section 27 its round 2: a menu's selected entry reads apart (LibKa0s v1.113.0). Section 28 is the
+ForeverDB adoption (LibKa0s v1.114.0, 2026-11-25): an outfit tooltip's missing items on WoW Forever.
 
 ## Sign-off
 
@@ -660,3 +661,17 @@ text, which no shipped skin does. The Result column is the owner's to fill.
 | MS2 (FB2-OR-01) | Wear an accessory outfit; hover the Outfits broker on a display (Titan Panel, ChocolateBar or similar) under Ka0s Default, Azeroth and Slate (on Forever, also WoW Forever); turn *Automatic changes* on | The worn outfit's row and *Automatic changes* carry the tick in the column and their text in gold, in every skin; each outfit row still shows its own icon, and an outfit not worn reads plain | |
 | MS3 (FB2-OR-01) | Under Azeroth, then Slate (on Forever, also WoW Forever), open New outfit and drop both of its *Automation:* pickers (the category, then the trigger); then the Rebuild dialog's stat picker | The row of the current value is gold in every skin, apart from the other rows' text (Azeroth's parchment, Slate's and WoW Forever's own), never the skin's accent; under Ka0s Default it is gold as before | |
 | MS4 (FB2-OR-REV) | Under Ka0s Default: put one item of an accessory outfit in the bank and wear the outfit anyway (its row in the window reads in the banked color); bank an item of a second outfit too, not worn; hover the Outfits broker | The worn outfit's row is in the selected color (gold), not the banked color, with its tick in the column; the second outfit, not worn, keeps the banked color. Take the first off: its row goes back to the banked color | |
+
+## 28. Missing items described from ForeverDB (LibKa0s v1.114.0, SF-OR-02, LibKa0s#105, 2026-11-25)
+
+WoW Forever unless a row says Retail. ForeverDB is optional (`## OptionalDeps`), and the switch is
+Outfit Window > List > Outfit rows > *Describe missing items from ForeverDB*, on by default. To make an
+item missing, build an outfit while wearing it, then sell or mail the item away (or pick one from a
+friend's link the client has never shown you, so it is not cached). The Result column is the owner's to
+fill.
+
+| # | Do | See | Result |
+|---|---|---|---|
+| SEEDS-OR-1 (with ForeverDB) | ForeverDB 2026.11.24.46 enabled. Log in; check `/run print(C_AddOns.IsAddOnLoaded("ForeverDB"))`, then hover the outfit with the missing item in the outfit window, then check again | Before the hover it prints `false` (nothing loads it at login, unless another addon such as Command Center did); after, `true`. The tooltip's *Missing:* line draws the item's name in its quality color (green, blue, purple...), and a level the character has not reached follows it in the missing red, as `(level 40)`; at or above that level there is no suffix. Turning the switch off draws the plain red list again. `/or diag` shows the `ForeverDB: present=yes loaded=yes` line | |
+| SEEDS-OR-2 (without ForeverDB) | ForeverDB disabled in the AddOns list. Log in and hover the same outfit | No Lua error; the *Missing:* line is the plain list in the missing red, as before this change. The switch's tooltip says it needs the ForeverDB addon. `/or diag` shows `ForeverDB: present=yes loaded=no` | |
+| SEEDS-OR-3 (Retail) | On Retail, open Outfit Window > List; hover an outfit with a missing item | There is no ForeverDB switch on the page, and the *Missing:* line is the plain list as before. `/or set window.foreverdb false` is refused (Retail has no such setting) and nothing changes | |
