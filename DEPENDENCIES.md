@@ -34,6 +34,7 @@ such rather than listed as a requirement.
 | POSIX shell | any | the suite's `-j` workers and the kit's bounds | `tests/_kit/framework.lua` shells out through `os.execute` and `io.popen` |
 | `lizard` | any recent (verified with 1.24.0) | the `complexity` suite of `tests/_kit/run-automated-tests.sh` | the runner calls `lizard` over the sighted shadow `tests/_kit/lizard_sighted.lua` builds, because `lizard` alone is blind in places in Lua (automated-tests-§3) |
 | `bash` | **4.x or later** | `tests/_kit/run-automated-tests.sh`, the automated-test bundle | its shebang is `#!/usr/bin/env bash` and it declares `declare -A ST DUR NOTE`, which POSIX `sh` cannot parse |
+| `python3` | **3.8+**, standard library only (`pytest` optional) | the seed tool's offline cases, `python3 -m pytest -q tools/seeds` (or `python3 -m unittest discover -s tools/seeds -p 'test_*.py'`), part of the commit gate | `CLAUDE.md`'s green gate names them (SF-OR-01); `tools/seeds/test_seeds.py`. Ubuntu 24.04 ships `python3`; the seed check's network needs are in [Release / assets](#release--assets) |
 
 **Lua 5.1 is a requirement, not a preference.** The harness sandboxes each source file with
 `setfenv`, which was removed in 5.2.
@@ -55,6 +56,7 @@ lua5.1 -v                # Lua 5.1.5 ...   (if `lua` is not 5.1, use lua5.1 expl
 luacheck --version
 lizard --version
 git --version
+python3 --version        # 3.8 or newer, for the seed tool's cases in the gate
 bash --version           # GNU bash 4.x or 5.x; Ubuntu ships one
 ```
 
@@ -114,8 +116,9 @@ is the floor because of its `from __future__ import annotations`. A run that is 
 fetches about 140 MB (Retail) or 21 MB (WoW Forever) per build into `tools/seeds/.cache/`
 (git-ignored, `tools/seeds/.gitignore`); a frozen bundle re-derives offline. Its tests,
 `python3 -m pytest -q tools/seeds`, need pytest, or run under the standard library's
-`python3 -m unittest discover -s tools/seeds -p 'test_*.py'`. Not needed to build, run or test the
-addon, and not part of the Lua gate.
+`python3 -m unittest discover -s tools/seeds -p 'test_*.py'`. The tests need no network and
+are part of `CLAUDE.md`'s green gate (SF-OR-01), so a contributor needs `python3` even without
+re-validating anything; the network is needed only for the check itself.
 
 ```sh
 python3 --version                     # 3.8 or newer
