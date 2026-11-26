@@ -693,3 +693,11 @@ Result column is the owner's to fill.
 | ISF-OR-2 (Forever and Retail) | Open Outfit Window > List > Outfit rows; type `/or set window.foreverdb false` | There is no *Describe missing items from ForeverDB* switch on either client, and the command is refused as an unknown setting | |
 | ISF-OR-3 (Forever, a profile that had the switch off) | Before updating, turn *Describe missing items from ForeverDB* off on a second profile; update, log in, `/reload` | No Lua error; `/dump OutfitterRebornDB.profiles` shows no `foreverdb` key under any profile's `window`, and `OutfitterRebornDB.global.schemaVersion` is 2. **Owner to confirm:** on WoW Forever the *Missing:* line is now always described from the game's answer (quality color, level suffix) and this profile's *off* is not carried over: there is no setting left for the plain list. Note here if you want a client-agnostic switch back | |
 | ISF-OR-4 (Retail) | On Retail, hover an outfit with a missing item | The *Missing:* line is the plain list in the missing red, as it always was | |
+
+## Help glyph (2026-11-27)
+
+The owner picked the help and missing-icon glyphs (Ka0sAddonsCommonTasks round 6). Unrun.
+
+| ID | Check | Result |
+|---|---|---|
+| GLYPH-1 | Open an outfit whose slot state is unknown (a slot the outfit neither sets nor clears): the slot's unknown mark is an outlined ring with a question mark (game-icons `gi:help`), not the bare **?**. | |
