@@ -7,11 +7,20 @@ local _, NS = ...
 -- level, then name (modules/QuickSlots_Sort.lua, which extends this table with QS.Sort).
 --
 -- HOOKS, NEVER REPLACEMENTS (design §7.0 rule 3, skinning-§7). The slot buttons take HookScript on
--- PostClick; the flyout's PaperDollItemsFrame.flyoutSettings.getItemsFunc and
--- postGetItemsFunc take hooksecurefunc post-hooks, which filter and sort the tables the original
--- filled, in place. The legacy code replaced both functions (OutfitterQuickSlots.lua:17-36). A
--- post-hook receives the caller's numItems, not the original's return: the original inserts "place in
--- bags" at index 1 and answers numItems + 1, so the count is read from the dense display table.
+-- PostClick. The legacy code replaced the flyout's getItemsFunc and postGetItemsFunc
+-- (OutfitterQuickSlots.lua:17-36).
+--
+-- NOTHING OF BLIZZARD'S LIST IS WRITTEN (the owner's ADDON_ACTION_BLOCKED, 2026-11-27, FLY-TAINT-01).
+-- Until then post-hooks on getItemsFunc and postGetItemsFunc filtered and sorted Blizzard's own tables
+-- in place. EquipmentFlyout_UpdateItems copies each display entry into `button.location`
+-- (wow-ui-source live, EquipmentFlyout.lua:285-286) and the button's click hands it to
+-- EquipmentManager_RunAction, so every location was a value this addon had written: a flyout click in
+-- combat ran PickupInventoryItem tainted, and the client blocked it and blamed this addon. Now the
+-- list stays Blizzard's, values and order, and EquipmentFlyout_UpdateItems' post-hook arranges the
+-- BUTTONS (arrangeFlyout): it reads each shown button's location, works the order out in a table of
+-- its own (QS.Sort), hides a button whose item is already worn, and anchors the rest to the flyout's
+-- grid in that order. A position and a shown flag carry no taint into a click. The order is per page
+-- (Blizzard pages its own list before the hook sees it).
 --
 -- BUILT ONCE, ON THE FIRST STAND-UP (Resume, which the login's OnEnable runs; design §5.12). The hooks
 -- cannot be removed, so a stand-down leaves them installed and every body reads the gate first: the
@@ -108,21 +117,81 @@ local function onPlayer(location)
     return Compat.BitAnd(location, mask) == player
 end
 
--- getItemsFunc's post-hook: remove items on the player from the choices.
-local function filterItems(_, itemTable)
-    if not active() or type(itemTable) ~= "table" then return end
-    for location in pairs(itemTable) do
-        if onPlayer(location) then itemTable[location] = nil end
+-- Whether flyout location `location` is an item already worn (a special entry, such as "place in
+-- bags", never is).
+local function wornItem(location)
+    local first = clientNumber("EQUIPMENTFLYOUT_FIRST_SPECIAL_LOCATION", 0xFFFFFFFD)
+    return location > 0 and location < first and onPlayer(location)
+end
+
+--- The order the flyout's shown buttons are drawn in, worked out in tables of this file's own
+--- (FLY-TAINT-01): the buttons whose item is not already worn, ordered by upgrade track, then item
+--- level, then name, with "place in bags" moved from the front to the end. Answers the ordered
+--- buttons, or nil to leave Blizzard's order (a location that is not a plain number).
+--- @param shown table the shown buttons, in Blizzard's order
+--- @return table|nil
+function QS.FlyoutOrder(shown)
+    local locs, byLoc = {}, {}
+    for _, b in ipairs(shown) do
+        local loc = Secrets.PlainNumber(b.location)
+        if not loc or byLoc[loc] then return nil end
+        byLoc[loc] = b
+        if not wornItem(loc) then locs[#locs + 1] = loc end
+    end
+    local n = #locs
+    QS.Sort.Items(locs, n)
+    QS.Sort.PlaceInBagsLast(locs, n)
+    local out = {}
+    for i, loc in ipairs(locs) do out[i] = byLoc[loc] end
+    return out
+end
+
+-- Grid cell `k` of the flyout's item frame, as Blizzard's EquipmentFlyout_CreateButton lays it
+-- (EquipmentFlyout.lua:57-75: ITEMS_PER_ROW to a row, BORDERWIDTH in, EFITEM_XOFFSET apart, a row
+-- EFITEM_HEIGHT - EFITEM_YOFFSET down), each number the client's own.
+local function cellPoint(k, w)
+    local perRow = math.max(1, clientNumber("EQUIPMENTFLYOUT_ITEMS_PER_ROW", 5))
+    local border = clientNumber("EQUIPMENTFLYOUT_BORDERWIDTH", 3)
+    local row, col = math.floor((k - 1) / perRow), (k - 1) % perRow
+    local x = border + col * (w + clientNumber("EFITEM_XOFFSET", 4))
+    local y = -border - row * (clientNumber("EFITEM_HEIGHT", 37) - clientNumber("EFITEM_YOFFSET", -5))
+    return x, y
+end
+
+local arranged = false   -- whether arrangeFlyout last moved the buttons off Blizzard's own order
+
+-- Anchor `buttons` to the item frame's cells in order.
+local function placeCells(frame, buttons)
+    for k, b in ipairs(buttons) do
+        local w = Secrets.UnsecretNumber(b:GetWidth(), 0)
+        local x, y = cellPoint(k, w > 0 and w or clientNumber("EFITEM_WIDTH", 37))
+        b:ClearAllPoints()
+        b:SetPoint("TOPLEFT", frame, "TOPLEFT", x, y)
     end
 end
 
--- postGetItemsFunc's post-hook: order the choices by upgrade track, then item level, then name, and
--- move "place in bags" from the front to the end.
-local function sortItems(_, displayTable)
-    if not active() or type(displayTable) ~= "table" then return end
-    local n = #displayTable
-    QS.Sort.Items(displayTable, n)
-    QS.Sort.PlaceInBagsLast(displayTable, n)
+--- EquipmentFlyout_UpdateItems' post-hook, first (FLY-TAINT-01): draw the paper doll's flyout in
+--- QS.FlyoutOrder's order, the worn items hidden. Off, stood down or another host's flyout, it puts
+--- back Blizzard's order once if it had moved it. Positions only: no list, location or setting of
+--- Blizzard's is written, so it is safe in combat too.
+function QS.ArrangeFlyout()
+    local flyout = _G.EquipmentFlyoutFrame
+    local buttons = flyout and rawget(flyout, "buttons")
+    local frame = flyout and rawget(flyout, "buttonFrame")
+    if type(buttons) ~= "table" or type(frame) ~= "table" then return end
+    local shown = {}
+    for _, b in ipairs(buttons) do if b:IsShown() then shown[#shown + 1] = b end end
+    local order = active() and slotOf[flyout.button] and QS.FlyoutOrder(shown) or nil
+    if not order then
+        if arranged then placeCells(frame, shown) end
+        arranged = false
+        return
+    end
+    local keep = {}
+    for _, b in ipairs(order) do keep[b] = true end
+    for _, b in ipairs(shown) do if not keep[b] then b:Hide() end end
+    placeCells(frame, order)
+    arranged = true
 end
 
 -- ── the slot buttons ──────────────────────────────────────────────────────────────────────────
@@ -161,12 +230,6 @@ local function postClick(button)
     EquipmentFlyoutPopoutButton_OnClick(popout)
 end
 
--- Post-hook `settings[name]` with `fn` when the client has that function (hooksecurefunc raises on a
--- missing member).
-local function hookFlyout(settings, name, fn)
-    if type(settings[name]) ~= "function" then return end
-    hooksecurefunc(settings, name, fn)
-end
 
 -- ── the outward drawer ──────────────────────────────────────────────────────────────────────────
 
@@ -575,6 +638,7 @@ end
 
 -- EquipmentFlyout_UpdateItems' post-hook.
 local function onFlyoutUpdate()
+    QS.ArrangeFlyout()
     if locked() then return end
     placeFlyout()
     fitGlow()
@@ -678,10 +742,6 @@ function QS.Install()
     hookGlobal("EquipmentFlyoutPopoutButton_SetReversed", onSetReversed)
     hookGlobal("EquipmentFlyoutPopoutButton_HideAll", onHideAll)
     hookGlobal("EquipmentFlyoutPopoutButton_RefreshVisualState", onRefreshVisual)
-    local settings = PaperDollItemsFrame and PaperDollItemsFrame.flyoutSettings
-    if type(settings) ~= "table" then return end
-    hookFlyout(settings, "getItemsFunc", filterItems)
-    hookFlyout(settings, "postGetItemsFunc", sortItems)
 end
 
 --- The lifecycle's stand-down (design §5.12): the hooks stay installed and their bodies read the

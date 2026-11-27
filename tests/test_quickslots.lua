@@ -10,11 +10,13 @@
 -- closes the flyout, the secret or void location, and the two gates every hook body reads: the latch
 -- and `quickSlots.enabled`. The outward drawer's cases are tests/test_drawer.lua.
 --
--- THE FLYOUT STAND-IN. The mock's PaperDollItemsFrame.flyoutSettings is an empty table; each case
--- that drives the hooks gives it the two functions the client's flyout calls, marks it hookable (the
--- mock's hooksecurefunc then really post-hooks it, mock_world.lua), and models the one behavior the
--- design leans on: the original postGetItemsFunc inserts "place in bags" at index 1 and answers
--- numItems + 1, which a post-hook never sees (design §7.9).
+-- THE FLYOUT STAND-IN. The mock's PaperDollItemsFrame.flyoutSettings gets the two functions the
+-- client's flyout calls, marked hookable (the mock's hooksecurefunc would then really post-hook it,
+-- mock_world.lua), so a case sees that nothing hooks them any more (FLY-TAINT-01). EquipmentFlyoutFrame
+-- has Blizzard's `buttons` (plain stand-ins that record their anchor) and `buttonFrame`, and
+-- EquipmentFlyout_UpdateItems copies Blizzard's display list (`M.__flyout.list`) into the buttons'
+-- `location`, showing one per entry, as EquipmentFlyout.lua:285-286 does; the module's post-hook then
+-- arranges the buttons. hooksecurefunc by name hooks the globals as the client does.
 --
 -- No module QuickSlots calls is owned by a later group, so no case installs a fake (design §12).
 
@@ -39,6 +41,19 @@ local function QS(NS) return NS.QuickSlots end
 
 -- ── the instances ────────────────────────────────────────────────────────────────────────────────
 
+-- One of Blizzard's flyout item buttons, as far as the arrangement reads it: shown or not, 37 px wide,
+-- and the one anchor it was last given (`pt`: point, relative, relative point, x, y).
+local function flyoutButton()
+    local b = { shown = false, w = 37 }
+    function b:IsShown() return self.shown end
+    function b:Show() self.shown = true end
+    function b:Hide() self.shown = false end
+    function b:GetWidth() return self.w end
+    function b:ClearAllPoints() self.pt = nil end
+    function b:SetPoint(...) self.pt = { ... } end
+    return b
+end
+
 -- An instance with the flyout stand-in installed, a gear scenario loaded, and the hooks built
 -- (Resume is the lifecycle's stand-up, which is where the hooks are built). `M.__flyout` records
 -- what the hooks asked of the client: the popout buttons clicked and the hides.
@@ -60,6 +75,35 @@ local function flyoutInstance(scenario)
         M.EQUIPMENTFLYOUT_PLACEINBAGS_LOCATION = PLACE_IN_BAGS
         local frame = M.CreateFrame("Frame", "EquipmentFlyoutFrame", M.UIParent)
         frame:Hide()
+        frame.buttonFrame = M.CreateFrame("Frame", nil, frame)
+        frame.buttons = {}
+        rec.list = {}
+        M.EquipmentFlyout_UpdateItems = function()
+            for i, loc in ipairs(rec.list) do
+                local b = frame.buttons[i]
+                if not b then
+                    -- EquipmentFlyout_CreateButton's cell, set once at creation (EquipmentFlyout.lua:64-70)
+                    b = flyoutButton()
+                    local row, col = math.floor((i - 1) / 5), (i - 1) % 5
+                    b:SetPoint("TOPLEFT", frame.buttonFrame, "TOPLEFT", 3 + col * 41, -3 - row * 42)
+                end
+                frame.buttons[i] = b
+                b.location = loc
+                b:Show()
+            end
+            for i = #rec.list + 1, #frame.buttons do frame.buttons[i]:Hide() end
+        end
+        local base = M.hooksecurefunc
+        M.hooksecurefunc = function(a, b, c)
+            if type(a) == "string" then
+                local orig = rawget(M, a)
+                if type(orig) ~= "function" then error("hooksecurefunc(): " .. a .. " is not a function", 2) end
+                rawset(M, a, function(...) orig(...); b(...) end)
+                M.__hooks[#M.__hooks + 1] = { target = M, name = a }
+                return
+            end
+            return base(a, b, c)
+        end
         M.EquipmentFlyout_Hide = function()
             rec.hidden = rec.hidden + 1
             frame.button = nil
@@ -93,17 +137,23 @@ local function flyoutHooks(M)
     return n
 end
 
--- The client's flyout run: getItemsFunc fills a fresh table, which is answered.
-local function flyoutItems(M, slotID)
-    local items = {}
-    M.PaperDollItemsFrame.flyoutSettings.getItemsFunc(slotID, items)
-    return items
-end
-
--- The client's display pass: postGetItemsFunc over `display`, as the caller's numItems.
-local function flyoutDisplay(M, display)
-    M.PaperDollItemsFrame.flyoutSettings.postGetItemsFunc(nil, display, #display)
-    return display
+-- The client opening the flyout on `slot` with Blizzard's display `list`: the buttons filled, then the
+-- post-hook. Answers the shown buttons' locations in drawn order (row by row, left to right).
+local function openWith(M, slot, list)
+    local frame = M.EquipmentFlyoutFrame
+    frame.button = M.__slotButtons[slot]
+    M.__flyout.list = list
+    frame:Show()
+    M.EquipmentFlyout_UpdateItems()
+    local shown = {}
+    for _, b in ipairs(frame.buttons) do if b:IsShown() then shown[#shown + 1] = b end end
+    table.sort(shown, function(a, b)
+        if a.pt[5] ~= b.pt[5] then return a.pt[5] > b.pt[5] end
+        return a.pt[4] < b.pt[4]
+    end)
+    local out = {}
+    for i, b in ipairs(shown) do out[i] = b.location end
+    return out, shown
 end
 
 -- An instance whose client answers each bag 0 slot from `state.items` (a fixture flyout's items):
@@ -159,14 +209,23 @@ end)
 
 test("quickslots: the hooks are post-hooks, built once however often the addon stands up", function()
     local _, NS, M = flyoutInstance("secret_slots")
-    -- red under: replacing flyoutSettings.getItemsFunc with a wrapper (the legacy replacement,
-    -- OutfitterQuickSlots.lua:17), which the mock's hooksecurefunc never records.
-    assertEqual(flyoutHooks(M), 2, "getItemsFunc and postGetItemsFunc are hooksecurefunc'd")
+    local fs = M.PaperDollItemsFrame.flyoutSettings
+    local get, post = fs.getItemsFunc, fs.postGetItemsFunc
+    -- red under (FLY-TAINT-01): post-hooks on getItemsFunc and postGetItemsFunc, which wrote Blizzard's
+    -- lists and so tainted every flyout button's location (the owner's ADDON_ACTION_BLOCKED)
+    assertEqual(flyoutHooks(M), 0, "nothing hooks the flyout's settings")
+    assertTrue(fs.getItemsFunc == get and fs.postGetItemsFunc == post, "the settings' functions are Blizzard's")
+    local function updateHooks()
+        local n = 0
+        for _, h in ipairs(M.__hooks) do if h.name == "EquipmentFlyout_UpdateItems" then n = n + 1 end end
+        return n
+    end
+    assertEqual(updateHooks(), 1, "EquipmentFlyout_UpdateItems is post-hooked")
     QS(NS).Resume()
     QS(NS).Install()
     QS(NS).SetEnabled(true)
     -- red under: dropping the `installed` guard in QuickSlots.Install (each stand-up hooks again).
-    assertEqual(flyoutHooks(M), 2, "a second stand-up hooked the flyout again")
+    assertEqual(updateHooks(), 1, "a second stand-up hooked the flyout again")
     M.__slotButtons.LegsSlot:__fire("PostClick", "LeftButton", false)
     assertEqual(#M.__flyout.clicked, 1, "a second stand-up hooked the slot button again")
 end)
@@ -275,27 +334,46 @@ end)
 
 -- ── the specials and "place in bags" ─────────────────────────────────────────────────────────────
 
-test("quickslots: the sort counts the dense table, and 'place in bags' moves to the end", function()
+test("quickslots: the buttons are drawn sorted, 'place in bags' last; Blizzard's list is never written", function()
     local inst, state = sortInstance()
     local M = inst.mocks
     state.items = { [1] = { name = "Low", level = 500 }, [2] = { name = "High", level = 700 } }
-    local fs = M.PaperDollItemsFrame.flyoutSettings
-    fs.postGetItemsFunc = function(_, display, numItems)
-        table.insert(display, 1, PLACE_IN_BAGS)
-        return numItems + 1
-    end
-    M.__hookable[fs] = true
     M.EQUIPMENTFLYOUT_FIRST_SPECIAL_LOCATION = FIRST_SPECIAL
     M.EQUIPMENTFLYOUT_PLACEINBAGS_LOCATION = PLACE_IN_BAGS
-    QS(inst.NS).Resume()
-    local display = flyoutDisplay(M, { bagLoc(0, 1), bagLoc(0, 2) })
-    -- red under: sorting with the caller's numItems (2) rather than #display (3): only "place in bags"
-    -- and Low would be looked at, and Low would stay first.
-    assertEqual(display[1], bagLoc(0, 2), "High first")
-    assertEqual(display[2], bagLoc(0, 1), "Low second")
-    -- red under: dropping Sort.PlaceInBagsLast from the postGetItemsFunc hook.
-    assertEqual(display[3], PLACE_IN_BAGS, "place in bags last")
-    assertEqual(#display, 3, "nothing added or lost")
+    local buttons = {}
+    for i, loc in ipairs({ PLACE_IN_BAGS, bagLoc(0, 1), bagLoc(0, 2) }) do
+        buttons[i] = flyoutButton(); buttons[i].location = loc; buttons[i]:Show()
+    end
+    local order = QS(inst.NS).FlyoutOrder(buttons)
+    assertEqual(order[1].location, bagLoc(0, 2), "High first")
+    assertEqual(order[2].location, bagLoc(0, 1), "Low second")
+    -- red under: dropping Sort.PlaceInBagsLast from the order.
+    assertEqual(order[3].location, PLACE_IN_BAGS, "place in bags last")
+    assertEqual(#order, 3, "nothing added or lost")
+    -- the buttons keep the locations Blizzard gave them: only the drawn order is this addon's
+    assertEqual(buttons[1].location, PLACE_IN_BAGS)
+    assertEqual(buttons[2].location, bagLoc(0, 1))
+    -- a location that is not a plain number leaves Blizzard's order
+    buttons[2].location = T.secret(bagLoc(0, 1))
+    assertNil(QS(inst.NS).FlyoutOrder(buttons), "a secret location: Blizzard's order")
+end)
+
+test("quickslots: the flyout's buttons go to Blizzard's grid cells in the sorted order", function()
+    local _, _, M = flyoutInstance("secret_slots")
+    M.EQUIPMENTFLYOUT_FIRST_SPECIAL_LOCATION = FIRST_SPECIAL
+    M.EQUIPMENTFLYOUT_PLACEINBAGS_LOCATION = PLACE_IN_BAGS
+    local list = { PLACE_IN_BAGS }
+    for slot = 1, 6 do list[#list + 1] = bagLoc(1, slot) end
+    local copy = { unpack(list) }
+    local drawn, shown = openWith(M, "LegsSlot", list)
+    assertEqual(drawn[#drawn], PLACE_IN_BAGS, "place in bags drawn last")
+    assertEqual(table.concat(M.__flyout.list, ","), table.concat(copy, ","), "Blizzard's list untouched")
+    -- cells: 3 px in, 41 px apart (37 + 4), five to a row, a row 42 px down (37 - -5)
+    local first, sixth = shown[1].pt, shown[6].pt
+    assertTrue(first[2] == M.EquipmentFlyoutFrame.buttonFrame and first[1] == "TOPLEFT", "anchored to the item frame")
+    assertEqual(first[4], 3); assertEqual(first[5], -3)
+    assertEqual(shown[2].pt[4], 44)
+    assertEqual(sixth[4], 3); assertEqual(sixth[5], -45, "the sixth starts the second row")
 end)
 
 test("quickslots: a special entry anywhere but first stays where the flyout put it", function()
@@ -323,14 +401,26 @@ test("quickslots: items already on the player leave the flyout; bag and bank ite
     local _, _, M = flyoutInstance("secret_slots")
     local worn, carried = PLAYER + 5, bagLoc(0, 2)
     local banked, bankBag = PLAYER + BANK + 40, PLAYER + BANK + BAGS + 6 * 256 + 1
-    M.__flyout.source = { [worn] = 1, [carried] = 2, [banked] = 3, [bankBag] = 4 }
-    local items = flyoutItems(M, 5)
-    assertNil(items[worn], "the worn chest is filtered out")
-    assertEqual(items[carried], 2, "a bag item stays")
+    local drawn = openWith(M, "LegsSlot", { worn, carried, banked, bankBag })
+    local seen = {}
+    for _, loc in ipairs(drawn) do seen[loc] = true end
+    assertFalse(seen[worn] == true, "the worn chest is hidden")
+    assertTrue(seen[carried], "a bag item stays")
     -- red under: a mask of PLAYER + BAGS only (the bank's main slots carry PLAYER + BANK and would
     -- read as worn).
-    assertEqual(items[banked], 3, "a bank slot stays")
-    assertEqual(items[bankBag], 4, "a bank bag item stays")
+    assertTrue(seen[banked], "a bank slot stays")
+    assertTrue(seen[bankBag], "a bank bag item stays")
+    assertEqual(#M.__flyout.list, 4, "hidden, never taken out of Blizzard's list")
+end)
+
+test("quickslots: off, the flyout gets Blizzard's order back once", function()
+    local _, NS, M = flyoutInstance("secret_slots")
+    M.EQUIPMENTFLYOUT_PLACEINBAGS_LOCATION = PLACE_IN_BAGS
+    openWith(M, "LegsSlot", { PLACE_IN_BAGS, bagLoc(0, 2), PLAYER + 5 })
+    NS.db.profile.quickSlots.enabled = false
+    local drawn = openWith(M, "LegsSlot", { PLACE_IN_BAGS, bagLoc(0, 2), PLAYER + 5 })
+    assertEqual(table.concat(drawn, ","), table.concat({ PLACE_IN_BAGS, bagLoc(0, 2), PLAYER + 5 }, ","),
+        "Blizzard's own order and every item")
 end)
 
 -- ── PostClick ────────────────────────────────────────────────────────────────────────────────────
@@ -429,10 +519,11 @@ end)
 
 -- Every hook body's effect at once: the filter, the sort and the click.
 local function hooksActed(M)
-    M.__flyout.source = { [PLAYER + 5] = 1 }
-    local filtered = flyoutItems(M, 5)[PLAYER + 5] == nil
-    local display = flyoutDisplay(M, { bagLoc(0, 2) })
-    local sorted = display[#display] == PLACE_IN_BAGS
+    M.EQUIPMENTFLYOUT_PLACEINBAGS_LOCATION = PLACE_IN_BAGS
+    local drawn = openWith(M, "LegsSlot", { PLACE_IN_BAGS, bagLoc(0, 2), PLAYER + 5 })
+    local filtered = #drawn == 2
+    local sorted = drawn[#drawn] == PLACE_IN_BAGS
+    M.EquipmentFlyout_Hide()
     local before = #M.__flyout.clicked
     M.__slotButtons.LegsSlot:__fire("PostClick", "LeftButton", false)
     return filtered, sorted, #M.__flyout.clicked > before
@@ -452,7 +543,7 @@ test("quickslots: every hook body stands down with the addon and comes back with
     NS.ApplyEnabled(true)
     filtered, sorted, opened = hooksActed(M)
     assertTrue(filtered and sorted and opened, "the hooks act again after the stand-up")
-    assertEqual(flyoutHooks(M), 2, "the stand-up did not hook the flyout twice")
+    assertEqual(flyoutHooks(M), 0, "the flyout's settings stay unhooked")
 end)
 
 test("quickslots: quickSlots.enabled off silences every hook body; on brings them back", function()

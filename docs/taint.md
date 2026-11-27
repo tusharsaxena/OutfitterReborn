@@ -79,14 +79,24 @@ never moves Blizzard's or another addon's tabs.
 ### The equipment flyout (the quick slots and the outward drawer)
 
 `modules/QuickSlots.lua` meets Blizzard's equipment flyout through post-hooks only: `HookScript`
-PostClick on the paper doll's 18 slot buttons (`Character<Slot>`), `hooksecurefunc` on
-its `flyoutSettings.getItemsFunc` and `postGetItemsFunc`, and `hooksecurefunc` on the globals
+PostClick on the paper doll's 18 slot buttons (`Character<Slot>`) and `hooksecurefunc` on the globals
 `EquipmentFlyout_UpdateItems`, `EquipmentFlyoutPopoutButton_SetReversed`,
 `EquipmentFlyoutPopoutButton_HideAll` and (Forever) `EquipmentFlyoutPopoutButton_RefreshVisualState`
 (wow-ui-source@297d7aa:Interface/AddOns/Blizzard_FrameXML/EquipmentFlyout.lua:238, :598, :633;
 F-UI Camelot/EquipmentFlyout.lua:731). A missing global is skipped, never hooked. `modules/SlotEnables.lua` adds `HookScript` OnShow and OnHide
 on `EquipmentFlyoutFrame` itself (the stand-down latch first), which only restack the addon's own
 slot boxes over it (smoke round 3 E2).
+
+**Blizzard's flyout list is never written (FLY-TAINT-01, the owner's `ADDON_ACTION_BLOCKED` on
+Retail, 2026-11-27).** Until then post-hooks on `flyoutSettings.getItemsFunc` and `postGetItemsFunc`
+filtered and sorted Blizzard's own item tables in place. `EquipmentFlyout_UpdateItems` copies each
+display entry into `button.location` (wow-ui-source live, EquipmentFlyout.lua:285-286) and the click
+hands it to `EquipmentManager_RunAction`, so a flyout click in combat ran `PickupInventoryItem`
+from a value this addon had written, and the client blocked it and named this addon. Now neither
+function is hooked: the `EquipmentFlyout_UpdateItems` post-hook reads the shown buttons' locations,
+works the order out in its own table (`QS.FlyoutOrder`), hides a button whose item is already worn
+and anchors the rest to Blizzard's grid cells (`QS.ArrangeFlyout`). A position and a shown flag
+carry no taint into a click, so it also runs in combat. The order is per page.
 
 **The flyout's rim tint** (smoke round 3 E1, the accepted deviation `DEV-SKIN-FLYOUT-TINT`,
 skinning-§7; owner ruling 2026-11-05). It is the one place this addon colors a Blizzard frame.
