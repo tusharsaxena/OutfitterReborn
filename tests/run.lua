@@ -289,6 +289,12 @@ Kit.skinValues = { root = root, rows = {
       cause = HOST_LOOK },
     { file = "modules/Sheet.lua", substring = "local EUI_ACCENT_FALLBACK =",
       why = "EllesmereUI's own fallback for a missing accent, matched to its neighbors", cause = HOST_LOOK },
+    { file = "modules/QuickSlots_Ammo.lua", substring = "UI-GearManager-Flyout\"",
+      why = "the ammo picker draws Blizzard's own flyout parchment, matched to the flyouts beside it",
+      cause = "DEV-SKIN-AMMO-PICKER" },
+    { file = "modules/QuickSlots_Ammo.lua", substring = "UI-GearManager-ItemButton-Highlight\"",
+      why = "the ammo picker's slot glow is Blizzard's own flyout highlight, matched to the flyouts beside it",
+      cause = "DEV-SKIN-AMMO-PICKER" },
     { file = "modules/Triggers_Families.lua", substring = "return 0, 0, 1 end",
       why = "the legacy RGBToHSV's hue, saturation and value for no color, not a color", category = "not a color" },
 } }
