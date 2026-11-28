@@ -876,6 +876,15 @@ function Compat.ContainerNumFreeSlots(bag)
     return S.UnsecretNumber(free, 0), S.PlainNumber(family)
 end
 
+--- How many items a container slot's stack holds; 0 when empty or unknown.
+function Compat.ContainerItemCount(bag, slot)
+    local fn = member(C_Container, "GetContainerItemInfo")
+    if not fn then return 0 end
+    local info = fn(bag, slot)
+    if type(info) ~= "table" or not Compat.CanAccessTable(info) then return 0 end
+    return NS.Secrets.UnsecretNumber(info.stackCount, 0)
+end
+
 --- The inventory slot a bag sits in, or nil (the backpack and the bank have none; the client raises).
 function Compat.ContainerIDToInventoryID(bag)
     local fn = member(C_Container, "ContainerIDToInventoryID")

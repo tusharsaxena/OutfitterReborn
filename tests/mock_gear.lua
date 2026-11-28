@@ -36,6 +36,11 @@
 --     of it (pickup, drop, UseEquipmentSet) until it opens, cache or not. C_EquipmentSet still
 --     knows where a banked set item is, as the client does.
 --   * The reagent bag (5) refuses gear on every path, a direct drop included.
+--   * WoW Forever's ammo slot (inventory id 0) is a REFERENCE, as the owner's in-game probes showed
+--     it (2026-11-28): GetInventoryItemsForSlot(0, t) lists nothing, ammo dropped on the slot stays
+--     in its bag and the slot names its type, and Blizzard's unequip (pick the slot up, put it in the
+--     backpack) moves the stack but leaves the slot naming it. The slot reads empty once no stack of
+--     that type is carried. Retail has no ammo slot.
 --   * Titan's Grip follows class and spec (a Fury warrior), and grips a two-handed axe, mace or
 --     sword only; a scenario may force it with `titansGrip = true/false`.
 --   * C_EquipmentSet keeps real sets that follow their items as they move; `M.__emFlake = true`
@@ -106,7 +111,7 @@ local QUALITY_COLORS = {
     [0] = { 0.62, 0.62, 0.62 }, [1] = { 1, 1, 1 }, [2] = { 0.12, 1, 0 }, [3] = { 0, 0.44, 0.87 },
     [4] = { 0.64, 0.21, 0.93 }, [5] = { 1, 0.5, 0 }, [6] = { 0.9, 0.8, 0.5 }, [7] = { 0, 0.8, 1 },
 }
-local CLASS_NAMES = { [1] = "Container", [2] = "Weapon", [4] = "Armor", [7] = "Tradeskill",
+local CLASS_NAMES = { [1] = "Container", [2] = "Weapon", [4] = "Armor", [6] = "Projectile", [7] = "Tradeskill",
                       [15] = "Miscellaneous" }
 
 -- The client strings the item code reads (GlobalStrings), as the enUS client has them.
@@ -176,6 +181,7 @@ function Gear.install(M, deps)
 
     local function reset()
         G.worn, G.bags, G.cursor, G.sets, G.nextSetID = {}, {}, nil, {}, 1
+        G.ammo = nil
         G.ignoreForSave, G.pending = {}, {}
         G.bankOpen, G.bankCached, G.titansGrip, G.canDualWield = false, false, nil, true
         G.bags[BACKPACK] = { size = 16, family = 0, slots = {} }
@@ -405,6 +411,43 @@ function Gear.install(M, deps)
         return true
     end
 
+    -- ── WoW Forever's ammo slot (a reference to a carried type, see the fidelity rules) ─────────
+
+    local AMMO_SLOT = 0
+    local function isAmmoSlot(id) return FOREVER and id == AMMO_SLOT end
+
+    -- The first carried stack of the type the ammo slot names, or nil (the slot reads empty).
+    local function carriedAmmo()
+        if not G.ammo then return nil end
+        for bag = BACKPACK, REAGENT_BAG do
+            local b = G.bags[bag]
+            for slot = 1, (b and b.size or 0) do
+                local i = b.slots[slot]
+                if i and i.def.id == G.ammo then return i end
+            end
+        end
+        return nil
+    end
+
+    -- Drop the cursor's item on the ammo slot: ammo names its type there and goes back to its bag.
+    local function ammoFromCursor()
+        local c = G.cursor
+        if not c then return false end
+        if c.inst.def.invType ~= "INVTYPE_AMMO" then return fail("ERR_WRONG_SLOT") end
+        G.ammo = c.inst.def.id
+        clearCursor()
+        queue("PLAYER_EQUIPMENT_CHANGED", AMMO_SLOT, false)
+        queue("UNIT_INVENTORY_CHANGED", "player")
+        return true
+    end
+
+    -- A click on the ammo slot: a drop with an item on the cursor, else the named stack lifted.
+    local function ammoSlotClick()
+        if G.cursor then return ammoFromCursor() end
+        local inst = carriedAmmo()
+        return inst ~= nil and lift(where(inst))
+    end
+
     -- ── the controller ───────────────────────────────────────────────────────────────────────
 
     local function placeBag(bagID, spec)
@@ -605,6 +648,7 @@ function Gear.install(M, deps)
     local function invAt(unit, id)
         if unit ~= "player" then return nil end
         if type(id) ~= "number" then return nil end
+        if isAmmoSlot(id) then return carriedAmmo() end
         if id > CONTAINER_BAG_OFFSET and id <= CONTAINER_BAG_OFFSET + REAGENT_BAG then
             local b = G.bags[id - CONTAINER_BAG_OFFSET]
             return b and b.bagInst
@@ -635,10 +679,15 @@ function Gear.install(M, deps)
     M.ClearCursor = function() record("ClearCursor"); clearCursor() end
     M.PickupInventoryItem = function(id)
         record("PickupInventoryItem", id)
+        if isAmmoSlot(id) then return ammoSlotClick() end
         if G.cursor then return equipFromCursor(id) end
         return lift({ equip = id })
     end
-    M.EquipCursorItem = function(id) record("EquipCursorItem", id); return equipFromCursor(id) end
+    M.EquipCursorItem = function(id)
+        record("EquipCursorItem", id)
+        if isAmmoSlot(id) then return ammoFromCursor() end
+        return equipFromCursor(id)
+    end
     M.PutItemInBackpack = function()
         record("PutItemInBackpack")
         if not G.cursor then return end

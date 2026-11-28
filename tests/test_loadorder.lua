@@ -155,7 +155,7 @@ local PLANNED = {
     "modules/Dialog_Outfit.lua", "modules/Dialog_Trigger.lua", "modules/Dialog_TriggerFields.lua",
     "modules/Dialog_Rebuild.lua", "modules/Dialog_Progress.lua",
     "modules/Bar.lua", "modules/Bar_Layout.lua", "modules/Bar_Chrome.lua",
-    "modules/Bar_Buttons.lua", "modules/Broker.lua", "modules/QuickSlots.lua", "modules/QuickSlots_Sort.lua",
+    "modules/Bar_Buttons.lua", "modules/Broker.lua", "modules/QuickSlots.lua", "modules/QuickSlots_Sort.lua", "modules/QuickSlots_Ammo.lua",
     "modules/Preview.lua", "modules/Api.lua", "modules/Diagnostics.lua",
     "settings/Schema.lua", "settings/Slash.lua", "settings/OptionsSetup.lua", "settings/General.lua",
     "settings/OutfitBar.lua", "settings/OutfitWindow.lua", "settings/Profiles.lua",

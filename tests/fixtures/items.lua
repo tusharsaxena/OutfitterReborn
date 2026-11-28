@@ -33,6 +33,7 @@ local GEM_HASTE = 213743
 
 -- Enum.ItemClass / weapon and armor subclasses, the client's numbers.
 local ARMOR, WEAPON, CONTAINER, TRADEGOODS, MISC = 4, 2, 1, 7, 15
+local PROJECTILE = 6   -- WoW Forever's ammo: subclass 2 arrows, 3 bullets
 
 local DB = {
     -- ── armor, one per slot ───────────────────────────────────────────────────────────────────
@@ -155,6 +156,17 @@ local DB = {
                         invType = "INVTYPE_RANGEDRIGHT", classID = WEAPON, subclassID = 2,
                         bindType = 1, durability = { 120, 120 },
                         stats = { ITEM_MOD_AGILITY_SHORT = 1500 } },
+    gun_ranged      = { id = 212090, name = "Blunderbuss of Breakpoints", quality = 3, level = 600,
+                        invType = "INVTYPE_RANGEDRIGHT", classID = WEAPON, subclassID = 3,
+                        bindType = 2, durability = { 90, 90 } },
+
+    -- ── WoW Forever's ammo (the ammo slot, Forever only) ────────────────────────────────────
+    ammo_arrow_low  = { id = 2512, name = "Rough Arrow", quality = 1, level = 5,
+                        invType = "INVTYPE_AMMO", classID = PROJECTILE, subclassID = 2 },
+    ammo_arrow_high = { id = 3030, name = "Razor Arrow", quality = 1, level = 40,
+                        invType = "INVTYPE_AMMO", classID = PROJECTILE, subclassID = 2 },
+    ammo_bullet     = { id = 11284, name = "Accurate Slugs", quality = 1, level = 50,
+                        invType = "INVTYPE_AMMO", classID = PROJECTILE, subclassID = 3 },
 
     -- ── binding variants ────────────────────────────────────────────────────────────────────
     boe_legs        = { id = 212060, name = "Leggings of the Auction", quality = 3, level = 600,

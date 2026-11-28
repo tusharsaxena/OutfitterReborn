@@ -4,7 +4,7 @@
 ![CurseForge Version](https://img.shields.io/curseforge/v/1698220)
 ![License](https://img.shields.io/badge/License-MIT-orange)
 ![Standard](https://img.shields.io/badge/Ka0s-WoW_Addon_Standard-yellow)
-![Tests](https://img.shields.io/badge/Tests-1664%2F1664_passing-green)
+![Tests](https://img.shields.io/badge/Tests-1684%2F1684_passing-green)
 
 Supports Retail and WoW Forever. Ka0s Outfitter Reborn manages your gear. You build named outfits from what you own and put them on with a click, a key or a slash command, or you let the addon change them for you: when you cast your fishing line, climb on a mount, shift into bear form, swap specs or walk into a particular battleground. It knows which items each outfit needs, tells you when one has gone missing or is sitting in the bank, and can put together the best outfit your bags hold for a stat or a Pawn scale.
 
@@ -39,7 +39,7 @@ Everything else is on the addon's page under Settings → AddOns, and `/or` (or 
 The same addon runs on WoW Forever, with what vanilla Azeroth has:
 
 - The sheet's way in is the last button of the side-tab strip outside the character frame's right edge, below *Statistics*, drawn like the tabs above it. It stays there on every page of the sheet, opens and closes the outfit window, and on another page takes you to the Character page first. With ChonkyCharacterSheet it matches Chonky's tabs, at the end of the row under the sheet when *Skin Character Tabs* is on. Where the tabs hang over the outfit window, the window grows wider so they sit over an empty strip of it.
-- Outfits can hold the ranged slot (guns, bows, crossbows, wands, thrown weapons and relics go there). Outfits can't hold ammo yet, but the ammo slot gets a flyout arrow like the others.
+- Outfits can hold the ranged slot (guns, bows, crossbows, wands, thrown weapons and relics go there). Outfits can't hold ammo yet, but the ammo slot gets an arrow like the others: it opens a list of the ammo in your bags that your ranged weapon fires, and a click switches to it (out of combat).
 - The flyouts open away from your character here too: the main hand and ranged slot to the left, the off-hand and ammo slot to the right.
 - The game won't let an addon open the character sheet cleanly on Forever, so `/or show`, the *Toggle outfit window* key and the broker menu's *Open outfit window* ask you to open the sheet, and the outfit window comes with it. A left-click on the broker display does open the sheet.
 - Stat rebuilds offer spell damage, healing, attack power, mana per five, hit and defense instead of haste, versatility and mastery.

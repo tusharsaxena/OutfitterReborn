@@ -78,7 +78,7 @@ and a raise reads as `nil` ("unknown"), which sends the caller to its tooltip fa
 | Equipment Manager | `EMSetIDs()` (bounded at 512, a secret id skipped), `EMSetInfo(id)`, `EMLocations(id)`, `EMIgnoredSlots(id)`, `EMLocation(location)` (alias `FlyoutLocationData`), `EMSetID(name)`, `EMNumSets()`, `EMMaxSets()`; writes `EMCreateSet`, `EMSaveSet`, `EMModifySet`, `EMDeleteSet`, `EMClearIgnored`, `EMIgnoreSlot(slotID, ignore)` | `{}` (the zero-sets path, Q8), `nil`, `0`, `10`, `false` |
 | Titles | `KnownTitles()` → `{ {id, name} }`, sorted case-insensitively, a secret name skipped; `SetCurrentTitle(id)` | `{}` / `false` |
 | Bank | `BankBagIDs()` and `IsBankerInteraction(type)`, routed from LibKa0s-Compat-1.0 (above) | `{}` / `false` |
-| Containers and cursor | `ContainerNumSlots`, `ContainerNumFreeSlots` → free, family; `ContainerIDToInventoryID`; `PickupContainerItem`, `PickupInventoryItem`, `PickupItemLocation(loc)`, `UseContainerItem`, `ShowContainerSellCursor`, `EquipCursorItem`, `ClearCursor` | `0` / `nil` / `false` |
+| Containers and cursor | `ContainerNumSlots`, `ContainerNumFreeSlots` → free, family; `ContainerItemCount` (a slot's stack size); `ContainerIDToInventoryID`; `PickupContainerItem`, `PickupInventoryItem`, `PickupItemLocation(loc)`, `UseContainerItem`, `ShowContainerSellCursor`, `EquipCursorItem`, `ClearCursor` | `0` / `nil` / `false` |
 | Other | `PawnVisibleScales()`, `PawnItemValue(link, scale)`, `CanDualWield()`, `BitAnd(a, b)` (plain arithmetic, no `bit` library) | `{}` / `nil` / `false` / `0` |
 
 `test_secrets` pins each group: plain answers through, secret answers out as their no-answer value,

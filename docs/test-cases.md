@@ -814,7 +814,7 @@ Total.
 - secrets states: a secret icon falls through to the spell; a secret spell id matches nothing
 - secrets states: the last mana reading survives a secret sample
 
-### test_quickslots.lua (19)
+### test_quickslots.lua (21)
 
 - quickslots: NS.QuickSlots and its sort are published
 - quickslots: the hooks are post-hooks, built once however often the addon stands up
@@ -824,9 +824,11 @@ Total.
 - quickslots: a raising CanUpgradeItem reads as 'the game won't say', and the sort goes on
 - quickslots: an untracked item joins the highest track whose range starts at or below it
 - quickslots: an item the client cannot place keeps the defaults and sorts last
-- quickslots: the sort counts the dense table, and 'place in bags' moves to the end
+- quickslots: the buttons are drawn sorted, 'place in bags' last; Blizzard's list is never written
+- quickslots: the flyout's buttons go to Blizzard's grid cells in the sorted order
 - quickslots: a special entry anywhere but first stays where the flyout put it
 - quickslots: items already on the player leave the flyout; bag and bank items stay
+- quickslots: off, the flyout gets Blizzard's order back once
 - quickslots: an empty slot, or an item on the cursor, opens the flyout; a plain click does not
 - quickslots: a click on the button the flyout is open on closes it
 - quickslots: an empty slot opened, closed and clicked again opens again
@@ -871,8 +873,29 @@ Total.
 - drawer (Forever): the doll hidden puts Blizzard's arrows and flyout back
 - drawer (Forever): in combat lockdown nothing is moved or turned
 - drawer (Forever): a BorderFrame hidden after the doll's show is caught by the refresh (S3)
-- drawer (Forever): the ammo slot gets its own arrow from Blizzard's template, opening right
-- drawer (Forever): the ammo slot's open glow takes the slot's size and centers on it
+- drawer (Forever): the ammo slot gets an arrow of this addon's own, opening right
+- drawer (Forever): the ammo arrow wears the open art while the picker is open
+
+### test_ammo_picker.lua (18)
+
+- ammo picker: the list is the carried ammo the ranged weapon fires, one entry a type, counts summed
+- ammo picker: a bow lists arrows, best item level first; no ranged weapon lists every type
+- ammo picker: a pick is dropped on the ammo slot from its bag, the cursor left empty
+- ammo picker: in combat lockdown nothing is picked up and the player is told
+- ammo picker: the ammo slot's arrow opens the picker, not Blizzard's flyout, and closes it again
+- ammo picker: a picked button equips that ammo and closes the picker
+- ammo picker: clicking the empty ammo slot opens the picker
+- ammo picker: no carried ammo opens nothing and says so
+- ammo picker: combat, the stand-down and a close each hide it and drop its events
+- ammo picker: opening in combat lockdown is refused
+- ammo picker: a bag change while open redraws the list
+- ammo picker: Retail builds no picker and no ammo arrow
+- ammo picker: two types draw Blizzard's one-row parchment, ItemButtons in its grid, no skin
+- ammo picker: one type draws the one-slot caps; a redraw to more hides none it still needs
+- ammo picker: the worn type is left out, as Blizzard leaves the worn item out
+- ammo picker: only the worn type carried opens nothing and says there is no other
+- ammo picker: it hangs off the arrow as Blizzard's flyout does, the glow on the slot at its size
+- ammo picker: its rim takes the flyout's tint while the window shows, and gets its own back
 
 ### test_equip_bracket.lua (32)
 
@@ -1960,8 +1983,9 @@ Total.
 | test_companion.lua | 25 |
 | test_states.lua | 29 |
 | test_secrets_states.lua | 6 |
-| test_quickslots.lua | 19 |
+| test_quickslots.lua | 21 |
 | test_drawer.lua | 35 |
+| test_ammo_picker.lua | 18 |
 | test_equip_bracket.lua | 32 |
 | test_tooltips.lua | 23 |
 | test_stack.lua | 27 |
@@ -2010,4 +2034,4 @@ Total.
 | test_lizard_sighted.lua | 8 |
 | test_prose.lua | 15 |
 | Skipped | 1 |
-| **Total** | **1664** |
+| **Total** | **1684** |

@@ -32,6 +32,8 @@ C.LOGO = ("Interface\\AddOns\\%s\\media\\logos\\%s.logo.tga"):format(addonName, 
 --   MEDIUM             HUD       the outfit bar: movable, clamped, toplevel
 --   HIGH               (Blizzard) EquipmentFlyoutFrame (EquipmentFlyout.xml:38, re-set on every
 --                      update), which the slot boxes rise over while it is open
+--   HIGH               FLYOUT    the ammo picker (modules/QuickSlots_Ammo.lua, WoW Forever): the
+--                                sibling of Blizzard's flyout, at its strata
 --   DIALOG             MODAL     the outfit, trigger, rebuild and progress dialogs; the LibKa0s icon
 --                                browser (modules/IconBrowserSetup.lua), a modal over them in a band
 --                                based UIParent + ICON_BROWSER (catcher +0, window +2, page +3, X +5)
@@ -49,7 +51,7 @@ C.LOGO = ("Interface\\AddOns\\%s\\media\\logos\\%s.logo.tga"):format(addonName, 
 -- player's edge B+BAR_EDGE (BORDER), the worn accent edge B+BAR_WORN_EDGE, and the mouse-off overlay
 -- holding the worn mark B+BAR_OVERLAY (OVERLAY).
 C.LAYERS = {
-    STRATA = { HUD = "MEDIUM", MODAL = "DIALOG", POPUP = "FULLSCREEN_DIALOG", CURSOR = "TOOLTIP" },
+    STRATA = { HUD = "MEDIUM", FLYOUT = "HIGH", MODAL = "DIALOG", POPUP = "FULLSCREEN_DIALOG", CURSOR = "TOOLTIP" },
     -- The client's eight strata, low to high: a host's strata is compared, never written from here.
     STRATA_ORDER = { "BACKGROUND", "LOW", "MEDIUM", "HIGH", "DIALOG", "FULLSCREEN", "FULLSCREEN_DIALOG",
                      "TOOLTIP" },

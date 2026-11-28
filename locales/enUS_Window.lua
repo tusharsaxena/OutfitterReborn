@@ -23,6 +23,10 @@ L["Banked:"] = "Banked:"
 L["%s (level %d)"] = "%s (level %d)"
 
 -- P4.18 keys (modules/QuickSlots.lua, modules/QuickSlots_Sort.lua)
+-- The ammo picker (modules/QuickSlots_Ammo.lua; WoW Forever)
+L["Ammo can't be changed in combat"] = "Ammo can't be changed in combat"
+L["No ammo in your bags"] = "No ammo in your bags"
+L["No other ammo in your bags"] = "No other ammo in your bags"
 
 -- P4.19 keys (modules/Dock.lua, modules/Window.lua, modules/Window_ListModel.lua, modules/Window_Rows.lua, modules/SlotEnables.lua)
 L["Toggle the Outfitter window"] = "Toggle the Outfitter window"

@@ -205,3 +205,11 @@ A Forever behavior this addon meets is written here, with its build.
   library puts in Forever's bags group, and never an account tab, because the library declares no account
   bank on Forever. *Measured:* not probed in game; the enum is BagIndexConstantsDocumentation.lua for
   build 70790, as the kit's Forever profile carries it. *Source:* LibKa0s#101.
+- **The ammo slot is a reference, and the paper doll's flyout lists no ammo.** Inventory slot 0 names a
+  carried ammo type; the stack stays in its bag. `GetInventoryItemsForSlot(0, t)` fills nothing, so
+  `EquipmentFlyout_Show` on the ammo slot has no entries and hides at once (`Camelot/EquipmentFlyout.lua`
+  304-307); Blizzard never opens it there (`EquipmentFlyout_UpdateFlyout` skips `INVSLOT_AMMO`, :648).
+  Blizzard's unequip, `PickupInventoryItem(0)` then `PutItemInBackpack()`, lifts the stack and moves it
+  but leaves the slot naming the type. Dropping ammo on the slot (`PickupContainerItem` then
+  `PickupInventoryItem(0)`) equips it. *Measured:* the owner's probes on 1.60.1, 2026-11-28
+  (`ammo candidates: 0`; `on cursor: true`, `slot now: 11284`). *Used by:* `modules/QuickSlots_Ammo.lua`.
