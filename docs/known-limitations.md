@@ -90,8 +90,10 @@ The port's first step (the 2026-11-08 design, `superpowers/specs/2026-11-08-fore
 makes the addon Forever-compatible; these wait for step 2 or for an open probe.
 
 - **The ammo slot** (ruling D1) is not in the slot table yet: it needs a stack-aware equip path
-  (tusharsaxena/OutfitterReborn#1). The slot has a flyout arrow (Forever smoke feedback 3), so ammo can be
-  equipped from the sheet, but no outfit saves or wears it.
+  (tusharsaxena/OutfitterReborn#1). The slot's arrow, and a click on the empty slot, open the addon's own
+  ammo picker (the owner's report, 2026-11-28; Blizzard's flyout lists no ammo), so ammo can be switched
+  from the sheet out of combat, but no outfit saves or wears it. The picker cannot empty the slot: the
+  client keeps the slot naming a type while any of it is carried (`forever-quirks.md`).
 - **The sheet is the player's to open** (the owner's report, 2026-11-09). Forever's CharacterFrame
   OnShow compares the player frame's secret health values, which raises when addon code opened it.
   `/or show`, the *Toggle outfit window* key, the minimap menu's and the broker menu's *Open outfit

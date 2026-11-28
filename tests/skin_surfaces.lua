@@ -30,7 +30,8 @@
 -- KIT REVISION 58 (SD-SK-OR, LibKa0s#97). Every family a surface draws must move on its own, and
 -- every StatusBar must draw and move its fill. The progress fill is a data fill, so it names
 -- `expect = "texture"`. No surface needs `hold`: an item row's quality color reads the skin's q.*
--- tokens, and the one host-look surface, the sheet button (DEV-SKIN-SHEET-BUTTON), is not declared.
+-- tokens, and the host-look surfaces, the sheet button (DEV-SKIN-SHEET-BUTTON) and WoW Forever's ammo
+-- picker (DEV-SKIN-AMMO-PICKER, Blizzard's flyout art), are not declared.
 -- No StatusBar is drawn clear, so none takes `clear = true`. The audit's rows added three (the
 -- progress track, a dialog button's label and a checkbox label; SD-SK-OR.1 to .3).
 --

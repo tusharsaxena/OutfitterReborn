@@ -546,7 +546,7 @@ The owner's third pass. On both clients unless a row says WoW Forever.
 | # | Do | See |
 |---|---|---|
 | FS3-1 (Forever) | Open the character sheet on the stock sheet and on Chonky | The main hand's and the ranged slot's arrows point left and their flyouts open left; the off-hand's and the ammo slot's point right and open right. Each arrow wears the side art at the side's size |
-| FS3-2 (Forever) | Look at the ammo slot; click its arrow; pick ammo from the flyout | The ammo slot has an arrow like the others. Its flyout lists your ammo and equips the pick. Ammo is not saved into outfits yet (tusharsaxena/OutfitterReborn#1) |
+| FS3-2 (Forever) | Look at the ammo slot; click its arrow; pick ammo from the list | The ammo slot has an arrow like the others. Superseded by AMMO-1 to AMMO-6 (2026-11-28): the arrow opens the addon's own ammo picker, not Blizzard's flyout, which lists no ammo. Ammo is not saved into outfits yet (tusharsaxena/OutfitterReborn#1) |
 | FS3-3 | Open the outfit window; compare it with a pre-change screenshot | The window is 1.25x its old size and still docks flush at the sheet's edge and top |
 | FS3-4 | Show the outfit bar with Master scale at 1.0 | The bar draws as it did at 1.25 before. Master scale still multiplies it |
 | FS3-5 | Hover the *Ka0s Outfitter Reborn: Outfits* broker; move onto the menu; move off both | The outfit menu drops under the display, stays while the pointer is on the display or the menu, and closes a moment after it leaves both. It ends with the two click hints |
@@ -570,7 +570,7 @@ The owner's third pass. On both clients unless a row says WoW Forever.
 
 | # | Do | See |
 |---|---|---|
-| FS3-11 (Forever) | On Chonky, the stock sheet and EllesmereUI, open the ammo slot's flyout; then open another slot's | The yellow glow hugs the ammo slot, centered and only slightly larger than it, on every sheet. Another slot's glow is as before |
+| FS3-11 (Forever) | Retired 2026-11-28 | Blizzard's flyout no longer opens on the ammo slot (the ammo picker replaced it, AMMO-1), so its glow is never placed there |
 
 ## 22. Window chrome: the docked test strip and the footer (LibKa0s v1.105.0 adoption, AD-88-OR, AD-89-OR, 2026-11-17)
 
@@ -702,3 +702,19 @@ The owner picked the help and missing-icon glyphs (Ka0sAddonsCommonTasks round 6
 |---|---|---|
 | GLYPH-1 | Open an outfit whose slot state is unknown (a slot the outfit neither sets nor clears): the slot's unknown mark is an outlined ring with a question mark (game-icons `gi:help`), not the bare **?**. | |
 | FLY-TAINT-1 (Retail, then Forever) | With BugSack on, open the character sheet and a ring or trinket slot's flyout out of combat: note the order. Then pull a target dummy and, in combat, open a weapon slot's flyout and click another weapon in it; do the same with a trinket. Out of combat, turn Quick slots off and open a flyout again. | No `ADDON_ACTION_BLOCKED ... PickupInventoryItem()` naming OutfitterReborn, and the swap happens (or the game's own "can't do that in combat" for armor). The flyout still lists by upgrade track, then item level, with "place in bags" last and items you already wear left out (a gap may remain at the end of the last row). With Quick slots off, the flyout is the game's own order with every item. | |
+
+## Ammo picker (WoW Forever, 2026-11-28)
+
+The owner's report: the ammo slot's arrow did nothing on an empty slot, and Blizzard's flyout never
+listed ammo (`GetInventoryItemsForSlot(0, t)` answers none). The arrow now opens a picker of the addon's
+own, drawn as Blizzard's flyout (DEV-SKIN-AMMO-PICKER). A hunter with a gun or bow and two or more kinds of ammo in
+the bags. Run AMMO-1 to AMMO-3 on the stock sheet, on ChonkyCharacterSheet and on EllesmereUI. Unrun.
+
+| ID | Check | Result |
+|---|---|---|
+| AMMO-1 | Ammo slot empty, ammo in the bags: click the ammo slot's arrow. Then open another slot's flyout beside it to compare. | The picker opens to the right of the arrow and looks like the other slots' flyouts: the same parchment frame, item buttons and spacing, and the gold glow hugging the ammo slot at its size (on Chonky's larger slot too). One button per kind of ammo your ranged weapon fires (a gun bullets, a bow or crossbow arrows), each with its total count, best item level first. The arrow wears its open art. | |
+| AMMO-2 | Click a button in the panel. | That ammo goes into the ammo slot (the slot shows its icon and count), the panel closes, and nothing is left on the cursor. | |
+| AMMO-3 | With ammo in the slot, open the panel again and hover each button; then pick the other kind. With the outfit window open, open the panel and another slot's flyout. | The worn kind is left out, as the other flyouts leave the worn item out. The tooltip is the item's, beside the panel. Picking the other kind switches the slot to it. With the window open the panel's rim takes the same tint as the other flyouts' rim, and its own gold back when the window closes. | |
+| AMMO-4 | Ammo slot empty: click the slot itself, not the arrow. Then click the arrow twice. | The slot click opens the panel. The arrow's first click closes it, the second opens it again. | |
+| AMMO-5 | Open the panel; pull a target dummy. In combat, click the arrow. | Entering combat closes the panel. In combat the arrow prints *Ammo can't be changed in combat* and opens nothing. No `ADDON_ACTION_BLOCKED` naming OutfitterReborn. | |
+| AMMO-6 | Open the panel, then open another slot's flyout; open it again and close the character sheet; bank or sell all your ammo and click the arrow. | Another slot's flyout closes the panel, and so does closing the sheet. With no ammo carried the arrow prints *No ammo in your bags*; with only the worn kind carried, *No other ammo in your bags*. | |

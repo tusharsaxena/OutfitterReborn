@@ -159,6 +159,7 @@ the diagnostics sections.
 | `modules/Broker.lua` | `NS.Broker`: the `OutfitterRebornOutfits` LibDataBroker data source, the old addon's outfit switcher (a second object beside the launcher; [ARCHITECTURE.md](ARCHITECTURE.md#documented-deviations)): its outfit menu on hover, the sheet with the window on a left-click through a secure click over the display (`OutfitterRebornBrokerClick`), the settings on a right-click |
 | `modules/QuickSlots.lua` | `NS.QuickSlots`: the equipment flyout hooks; while the paper doll shows (Forever smoke feedback S7), every slot's arrow and every flyout turned outward (Retail: the left column's drawer and a horizontal flyout level with its slot; Forever: by F-UI's own rules); the drawer gated by `window.drawer`; the flyout's rim tinted in the skin's `win.border` while the window holds it, Blizzard's color restored when it lets go (`QS.TintSync`, the deviation `DEV-SKIN-FLYOUT-TINT`) |
 | `modules/QuickSlots_Sort.lua` | The flyout's upgrade-track sort (extends `NS.QuickSlots`) |
+| `modules/QuickSlots_Ammo.lua` | WoW Forever's ammo picker: the carried ammo listed and equipped out of combat, opened by the ammo slot's arrow and empty-slot click (extends `NS.QuickSlots`) |
 | `modules/Preview.lua` | `NS.Preview`: test mode, the sample outfits on the bar and the window |
 | `modules/Api.lua` | The public API, `NS.API.v1`, published as `OutfitterReborn.API.v1` ([ARCHITECTURE.md](ARCHITECTURE.md#public-api)) |
 | `modules/Diagnostics.lua` | This addon's sections of `/or diagnostics` (debug-logging-§14) |

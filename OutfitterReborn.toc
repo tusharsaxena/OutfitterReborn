@@ -147,6 +147,7 @@ modules\Bar_Buttons.lua
 modules\Broker.lua
 modules\QuickSlots.lua
 modules\QuickSlots_Sort.lua
+modules\QuickSlots_Ammo.lua
 modules\Preview.lua
 modules\Api.lua
 modules\Diagnostics.lua

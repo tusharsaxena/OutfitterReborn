@@ -162,11 +162,15 @@ anchored by each slot's `flyoutDirection`. The drawer never writes that field:
 - the main hand and ranged slot open left, the off-hand and ammo slot right;
 - the `EquipmentFlyout_UpdateItems` post-hook anchors `buttonFrame` by F-UI's formula for that
   direction (`Camelot/EquipmentFlyout.lua:420-433`);
-- the ammo slot, which F-UI gives no arrow, gets one made from Blizzard's
-  `EquipmentFlyoutPopoutButtonTemplate`, set as the slot's `popoutButton` so Blizzard's lock and close
-  logic finds it. That field is the one value this addon writes on a Blizzard frame. Its open
-  flyout's glow (`EquipmentFlyoutFrame.Highlight`) is sized and centered on the 27 px slot, and
-  Blizzard's point comes back for the next slot.
+- the ammo slot, which F-UI gives no arrow, gets a button of the addon's own, set as the slot's
+  `popoutButton` so the drawer places and paints it with the others. That field is the one value this
+  addon writes on a Blizzard frame. It is not made from `EquipmentFlyoutPopoutButtonTemplate`: that
+  template's OnLoad adds the button to Blizzard's popout list, so `EquipmentFlyoutPopoutButton_HideAll`
+  would read and write a lock this addon set, and its OnClick would run Blizzard's flyout. The arrow
+  opens `modules/QuickSlots_Ammo.lua`'s picker instead (Blizzard's flyout lists no ammo:
+  `GetInventoryItemsForSlot(0, t)` answers none, the owner's probe 2026-11-28). The picker is an addon
+  frame; its pick is a cursor write (`PickupContainerItem`, then `PickupInventoryItem(0)`) from addon
+  code, so it is refused in combat lockdown, and the picker closes on `PLAYER_REGEN_DISABLED`.
 
 These are Show, Hide, anchor, texcoord, atlas, size and rotation writes on the arrows,
 `buttonFrame` and the glow, none of them protected. Every one is **out of combat only** (each hook

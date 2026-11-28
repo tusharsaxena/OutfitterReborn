@@ -156,6 +156,7 @@ local SUITES = {
 
     { name = "test_quickslots" },
     { name = "test_drawer" },
+    { name = "test_ammo_picker" },
 
     { name = "test_equip_bracket" },
 

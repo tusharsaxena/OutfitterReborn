@@ -24,7 +24,9 @@ local _, NS = ...
 --
 -- BUILT ONCE, ON THE FIRST STAND-UP (Resume, which the login's OnEnable runs; design §5.12). The hooks
 -- cannot be removed, so a stand-down leaves them installed and every body reads the gate first: the
--- latch, then the profile's `quickSlots.enabled` (H26). QuickSlots owns no frames, events or timers.
+-- latch, then the profile's `quickSlots.enabled` (H26). QuickSlots owns no events or timers; its one
+-- frame on WoW Forever is the ammo slot's arrow, and modules/QuickSlots_Ammo.lua's picker listens only
+-- while it is open.
 --
 -- THE DRAWER (sheet and window feedback design G8, smoke round 2 design G3; Forever smoke feedback S7,
 -- owner 2026-11-09: no longer only while the outfit window shows). While the paper doll is on screen
@@ -78,7 +80,8 @@ local _, NS = ...
 -- as nil.
 --
 -- THE BORDER TINT (smoke round 3 E1): the one Blizzard frame this addon colors, under the accepted
--- deviation DEV-SKIN-FLYOUT-TINT; see "the flyout's border tint" below.
+-- deviation DEV-SKIN-FLYOUT-TINT; see "the flyout's border tint" below. The ammo picker's strips
+-- (DEV-SKIN-AMMO-PICKER, modules/QuickSlots_Ammo.lua) follow the same tint.
 --
 -- CALLS (at call time; design §12): NS.Dock.IsVisible (the tint), NS.Dock.DollVisible (the drawer),
 -- NS.SlotEnables.COLUMN, NS.Skin.Color and
@@ -210,6 +213,7 @@ end
 -- would then only unlock it.
 local function postClick(button)
     if not active() then return end
+    if slotOf[button] == "AmmoSlot" then return QS.Ammo.SlotClick(button) end
     local popout = button.popoutButton
     if flyoutOpenOn(button) then
         if popout and popout.flyoutLocked then
@@ -275,12 +279,13 @@ local UP_ART = { normal = "UI-Character-Info-Button-PullUp", open = "UI-Characte
                  pressed = "UI-Character-Info-Button-PullUp-Pressed", w = 43, h = 20 }
 local ART = { LEFT = SIDE_ART, RIGHT = SIDE_ART, UP = UP_ART, DOWN = UP_ART }
 -- The ammo slot (Forever smoke feedback 3): F-UI gives CharacterAmmoSlot no arrow
--- (Camelot/PaperDollFrame.xml:873-927), so the drawer makes one from Blizzard's own
--- EquipmentFlyoutPopoutButtonTemplate. Its click runs Blizzard's EquipmentFlyout_Show on the slot,
--- which lists ammo through PaperDollItemsFrame's flyoutSettings like any slot. The arrow is the
--- slot's `popoutButton` so Blizzard's lock and close logic finds it. Ammo is not part of an outfit
--- yet (tusharsaxena/OutfitterReborn#1): this is the flyout only.
-local AMMO_TEMPLATE = "EquipmentFlyoutPopoutButtonTemplate"
+-- (Camelot/PaperDollFrame.xml:873-927), so the drawer gives it one: a button of this addon's own,
+-- the slot's `popoutButton` so the drawer places and paints it like the others. Its click opens
+-- modules/QuickSlots_Ammo.lua's picker, never Blizzard's flyout, whose list has no ammo
+-- (GetInventoryItemsForSlot answers none for the slot: the owner's probe, 2026-11-28). It is not
+-- made from Blizzard's EquipmentFlyoutPopoutButtonTemplate, whose OnLoad would add it to Blizzard's
+-- popout list (HideAll would then write its lock) and whose OnClick runs Blizzard's flyout. Ammo is
+-- not part of an outfit yet (tusharsaxena/OutfitterReborn#1).
 local POP_OUT_GAP = 5             -- Camelot/PaperDollFrame.lua:1981-1987
 -- POP_OUT_DIRECTION_DATA's rotations (Camelot/EquipmentFlyout.lua:713-718): the baseline pi/2 added.
 local ROTATION = { LEFT = 0, RIGHT = math.pi, UP = 0, DOWN = math.pi }
@@ -566,20 +571,37 @@ local function isDesaturated(t)
     return type(t.IsDesaturated) == "function" and Secrets.PlainTruth(t:IsDesaturated()) == true
 end
 
--- Every tinted texture back to what it had, and forgotten.
-local function restoreRim()
+-- Every tinted texture not in `keep` back to what it had, and forgotten (all of them with no `keep`).
+local function restoreRim(keep)
     for t, was in pairs(tinted) do
-        t:SetDesaturated(was[5])
-        t:SetVertexColor(was[1], was[2], was[3], was[4])
-        tinted[t] = nil
+        if not (keep and keep[t]) then
+            t:SetDesaturated(was[5])
+            t:SetVertexColor(was[1], was[2], was[3], was[4])
+            tinted[t] = nil
+        end
     end
 end
 
--- Every rim texture in the skin's border color, each read first if it has not been.
-local function tintRim(flyout)
+-- The rim textures this addon holds now: the flyout's while tintWanted, and the ammo picker's strips
+-- while it is open with the window on screen (DEV-SKIN-AMMO-PICKER follows DEV-SKIN-FLYOUT-TINT).
+local function wantedRim()
+    local want = {}
+    local flyout = _G.EquipmentFlyoutFrame
+    if type(flyout) == "table" and tintWanted(flyout) then
+        for _, t in ipairs(rimTextures(flyout)) do want[t] = true end
+    end
+    local picker = QS.Ammo.RimTextures()
+    if #picker > 0 and not NS.IsStoodDown() and NS.Dock.IsVisible() == true then
+        for _, t in ipairs(picker) do want[t] = true end
+    end
+    return want
+end
+
+-- Every wanted rim texture in the skin's border color, each read first if it has not been.
+local function tintRim(want)
     local r, g, b, a = NS.Skin.Color(RIM_TOKEN)
     if r == nil then return restoreRim() end
-    for _, t in ipairs(rimTextures(flyout)) do
+    for t in pairs(want) do
         if not tinted[t] then
             local tr, tg, tb, ta = t:GetVertexColor()
             tinted[t] = { tr, tg, tb, ta, isDesaturated(t) }
@@ -589,59 +611,24 @@ local function tintRim(flyout)
     end
 end
 
---- Bring the flyout's rim in line with who holds it: the skin's border color while this addon does,
---- Blizzard's own otherwise. The flyout's updates, DrawerSync (the window's show and hide, the
---- stand-down) and a skin change call it. Never in combat lockdown.
+--- Bring the flyout's rim, and the ammo picker's, in line with who holds them: the skin's border
+--- color while this addon does, Blizzard's own otherwise. The flyout's updates, the picker's open,
+--- redraw and close, DrawerSync (the window's show and hide, the stand-down) and a skin change call
+--- it. Never in combat lockdown.
 function QS.TintSync()
     if not installed or locked() then return end
-    local flyout = _G.EquipmentFlyoutFrame
-    if type(flyout) == "table" and tintWanted(flyout) then return tintRim(flyout) end
-    restoreRim()
+    local want = wantedRim()
+    restoreRim(want)
+    if next(want) then tintRim(want) end
 end
 
--- THE AMMO HIGHLIGHT (Forever smoke feedback 5, owner 2026-11-09, 32.png). EquipmentFlyout_Show sizes
--- the open slot's glow (`EquipmentFlyoutFrame.Highlight`) to 50 x 50 and puts it at the flyout's LEFT
--- -4 (Camelot/EquipmentFlyout.lua:259-262, EquipmentFlyout.xml:58-66): art made for a 40 px slot. The
--- ammo slot is 27 px (Camelot/PaperDollFrame.xml:874) and a sheet addon may resize it (Chonky), so on
--- it the glow sits too large and off center. On the ammo slot the glow takes the slot's size by the
--- art's own 50 : 40 and centers on it; on any other slot Blizzard's point comes back (Show adds its
--- LEFT point without clearing, so the CENTER one must go).
-local GLOW_RATIO = 50 / 40
-local glowMoved = false
-
-local function glowScale(f)
-    local s = NS.SafeNumber(f:GetEffectiveScale(), 1)
-    return s > 0 and s or 1
-end
-
-local function fitGlow()
-    local flyout = _G.EquipmentFlyoutFrame
-    local glow = flyout and rawget(flyout, "Highlight")
-    local button = flyout and flyout.button
-    if type(glow) ~= "table" or not button then return end
-    if slotOf[button] == "AmmoSlot" then
-        local k = glowScale(button) / glowScale(flyout)
-        local w = NS.SafeNumber(button:GetWidth(), 0) * k
-        local h = NS.SafeNumber(button:GetHeight(), 0) * k
-        if w <= 0 or h <= 0 then return end
-        glow:ClearAllPoints()
-        glow:SetPoint("CENTER", button, "CENTER", 0, 0)
-        glow:SetSize(w * GLOW_RATIO, h * GLOW_RATIO)
-        glowMoved = true
-    elseif glowMoved then
-        local s = hostSettings(button)
-        glow:ClearAllPoints()
-        glow:SetPoint("LEFT", flyout, "LEFT", NS.SafeNumber(s.highlightOfsX, -4), NS.SafeNumber(s.highlightOfsY, 0))
-        glowMoved = false
-    end
-end
-
--- EquipmentFlyout_UpdateItems' post-hook.
+-- EquipmentFlyout_UpdateItems' post-hook. Blizzard's flyout opening on another slot closes the ammo
+-- picker, as it closes any other open flyout.
 local function onFlyoutUpdate()
     QS.ArrangeFlyout()
+    if QS.Ammo then QS.Ammo.Close() end
     if locked() then return end
     placeFlyout()
-    fitGlow()
     QS.TintSync()
 end
 
@@ -686,6 +673,14 @@ function QS.DrawerSync()
     placeFlyout()
     showArrows(want)
 end
+--- Paint `button`'s arrow again for its state (Forever, the drawer on): the ammo picker's open and
+--- close turn the ammo arrow's art, which no Blizzard handler repaints.
+--- @param button table a sheet slot
+function QS.PaintArrow(button)
+    if not installed or not drawerOn or not FOREVER_DRAWER or locked() then return end
+    local popout, dir = button.popoutButton, outDir(button)
+    if popout and dir then paintForeverArrow(popout, dir) end
+end
 --- Place the outward arrows again where they stand (Forever): a sheet addon may hide the slots'
 --- BorderFrame art after the doll's OnShow (Chonky sets its sheet up from its own hook), which moves
 --- S3's flush rule. Dock's next-frame sheet check calls it. Never in lockdown; a no-op off the drawer.
@@ -703,19 +698,16 @@ end
 
 -- ── the lifecycle ─────────────────────────────────────────────────────────────────────────────
 
--- Whether the client has XML template `name`.
-local function hasTemplate(name)
-    local xml = _G.C_XMLUtil
-    return type(xml) == "table" and type(xml.GetTemplateInfo) == "function" and xml.GetTemplateInfo(name) ~= nil
-end
-
--- Forever: the ammo slot's own arrow, made once from Blizzard's template (see AMMO_TEMPLATE).
+-- Forever: the ammo slot's own arrow, made once (see "The ammo slot" above). Hidden until the drawer
+-- shows the arrows; its click toggles the ammo picker.
 local function ammoArrow()
     local ammo = _G.CharacterAmmoSlot
     if not FOREVER_DRAWER or type(ammo) ~= "table" then return nil end
-    if not rawget(ammo, "popoutButton") and hasTemplate(AMMO_TEMPLATE) then
-        local ok, pop = pcall(CreateFrame, "Button", "OutfitterRebornAmmoPopout", ammo, AMMO_TEMPLATE)
-        if ok and pop then rawset(ammo, "popoutButton", pop) end
+    if not rawget(ammo, "popoutButton") then
+        local pop = CreateFrame("Button", "OutfitterRebornAmmoPopout", ammo)
+        pop:Hide()
+        pop:SetScript("OnClick", function() QS.Ammo.Toggle() end)
+        rawset(ammo, "popoutButton", pop)
     end
     return ammo
 end
@@ -747,6 +739,7 @@ end
 --- The lifecycle's stand-down (design §5.12): the hooks stay installed and their bodies read the
 --- latch; the drawer goes back to Blizzard's.
 function QS.Suspend()
+    QS.Ammo.Close()
     QS.DrawerSync()
 end
 

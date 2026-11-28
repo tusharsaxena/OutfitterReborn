@@ -698,19 +698,19 @@ test("drawer (Forever): a BorderFrame hidden after the doll's show is caught by 
     assertEqual(p[1], "RIGHT"); assertEqual(p[4], 0)
 end)
 
-test("drawer (Forever): the ammo slot gets its own arrow from Blizzard's template, opening right", function()
+test("drawer (Forever): the ammo slot gets an arrow of this addon's own, opening right", function()
     if not FOREVER then T.skip(FOREVER_ONLY) end
     local NS, M, state = drawerInstance({ mutate = function(M)
         M.CharacterAmmoSlot = M.CreateFrame("Button", "CharacterAmmoSlot", M.PaperDollItemsFrame)
-        M.C_XMLUtil = { GetTemplateInfo = function(name)
-            if name == "EquipmentFlyoutPopoutButtonTemplate" then return { type = "Button" } end
-        end }
     end })
     local ammo = M.CharacterAmmoSlot
     local pop = rawget(ammo, "popoutButton")
     -- red under: no ammo arrow (F-UI's CharacterAmmoSlot has none).
     assertTrue(pop ~= nil, "the ammo slot has an arrow")
-    assertEqual(pop.__template, "EquipmentFlyoutPopoutButtonTemplate")
+    -- red under: Blizzard's EquipmentFlyoutPopoutButtonTemplate, whose OnClick opens Blizzard's
+    -- flyout (no ammo in its list: the owner's arrow that did nothing, 2026-11-28).
+    assertEqual(pop.__template, nil, "not Blizzard's popout template")
+    assertEqual(type(pop:GetScript("OnClick")), "function", "its click is the picker's")
     setWindow(NS, state, true)
     assertTrue(pop:IsShown(), "shown with the doll")
     local p = pop.__pts and pop.__pts[#pop.__pts]
@@ -720,29 +720,20 @@ test("drawer (Forever): the ammo slot gets its own arrow from Blizzard's templat
     assertFalse(pop:IsShown(), "hidden with the doll")
 end)
 
-test("drawer (Forever): the ammo slot's open glow takes the slot's size and centers on it", function()
+test("drawer (Forever): the ammo arrow wears the open art while the picker is open", function()
     if not FOREVER then T.skip(FOREVER_ONLY) end
     local NS, M, state = drawerInstance({ mutate = function(M)
         M.CharacterAmmoSlot = M.CreateFrame("Button", "CharacterAmmoSlot", M.PaperDollItemsFrame)
-        rawset(M.CharacterAmmoSlot, "GetWidth", function() return 27 end)
-        rawset(M.CharacterAmmoSlot, "GetHeight", function() return 27 end)
-        M.C_XMLUtil = { GetTemplateInfo = function(name)
-            if name == "EquipmentFlyoutPopoutButtonTemplate" then return { type = "Button" } end
-        end }
+        rawset(M.CharacterAmmoSlot, "GetID", function() return 0 end)
+        M.__gear:load({ bags = { [0] = { items = { [1] = { key = "ammo_bullet", count = 200 } } } } })
     end })
     setWindow(NS, state, true)
-    local flyout = M.EquipmentFlyoutFrame
-    local glow = region({ SetSize = function(self, w, h) self.w, self.h = w, h end })
-    rawset(flyout, "Highlight", glow)
-    local ammo = M.CharacterAmmoSlot
-    flyout.button = ammo
-    flyout:Show()
-    M.EquipmentFlyout_UpdateItems()
-    -- red under: Blizzard's 50 x 50 at the flyout's LEFT -4 (made for a 40 px slot; 32.png).
-    assertEqual(glow.pts[#glow.pts][1], "CENTER"); assertEqual(glow.pts[#glow.pts][2], ammo)
-    assertEqual(glow.w, 27 * 50 / 40); assertEqual(glow.h, 27 * 50 / 40)
-    -- Another slot next: Blizzard's own point back, alone.
-    openFlyout(M, "HeadSlot")
-    assertEqual(#glow.pts, 1, "the CENTER point was left beside Blizzard's")
-    assertEqual(glow.pts[1][1], "LEFT"); assertEqual(glow.pts[1][2], flyout); assertEqual(glow.pts[1][4], -4)
+    local pop = rawget(M.CharacterAmmoSlot, "popoutButton")
+    local atlas
+    rawset(pop, "SetNormalAtlas", function(_, a) atlas = a end)
+    pop:__fire("OnClick")
+    -- red under: no repaint on the picker's open (no Blizzard handler repaints this arrow).
+    assertEqual(atlas, "UI-Character-Info-Button-PullSide-Open")
+    pop:__fire("OnClick")
+    assertEqual(atlas, "UI-Character-Info-Button-PullSide")
 end)
